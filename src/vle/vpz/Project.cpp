@@ -35,9 +35,7 @@ namespace vpz {
 
 Project::Project()
   : m_version(vle::string_version())
-  , m_instance(-1)
-{
-}
+{}
 
 void
 Project::write(std::ostream& out) const

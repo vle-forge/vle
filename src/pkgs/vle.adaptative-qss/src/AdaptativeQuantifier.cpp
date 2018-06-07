@@ -96,7 +96,7 @@ public:
     }
 
     ~AdaptativeQuantifier() override // This is mandatory
-    {}
+    = default;
 
     vd::Time init(vd::Time /* time */) override
     {
@@ -321,7 +321,7 @@ private:
 
     void update_thresholds()
     {
-        double step_number = static_cast<double>(m_step_number);
+        auto step_number = static_cast<double>(m_step_number);
 
         m_upthreshold = m_offset + m_step_size * (step_number + 1);
         m_downthreshold = m_offset + m_step_size * (step_number - 1);
@@ -329,16 +329,17 @@ private:
 
     void update_thresholds(double factor)
     {
-        double step_number = static_cast<double>(m_step_number);
+        auto step_number = static_cast<double>(m_step_number);
 
-        m_upthreshold = m_offset + m_step_size * (step_number + (1 - factor));
+        m_upthreshold =
+          m_offset + m_step_size * (step_number + (1 - factor));
         m_downthreshold =
           m_offset + m_step_size * (step_number - (1 - factor));
     }
 
     void update_thresholds(double factor, Direction d)
     {
-        double step_number = static_cast<double>(m_step_number);
+        auto step_number = static_cast<double>(m_step_number);
 
         if (UP == d) {
             m_upthreshold =

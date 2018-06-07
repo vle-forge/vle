@@ -837,7 +837,7 @@ Package::getExperiments(VLE_PACKAGE_TYPE type) const
             if (it->is_file()) {
                 std::string ext = it->path().extension();
                 if (ext == ".vpz") {
-                    result.push_back(it->path().string());
+                    result.emplace_back(it->path().string());
                 }
             } else if (it->is_directory()) {
                 stack.push(it->path());
@@ -869,7 +869,7 @@ getLibrariesAbsolutePath(const std::string& path)
                     if (ext == ".so") {
 #endif
 
-                        result.push_back(it->path().string());
+                        result.emplace_back(it->path().string());
                     } else if (it->is_directory()) {
                         stack.push(it->path());
                     }
@@ -1032,7 +1032,7 @@ template<typename T>
 static void
 getPlugins(std::string prefix_path, T& lst)
 {
-    int e = static_cast<int>(PluginType::PLUG_COUNT);
+    auto e = static_cast<int>(PluginType::PLUG_COUNT);
 
     for (int i = 0; i < e; ++i) {
         try {
@@ -1065,7 +1065,7 @@ Package::fillBinaryContent(std::vector<std::string>& pkgcontent)
 
     try {
         tmp = getExperiments();
-        pkgcontent.push_back("-- experiments:");
+        pkgcontent.emplace_back("-- experiments:");
         std::sort(tmp.begin(), tmp.end());
 
         for (auto& elem : tmp)

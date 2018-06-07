@@ -28,6 +28,7 @@
 #define VLE_MANAGER_TYPES_HPP
 
 #include <string>
+#include <utility>
 
 namespace vle {
 namespace manager {
@@ -46,22 +47,14 @@ namespace manager {
  */
 struct Error
 {
-    Error()
-      : code(0)
-    {
-    }
+    Error() = default;
 
-    Error(int code, const std::string& message)
+    Error(int code, std::string message)
       : code(code)
-      , message(message)
-    {
-    }
+      , message(std::move(message))
+    {}
 
-    Error(const Error& error)
-      : code(error.code)
-      , message(error.message)
-    {
-    }
+    Error(const Error& error) = default;
 
     Error& operator=(const Error& other)
     {
@@ -73,11 +66,9 @@ struct Error
         return *this;
     }
 
-    ~Error()
-    {
-    }
+    ~Error() = default;
 
-    int code;
+    int code{ 0 };
     std::string message;
 };
 
@@ -159,7 +150,8 @@ operator|(SimulationOptions lhs, SimulationOptions rhs)
                                           static_cast<unsigned>(rhs));
 }
 
-inline SimulationOptions operator&(SimulationOptions lhs, SimulationOptions rhs)
+inline SimulationOptions operator&(SimulationOptions lhs,
+                                   SimulationOptions rhs)
 {
     return static_cast<SimulationOptions>(static_cast<unsigned>(lhs) &
                                           static_cast<unsigned>(rhs));

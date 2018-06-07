@@ -28,6 +28,7 @@
 #define VLE_GRAPH_COUPLED_MODEL_HPP
 
 #include <map>
+#include <utility>
 #include <vector>
 #include <vle/DllDefines.hpp>
 #include <vle/vpz/BaseModel.hpp>
@@ -546,9 +547,9 @@ public:
      */
     struct UpdateDynamics
     {
-        UpdateDynamics(const std::string& oldname, const std::string& newname)
-          : oldname(oldname)
-          , newname(newname)
+        UpdateDynamics(std::string  oldname, std::string  newname)
+          : oldname(std::move(oldname))
+          , newname(std::move(newname))
         {}
 
         inline void operator()(const ModelList::value_type& value)
@@ -567,8 +568,8 @@ public:
      */
     struct PurgeDynamics
     {
-        PurgeDynamics(const std::set<std::string>& dynamics)
-          : dynamics(dynamics)
+        PurgeDynamics(std::set<std::string>  dynamics)
+          : dynamics(std::move(dynamics))
         {}
 
         inline void operator()(const ModelList::value_type& value)
@@ -586,10 +587,10 @@ public:
      */
     struct UpdateObservable
     {
-        UpdateObservable(const std::string& oldname,
-                         const std::string& newname)
-          : oldname(oldname)
-          , newname(newname)
+        UpdateObservable(std::string  oldname,
+                         std::string  newname)
+          : oldname(std::move(oldname))
+          , newname(std::move(newname))
         {}
 
         inline void operator()(const ModelList::value_type& value)
@@ -608,8 +609,8 @@ public:
      */
     struct PurgeObservable
     {
-        PurgeObservable(const std::set<std::string>& observables)
-          : observables(observables)
+        PurgeObservable(std::set<std::string>  observables)
+          : observables(std::move(observables))
         {}
 
         inline void operator()(const ModelList::value_type& value)
@@ -627,10 +628,10 @@ public:
      */
     struct UpdateConditions
     {
-        UpdateConditions(const std::string& oldname,
-                         const std::string& newname)
-          : oldname(oldname)
-          , newname(newname)
+        UpdateConditions(std::string  oldname,
+                         std::string  newname)
+          : oldname(std::move(oldname))
+          , newname(std::move(newname))
         {}
 
         inline void operator()(const ModelList::value_type& value)
@@ -649,8 +650,8 @@ public:
      */
     struct PurgeConditions
     {
-        PurgeConditions(const std::set<std::string>& conditions)
-          : conditions(conditions)
+        PurgeConditions(std::set<std::string>  conditions)
+          : conditions(std::move(conditions))
         {}
 
         inline void operator()(const ModelList::value_type& value)

@@ -44,13 +44,7 @@ Vpz::Vpz(const std::string& filename)
     parseFile(filename);
 }
 
-Vpz::Vpz(const Vpz& vpz)
-  : Base(vpz)
-  , m_isGzip(vpz.m_isGzip)
-  , m_filename(vpz.m_filename)
-  , m_project(vpz.m_project)
-{
-}
+Vpz::Vpz(const Vpz& /*vpz*/) = default;
 
 void
 Vpz::write(std::ostream& out) const

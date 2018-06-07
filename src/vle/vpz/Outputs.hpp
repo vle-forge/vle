@@ -59,15 +59,13 @@ public:
      * @brief Build an empty Outputs.
      */
     Outputs()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Outputs() override
-    {
-    }
+    = default;
 
     /**
      * @brief Write the XML representation of this class.

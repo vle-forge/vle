@@ -68,15 +68,13 @@ public:
      * @brief Build a new Dynamics.
      */
     Dynamics()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Dynamics() override
-    {
-    }
+    = default;
 
     /**
      * @brief A operator to retrieve the list of keys

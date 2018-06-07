@@ -29,6 +29,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 #include <vle/DllDefines.hpp>
 
@@ -161,8 +162,8 @@ public:
      *
      * @param buffer The template, can be empty.
      */
-    Template(const std::string& buffer = std::string())
-      : buffer_(buffer)
+    Template(std::string  buffer = std::string())
+      : buffer_(std::move(buffer))
     {
     }
 

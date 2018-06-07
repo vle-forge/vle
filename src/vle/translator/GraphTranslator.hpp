@@ -86,7 +86,7 @@ public:
         bool directed;
     };
 
-    graph_generator(const parameter& params);
+    graph_generator(parameter  params);
 
     graph_metrics metrics() const;
 

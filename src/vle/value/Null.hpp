@@ -43,25 +43,18 @@ public:
     /**
      * @brief Build a Null object.
      */
-    Null()
-    {
-    }
+    Null() = default;
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    Null(const Null& value)
-      : Value(value)
-    {
-    }
+    Null(const Null& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Null() override
-    {
-    }
+    ~Null() override = default;
 
     ///
     ////

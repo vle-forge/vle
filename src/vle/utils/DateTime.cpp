@@ -97,12 +97,12 @@ intern_aMonth(int year, int month) noexcept
 
 struct intern_date
 {
-    int myear;
-    int mmonth;
-    int mday;
-    int mhours;
-    int mminutes;
-    int mseconds;
+    int myear{ 1400 };
+    int mmonth{ 1 };
+    int mday{ 1 };
+    int mhours{ 0 };
+    int mminutes{ 0 };
+    int mseconds{ 0 };
 
     enum STR_FORMAT
     {
@@ -111,14 +111,7 @@ struct intern_date
         hms       //"%H:%M:%S"
     };
 
-    intern_date() noexcept
-      : myear(1400)
-      , mmonth(1)
-      , mday(1)
-      , mhours(0)
-      , mminutes(0)
-      , mseconds(0)
-    {}
+    intern_date() noexcept = default;
 
     intern_date(int year, int month, int day, double partofday) noexcept
       : myear(year)
@@ -196,7 +189,7 @@ struct intern_date
         if (toparse == extended) {
             // parse "%Y-%m-%d %H:%M:%S"
             try {
-                std::regex regex("([^\\s]+)\\s([^\\s]+)");
+                std::regex regex(R"(([^\s]+)\s([^\s]+))");
                 std::sregex_iterator next(date.begin(), date.end(), regex);
                 std::sregex_iterator end;
 
@@ -279,7 +272,8 @@ struct intern_date
         int B = 274277;
         int C = -38;
 
-        int f = static_cast<int>(J + j + (((4 * J + B) / 146097) * 3) / 4 + C);
+        auto f =
+          static_cast<int>(J + j + (((4 * J + B) / 146097) * 3) / 4 + C);
         int e = r * f + v;
         int g = (e % p) / r;
         int h = u * g + w;
@@ -377,7 +371,7 @@ struct intern_date
 
     double julianDay() const noexcept
     {
-        double res = static_cast<double>(julianDayNumber());
+        auto res = static_cast<double>(julianDayNumber());
         res += static_cast<double>(mhours) / 24.0;
         res += static_cast<double>(mminutes) / 1440.0;
         res += static_cast<double>(mseconds) / 86400.0;
@@ -420,7 +414,7 @@ struct intern_date
     {
         auto julianbegin =
           static_cast<int>(intern_date(myear, 1, 1, 0).julianDay());
-        int juliantoday = static_cast<int>(julianDay());
+        auto juliantoday = static_cast<int>(julianDay());
         int day = (julianbegin + 3) % 7;
         int week = (juliantoday + day - julianbegin + 4) / 7;
 

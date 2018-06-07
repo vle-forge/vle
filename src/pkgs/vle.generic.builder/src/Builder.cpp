@@ -351,8 +351,7 @@ public:
     }
 
     ~Builder() override
-    {
-    }
+    = default;
 };
 
 DECLARE_EXECUTIVE(Builder)

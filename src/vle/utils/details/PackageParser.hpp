@@ -94,19 +94,17 @@ public:
     bool empty() const;
 
 private:
-    PackageParser(const PackageParser&);
-    PackageParser& operator=(const PackageParser&);
+    PackageParser(const PackageParser&) = delete;
+    PackageParser& operator=(const PackageParser&) = delete;
 
     Packages m_packages; /** The list of extracted packages. */
 };
 
 inline PackageParser::PackageParser()
-{
-}
+= default;
 
 inline PackageParser::~PackageParser()
-{
-}
+= default;
 
 inline Packages::iterator
 PackageParser::begin()

@@ -33,8 +33,7 @@ namespace vle {
 namespace vpz {
 
 ModelPortList::~ModelPortList()
-{
-}
+= default;
 
 void
 ModelPortList::add(BaseModel* model, const std::string& portname)

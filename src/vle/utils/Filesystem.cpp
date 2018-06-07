@@ -26,6 +26,7 @@
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Filesystem.hpp>
@@ -51,16 +52,9 @@
 namespace vle {
 namespace utils {
 
-Path::Path()
-  : m_type(native_path)
-  , m_absolute(false)
-{}
+Path::Path() = default;
 
-Path::Path(const Path& path)
-  : m_path(path.m_path)
-  , m_type(path.m_type)
-  , m_absolute(path.m_absolute)
-{}
+Path::Path(const Path& /*path*/) = default;
 
 Path::Path(Path&& path)
   : m_path(std::move(path.m_path))
@@ -218,7 +212,7 @@ Path::parent_path() const
 
     if (m_path.empty()) {
         if (!m_absolute)
-            result.m_path.push_back("..");
+            result.m_path.emplace_back("..");
     } else {
         size_t until = m_path.size() - 1;
         for (size_t i = 0; i < until; ++i)
@@ -238,8 +232,8 @@ Path::operator/(const Path& other) const
 
     Path result(*this);
 
-    for (size_t i = 0; i < other.m_path.size(); ++i)
-        result.m_path.push_back(other.m_path[i]);
+    for (const auto& i : other.m_path)
+        result.m_path.push_back(i);
 
     return result;
 }
@@ -303,13 +297,7 @@ Path::set(const std::string& str, path_type type)
 }
 
 Path&
-Path::operator=(const Path& path)
-{
-    m_type = path.m_type;
-    m_path = path.m_path;
-    m_absolute = path.m_absolute;
-    return *this;
-}
+Path::operator=(const Path& path) = default;
 
 Path&
 Path::operator=(Path&& path)
@@ -378,8 +366,8 @@ Path::create_directories() const
     } else {
         Path tmp;
 
-        for (auto it = cbegin(), end = cend(); it != end; ++it) {
-            tmp /= *it;
+        for (const auto& it : *this) {
+            tmp /= it;
             if (not tmp.exists())
                 if (not tmp.create_directory())
                     return false;
@@ -394,7 +382,7 @@ Path::current_path()
 {
 #if !defined(_WIN32)
     char temp[PATH_MAX];
-    if (::getcwd(temp, PATH_MAX) == NULL)
+    if (::getcwd(temp, PATH_MAX) == nullptr)
         throw FileError(_("Internal error in getcwd(): %s"), strerror(errno));
     return Path(temp);
 #else
@@ -588,8 +576,6 @@ Path::create_directories(const Path& p)
 
 DirectoryEntry::DirectoryEntry()
   : m_path()
-  , m_is_file(false)
-  , m_is_directory(false)
 {}
 
 const Path&
@@ -630,7 +616,7 @@ struct DirectoryIterator::Pimpl
     bool m_finish;
 
 public:
-    Pimpl(const Path& path)
+    Pimpl(Path path)
 #if defined(_WIN32)
       : hFind(INVALID_HANDLE_VALUE)
       , m_path(path)
@@ -659,7 +645,7 @@ public:
     }
 #else
       : m_directory(nullptr)
-      , m_path(path)
+      , m_path(std::move(path))
       , m_finish(false)
     {
         m_directory = opendir(m_path.string().c_str());

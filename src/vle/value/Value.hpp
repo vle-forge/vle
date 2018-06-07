@@ -90,8 +90,7 @@ public:
      * @brief Nothing to delete.
      */
     virtual ~Value()
-    {
-    }
+    = default;
 
     ///
     //// Abstract functions

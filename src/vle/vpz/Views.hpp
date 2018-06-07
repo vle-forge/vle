@@ -58,15 +58,13 @@ public:
      * @brief Build an empty Views.
      */
     Views()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Views() override
-    {
-    }
+    = default;
 
     /**
      * @brief Write into the stream the XML representation of these class.

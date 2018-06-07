@@ -29,6 +29,7 @@
 
 #include <map>
 #include <memory>
+#include <utility>
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Types.hpp>
 #include <vle/value/Matrix.hpp>
@@ -83,8 +84,8 @@ public:
      * @param location this string represents the name of the default
      * directory
      */
-    Plugin(const std::string& location)
-      : m_location(location)
+    Plugin(std::string  location)
+      : m_location(std::move(location))
     {
     }
 
@@ -92,8 +93,7 @@ public:
      * Nothing to delete.
      */
     virtual ~Plugin()
-    {
-    }
+    = default;
 
     /**
      * Return a clone of the \c value::Matrix.

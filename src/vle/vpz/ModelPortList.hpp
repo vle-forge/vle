@@ -46,8 +46,7 @@ public:
     using value_type = Values::value_type;
 
     ModelPortList()
-    {
-    }
+    = default;
 
     virtual ~ModelPortList();
 

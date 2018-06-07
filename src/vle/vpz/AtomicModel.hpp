@@ -72,8 +72,8 @@ public:
     AtomicModel(const std::string& name,
                 CoupledModel* parent,
                 const std::string& condition,
-                const std::string& dynamic,
-                const std::string& observable);
+                std::string  dynamic,
+                std::string  observable);
 
     AtomicModel(const AtomicModel& mdl);
 
@@ -88,8 +88,7 @@ public:
      * @brief Nothing to delete.
      */
     ~AtomicModel() override
-    {
-    }
+    = default;
 
     /**
      * @brief Return true, AtomicModel is an atomic model.

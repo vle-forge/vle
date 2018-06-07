@@ -70,15 +70,13 @@ public:
      * @brief Build a empty Observables.
      */
     Observables()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Observables() override
-    {
-    }
+    = default;
 
     /**
      * @brief A operator to retrieve the list of keys

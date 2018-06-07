@@ -59,7 +59,7 @@ public:
      * @brief Build a new Condition with only a name.
      * @param name The name of the condition.
      */
-    Condition(const std::string& name);
+    Condition(std::string  name);
 
     /**
      * @brief Copy constructor. All values are cloned.
@@ -76,8 +76,7 @@ public:
      * @brief Delete all the values attached to this Conditon.
      */
     ~Condition() override
-    {
-    }
+    = default;
 
     /**
      * @brief Add Condition informations to the stream.

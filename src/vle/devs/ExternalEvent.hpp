@@ -29,6 +29,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/value/Map.hpp>
@@ -53,15 +54,15 @@ public:
     ExternalEvent& operator=(ExternalEvent&& other) = default;
     ~ExternalEvent() = default;
 
-    ExternalEvent(const std::string& port)
-      : m_port(port)
+    ExternalEvent(std::string  port)
+      : m_port(std::move(port))
     {
     }
 
-    ExternalEvent(const std::shared_ptr<value::Value>& attributes,
-                  const std::string& port)
-      : m_attributes(attributes)
-      , m_port(port)
+    ExternalEvent(std::shared_ptr<value::Value>  attributes,
+                  std::string  port)
+      : m_attributes(std::move(attributes))
+      , m_port(std::move(port))
     {
     }
 

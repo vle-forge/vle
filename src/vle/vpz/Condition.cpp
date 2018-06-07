@@ -27,6 +27,7 @@
 #include <cassert>
 #include <ostream>
 #include <string>
+#include <utility>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
@@ -47,9 +48,9 @@
 namespace vle {
 namespace vpz {
 
-Condition::Condition(const std::string& name)
+Condition::Condition(std::string  name)
   : Base()
-  , m_name(name)
+  , m_name(std::move(name))
 {
 }
 

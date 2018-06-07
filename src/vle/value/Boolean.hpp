@@ -42,10 +42,7 @@ public:
     /**
      * @brief Build a Boolean object with a false as value.
      */
-    Boolean()
-      : m_value(false)
-    {
-    }
+    Boolean() = default;
 
     /**
      * @brief Build a Boolean object with a specified value.
@@ -53,25 +50,18 @@ public:
      */
     Boolean(bool value)
       : m_value(value)
-    {
-    }
+    {}
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    Boolean(const Boolean& value)
-      : Value(value)
-      , m_value(value.m_value)
-    {
-    }
+    Boolean(const Boolean& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Boolean() override
-    {
-    }
+    ~Boolean() override = default;
 
     ///
     ////
@@ -165,7 +155,7 @@ public:
     }
 
 private:
-    bool m_value;
+    bool m_value{ false };
 };
 
 inline const Boolean&

@@ -76,8 +76,7 @@ public:
     }
 
     ~Console() override
-    {
-    }
+    = default;
 
     void onParameter(const std::string& /*plugin*/,
                      const std::string& /*location*/,
@@ -223,7 +222,7 @@ public:
             std::vector<std::string> array(mColumns.size());
 
             {
-                Columns::iterator it = mColumns.begin();
+                auto it = mColumns.begin();
                 for (it = mColumns.begin(); it != mColumns.end(); ++it) {
                     array[it->second] = it->first;
                 }
@@ -232,7 +231,7 @@ public:
             std::cout << "time";
 
             if (not array.empty()) {
-                std::vector<std::string>::iterator it = array.begin();
+                auto it = array.begin();
                 while (it != array.end()) {
                     std::cout << *it;
                     ++it;
@@ -290,7 +289,7 @@ public:
         if (mValid.empty() or
             std::find(mValid.begin(), mValid.end(), true) != mValid.end()) {
             std::cout << trameTime << '\t';
-            for (value::Set::iterator it = mBuffer.begin();
+            for (auto it = mBuffer.begin();
                  it != mBuffer.end();
                  ++it) {
                 if (*it) {

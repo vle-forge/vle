@@ -43,15 +43,13 @@ public:
      * @brief Build a new In.
      */
     In()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~In() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -80,15 +78,13 @@ public:
      * @brief Build a new Out.
      */
     Out()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Out() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -117,15 +113,13 @@ public:
      * @brief Build a new Init.
      */
     Init()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Init() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -154,15 +148,13 @@ public:
      * @brief Build a new State.
      */
     State()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~State() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -191,15 +183,13 @@ public:
      * @brief Build a new Port.
      */
     Port()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Port() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.

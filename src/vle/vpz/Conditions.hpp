@@ -80,8 +80,7 @@ public:
      * @brief Nothing to delete.
      */
     ~Conditions() override
-    {
-    }
+    = default;
 
     /**
      * @brief A operator to retrieve the list of keys

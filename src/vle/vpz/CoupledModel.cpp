@@ -62,8 +62,8 @@ CoupledModel::CoupledModel(const CoupledModel& mdl)
     copyConnection(mdl.m_internalInputList, m_internalInputList);
     copyConnection(mdl.m_internalOutputList, m_internalOutputList);
 
-    ModelList::const_iterator it = mdl.getModelList().begin();
-    ModelList::iterator jt = m_modelList.begin();
+    auto it = mdl.getModelList().begin();
+    auto jt = m_modelList.begin();
     while (it != mdl.getModelList().end()) {
         const BaseModel* src = it->second;
         BaseModel* dst = jt->second;
@@ -184,7 +184,7 @@ CoupledModel::existInputConnection(const std::string& portsrc,
 {
     BaseModel* mdst = findModel(dst);
 
-    if (mdst == 0)
+    if (mdst == nullptr)
         return false;
 
     if (not mdst->existInputPort(portdst))
@@ -212,7 +212,7 @@ CoupledModel::existOutputConnection(const std::string& src,
 {
     BaseModel* msrc = findModel(src);
 
-    if (msrc == 0)
+    if (msrc == nullptr)
         return false;
 
     if (not msrc->existOutputPort(portsrc))
@@ -242,7 +242,7 @@ CoupledModel::existInternalConnection(const std::string& src,
     BaseModel* msrc = findModel(src);
     BaseModel* mdst = findModel(dst);
 
-    if (msrc == 0 or mdst == 0)
+    if (msrc == nullptr or mdst == nullptr)
         return false;
 
     if (not msrc->existOutputPort(portsrc))
@@ -272,7 +272,7 @@ CoupledModel::nbInputConnection(const std::string& portsrc,
 
     BaseModel* mdst = findModel(dst);
 
-    if (mdst == 0) {
+    if (mdst == nullptr) {
         return false;
     }
 
@@ -297,10 +297,10 @@ CoupledModel::nbInputConnection(const std::string& portsrc,
 
     return true;
 
-    ConnectionList::iterator iter = mdst->getInputPortList().find(portdst);
+    auto iter = mdst->getInputPortList().find(portdst);
     ModelPortList model(iter->second);
-    for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
-        if (it->first == this and it->second == portdst) {
+    for (auto & it : model) {
+        if (it.first == this and it.second == portdst) {
             nbConnections++;
         }
     }
@@ -316,7 +316,7 @@ CoupledModel::nbOutputConnection(const std::string& src,
     BaseModel* msrc = findModel(src);
     int nbConnections = 0;
 
-    if (msrc == 0) {
+    if (msrc == nullptr) {
         return 0;
     }
 
@@ -339,10 +339,10 @@ CoupledModel::nbOutputConnection(const std::string& src,
         return 0;
     }
 
-    ConnectionList::iterator iter = msrc->getOutputPortList().find(portsrc);
+    auto iter = msrc->getOutputPortList().find(portsrc);
     ModelPortList model(iter->second);
-    for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
-        if (it->first == this and it->second == portdst) {
+    for (auto & it : model) {
+        if (it.first == this and it.second == portdst) {
             nbConnections++;
         }
     }
@@ -360,7 +360,7 @@ CoupledModel::nbInternalConnection(const std::string& src,
     BaseModel* mdst = findModel(dst);
     int nbConnections = 0;
 
-    if (msrc == 0 or mdst == 0) {
+    if (msrc == nullptr or mdst == nullptr) {
         return 0;
     }
 
@@ -383,10 +383,10 @@ CoupledModel::nbInternalConnection(const std::string& src,
         return 0;
     }
 
-    ConnectionList::iterator iter = msrc->getOutputPortList().find(portsrc);
+    auto iter = msrc->getOutputPortList().find(portsrc);
     ModelPortList model(iter->second);
-    for (ModelPortList::iterator it = model.begin(); it != model.end(); ++it) {
-        if (it->first == mdst and it->second == portdst) {
+    for (auto & it : model) {
+        if (it.first == mdst and it.second == portdst) {
             nbConnections++;
         }
     }
@@ -549,29 +549,29 @@ CoupledModel::delAllConnection(BaseModel* m)
           _("Cannot delete all connection with an unknown model source"));
     }
 
-    for (ConnectionList::iterator it = m->getInputPortList().begin();
+    for (auto it = m->getInputPortList().begin();
          it != m->getInputPortList().end();
          ++it) {
         ModelPortList& ins = it->second;
-        for (ModelPortList::iterator jt = ins.begin(); jt != ins.end(); ++jt) {
-            if (jt->first == this) {
-                getInternalInPort(jt->second).remove(m, it->first);
+        for (auto & in : ins) {
+            if (in.first == this) {
+                getInternalInPort(in.second).remove(m, it->first);
             } else {
-                jt->first->getOutPort(jt->second).remove(m, it->first);
+                in.first->getOutPort(in.second).remove(m, it->first);
             }
         }
         ins.clear();
     }
 
-    for (ConnectionList::iterator it = m->getOutputPortList().begin();
+    for (auto it = m->getOutputPortList().begin();
          it != m->getOutputPortList().end();
          ++it) {
         ModelPortList& ins = it->second;
-        for (ModelPortList::iterator jt = ins.begin(); jt != ins.end(); ++jt) {
-            if (jt->first == this) {
-                getInternalOutPort(jt->second).remove(m, it->first);
+        for (auto & in : ins) {
+            if (in.first == this) {
+                getInternalOutPort(in.second).remove(m, it->first);
             } else {
-                jt->first->getInPort(jt->second).remove(m, it->first);
+                in.first->getInPort(in.second).remove(m, it->first);
             }
         }
         ins.clear();
@@ -581,9 +581,8 @@ CoupledModel::delAllConnection(BaseModel* m)
 void
 CoupledModel::delAllConnection()
 {
-    for (ModelList::iterator it = m_modelList.begin(); it != m_modelList.end();
-         ++it) {
-        delAllConnection(it->second);
+    for (auto & it : m_modelList) {
+        delAllConnection(it.second);
     }
 }
 
@@ -600,19 +599,17 @@ CoupledModel::replace(BaseModel* oldmodel, BaseModel* newmodel)
 
     {
         ConnectionList& source(oldmodel->getInputPortList());
-        for (ConnectionList::iterator it = source.begin(); it != source.end();
-             ++it) {
-            ModelPortList& lst(newmodel->addInputPort(it->first));
-            lst.merge(it->second);
+        for (auto & it : source) {
+            ModelPortList& lst(newmodel->addInputPort(it.first));
+            lst.merge(it.second);
         }
     }
 
     {
         ConnectionList& source(oldmodel->getOutputPortList());
-        for (ConnectionList::iterator it = source.begin(); it != source.end();
-             ++it) {
-            ModelPortList& lst(newmodel->addOutputPort(it->first));
-            lst.merge(it->second);
+        for (auto & it : source) {
+            ModelPortList& lst(newmodel->addOutputPort(it.first));
+            lst.merge(it.second);
         }
     }
 
@@ -625,25 +622,22 @@ CoupledModel::getBasicConnections(const ModelList& models) const
 {
     std::vector<std::string> storecnts;
 
-    for (ModelList::const_iterator it = models.begin(); it != models.end();
-         ++it) {
+    for (const auto & model : models) {
 
-        if (it->second->getParent() != this) {
+        if (model.second->getParent() != this) {
             throw utils::DevsGraphError(
               (fmt(_("The model %1% is not the child of %2%")) %
-               it->second->getName() % getName())
+               model.second->getName() % getName())
                 .str());
         }
 
-        const ConnectionList& cnts((*it).second->getOutputPortList());
-        for (ConnectionList::const_iterator jt = cnts.begin();
-             jt != cnts.end();
-             ++jt) {
-            for (ModelPortList::const_iterator kt = jt->second.begin();
-                 kt != jt->second.end();
+        const ConnectionList& cnts(model.second->getOutputPortList());
+        for (const auto & cnt : cnts) {
+            for (auto kt = cnt.second.begin();
+                 kt != cnt.second.end();
                  ++kt) {
-                storecnts.push_back((*it).second->getName());
-                storecnts.push_back(jt->first);
+                storecnts.push_back(model.second->getName());
+                storecnts.push_back(cnt.first);
                 storecnts.push_back(kt->first->getName());
                 storecnts.push_back(kt->second);
             }
@@ -661,7 +655,7 @@ CoupledModel::setBasicConnections(const std::vector<std::string>& lst)
           _("The basic connections list is malformed."));
     }
 
-    for (std::vector<std::string>::const_iterator it = lst.begin();
+    for (auto it = lst.begin();
          it != lst.end();
          it += 4) {
         const std::string& source(*(it));
@@ -673,7 +667,7 @@ CoupledModel::setBasicConnections(const std::vector<std::string>& lst)
             addInternalConnection(
               source, portsource, destination, portdestination);
         } catch (const utils::DevsGraphError& e) {
-            for (std::vector<std::string>::const_iterator jt = lst.begin();
+            for (auto jt = lst.begin();
                  jt != it;
                  jt += 4) {
                 delInternalConnection(*jt, *(jt + 1), *(jt + 2), *(jt + 3));
@@ -712,7 +706,7 @@ CoupledModel::displace(ModelList& models, CoupledModel* destination)
 bool
 CoupledModel::hasConnectionProblem(const ModelList& lst) const
 {
-    for (ModelList::const_iterator it = lst.begin(); it != lst.end(); ++it) {
+    for (auto it = lst.begin(); it != lst.end(); ++it) {
         const ConnectionList& ins(it->second->getInputPortList());
         if (haveConnectionWithOtherModel(ins, lst))
             return true;
@@ -728,13 +722,11 @@ bool
 CoupledModel::haveConnectionWithOtherModel(const ConnectionList& cnts,
                                            const ModelList& mdls) const
 {
-    for (ConnectionList::const_iterator it = cnts.begin(); it != cnts.end();
-         ++it) {
-        const ModelPortList& lst(it->second);
-        for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
-             ++jt) {
+    for (const auto & cnt : cnts) {
+        const ModelPortList& lst(cnt.second);
+        for (const auto & jt : lst) {
 
-            if (mdls.count(jt->first->getName()) == 0) {
+            if (mdls.count(jt.first->getName()) == 0) {
                 return true;
             }
         }
@@ -745,14 +737,14 @@ CoupledModel::haveConnectionWithOtherModel(const ConnectionList& cnts,
 BaseModel*
 CoupledModel::findModel(const std::string& name) const
 {
-    ModelList::const_iterator it = m_modelList.find(name);
+    auto it = m_modelList.find(name);
     return (it == m_modelList.end()) ? 0 : it->second;
 }
 
 BaseModel*
 CoupledModel::getModel(const std::string& name) const
 {
-    ModelList::const_iterator it = m_modelList.find(name);
+    auto it = m_modelList.find(name);
     return (it == m_modelList.end()) ? 0 : it->second;
 }
 
@@ -798,7 +790,7 @@ CoupledModel::addAtomicModel(const std::string& name)
             .str());
     }
 
-    AtomicModel* x = new AtomicModel(name, this);
+    auto* x = new AtomicModel(name, this);
     m_modelList[name] = x;
     return x;
 }
@@ -814,7 +806,7 @@ CoupledModel::addCoupledModel(const std::string& name)
             .str());
     }
 
-    CoupledModel* x = new CoupledModel(name, this);
+    auto* x = new CoupledModel(name, this);
     m_modelList[name] = x;
     return x;
 }
@@ -822,7 +814,7 @@ CoupledModel::addCoupledModel(const std::string& name)
 void
 CoupledModel::delModel(BaseModel* model)
 {
-    ModelList::iterator it = m_modelList.find(model->getName());
+    auto it = m_modelList.find(model->getName());
     if (it != m_modelList.end()) {
         delAllConnection(model);
         m_modelList.erase(it);
@@ -862,9 +854,9 @@ CoupledModel::attachModels(ModelList& models)
 void
 CoupledModel::detachModel(BaseModel* model)
 {
-    ModelList::iterator it = m_modelList.find(model->getName());
+    auto it = m_modelList.find(model->getName());
     if (it != m_modelList.end()) {
-        it->second->setParent(0);
+        it->second->setParent(nullptr);
         m_modelList.erase(it);
     } else {
         throw utils::DevsGraphError(
@@ -888,10 +880,8 @@ CoupledModel::writeXML(std::ostream& out) const
     writePortListXML(out);
     out << "<submodels>\n";
 
-    for (ModelList::const_iterator it = m_modelList.begin();
-         it != m_modelList.end();
-         ++it) {
-        it->second->writeXML(out);
+    for (const auto & it : m_modelList) {
+        it.second->writeXML(out);
     }
     out << "</submodels>\n";
 
@@ -904,54 +894,44 @@ CoupledModel::writeXML(std::ostream& out) const
 void
 CoupledModel::writeConnections(std::ostream& out) const
 {
-    for (ConnectionList::const_iterator it = m_internalOutputList.begin();
-         it != m_internalOutputList.end();
-         ++it) {
-        const std::string& port(it->first);
-        const ModelPortList& lst(it->second);
-        for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
-             ++jt) {
+    for (const auto & it : m_internalOutputList) {
+        const std::string& port(it.first);
+        const ModelPortList& lst(it.second);
+        for (const auto & jt : lst) {
             out << "<connection type=\"output\">\n"
-                << " <origin model=\"" << jt->first->getName().c_str() << "\" "
-                << "port=\"" << jt->second.c_str() << "\" />\n"
+                << " <origin model=\"" << jt.first->getName().c_str() << "\" "
+                << "port=\"" << jt.second.c_str() << "\" />\n"
                 << " <destination model=\"" << getName().c_str() << "\" "
                 << "port=\"" << port.c_str() << "\" />\n"
                 << "</connection>\n";
         }
     }
 
-    for (ConnectionList::const_iterator it = m_internalInputList.begin();
-         it != m_internalInputList.end();
-         ++it) {
-        const std::string& port(it->first);
-        const ModelPortList& lst(it->second);
-        for (ModelPortList::const_iterator jt = lst.begin(); jt != lst.end();
-             ++jt) {
+    for (const auto & it : m_internalInputList) {
+        const std::string& port(it.first);
+        const ModelPortList& lst(it.second);
+        for (const auto & jt : lst) {
             out << "<connection type=\"input\">\n"
                 << " <origin model=\"" << getName().c_str() << "\" "
                 << "port=\"" << port.c_str() << "\" />\n"
-                << " <destination model=\"" << jt->first->getName().c_str()
+                << " <destination model=\"" << jt.first->getName().c_str()
                 << "\" "
-                << "port=\"" << jt->second.c_str() << "\" />\n"
+                << "port=\"" << jt.second.c_str() << "\" />\n"
                 << "</connection>\n";
         }
     }
 
-    for (ModelList::const_iterator it = m_modelList.begin();
-         it != m_modelList.end();
-         ++it) {
-        const ConnectionList& cnts((*it).second->getOutputPortList());
-        for (ConnectionList::const_iterator jt = cnts.begin();
-             jt != cnts.end();
-             ++jt) {
-            for (ModelPortList::const_iterator kt = jt->second.begin();
-                 kt != jt->second.end();
+    for (const auto & it : m_modelList) {
+        const ConnectionList& cnts(it.second->getOutputPortList());
+        for (const auto & cnt : cnts) {
+            for (auto kt = cnt.second.begin();
+                 kt != cnt.second.end();
                  ++kt) {
                 if (kt->first != this) {
                     out << "<connection type=\"internal\">\n"
                         << " <origin model=\""
-                        << (*it).second->getName().c_str() << "\" "
-                        << "port=\"" << jt->first.c_str() << "\" />\n"
+                        << it.second->getName().c_str() << "\" "
+                        << "port=\"" << cnt.first.c_str() << "\" />\n"
                         << " <destination model=\""
                         << kt->first->getName().c_str() << "\" port=\""
                         << kt->second.c_str() << "\" />\n"
@@ -986,14 +966,12 @@ CoupledModel::write(std::ostream& out) const
             out << "<submodels>\n";
 
             const vpz::ModelList& childs(top->getModelList());
-            for (vpz::ModelList::const_iterator it = childs.begin();
-                 it != childs.end();
-                 ++it) {
-                if (it->second->isCoupled()) {
-                    cms.push(static_cast<vpz::CoupledModel*>(it->second));
+            for (const auto & child : childs) {
+                if (child.second->isCoupled()) {
+                    cms.push(static_cast<vpz::CoupledModel*>(child.second));
                     writed.push(false);
-                } else if (it->second->isAtomic()) {
-                    (static_cast<vpz::AtomicModel*>(it->second))->write(out);
+                } else if (child.second->isAtomic()) {
+                    (static_cast<vpz::AtomicModel*>(child.second))->write(out);
                 }
             }
         } else {
@@ -1064,7 +1042,7 @@ CoupledModel::writeConnection(std::ostream& out) const
 BaseModel*
 CoupledModel::find(int x, int y) const
 {
-    ModelList::const_iterator it = std::find_if(
+    auto it = std::find_if(
       m_modelList.begin(), m_modelList.end(), IsInModelList(x, y));
     return (it == m_modelList.end()) ? 0 : it->second;
 }
@@ -1072,14 +1050,14 @@ CoupledModel::find(int x, int y) const
 BaseModel*
 CoupledModel::find(int x, int y, int width, int height) const
 {
-    ModelList::const_iterator it = m_modelList.begin();
+    auto it = m_modelList.begin();
     while (it != m_modelList.end()) {
         if (it->second->x() <= x and x <= it->second->x() + width and
             it->second->y() <= y and y <= it->second->y() + height)
             return it->second;
         ++it;
     }
-    return 0;
+    return nullptr;
 }
 
 std::string
@@ -1105,7 +1083,7 @@ CoupledModel::buildNewName(const std::string& prefix) const
 ModelPortList&
 CoupledModel::getInternalInPort(const std::string& name)
 {
-    ConnectionList::iterator it = m_internalInputList.find(name);
+    auto it = m_internalInputList.find(name);
     if (it == m_internalInputList.end()) {
         throw utils::DevsGraphError(
           (fmt(_("Coupled model %1% have no input port %2%")) % getName() %
@@ -1119,7 +1097,7 @@ CoupledModel::getInternalInPort(const std::string& name)
 const ModelPortList&
 CoupledModel::getInternalInPort(const std::string& name) const
 {
-    ConnectionList::const_iterator it = m_internalInputList.find(name);
+    auto it = m_internalInputList.find(name);
     if (it == m_internalInputList.end()) {
         throw utils::DevsGraphError(
           (fmt(_("Coupled model %1% have no input port %2%")) % getName() %
@@ -1133,7 +1111,7 @@ CoupledModel::getInternalInPort(const std::string& name) const
 ModelPortList&
 CoupledModel::getInternalOutPort(const std::string& name)
 {
-    ConnectionList::iterator it = m_internalOutputList.find(name);
+    auto it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
         throw utils::DevsGraphError(
           (fmt(_("Coupled model %1% have no output port %2%")) % getName() %
@@ -1147,7 +1125,7 @@ CoupledModel::getInternalOutPort(const std::string& name)
 const ModelPortList&
 CoupledModel::getInternalOutPort(const std::string& name) const
 {
-    ConnectionList::const_iterator it = m_internalOutputList.find(name);
+    auto it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
         throw utils::DevsGraphError(
           (fmt(_("Coupled model %1% have no output port %2%")) % getName() %
@@ -1166,8 +1144,8 @@ CoupledModel::copyInternalConnection(const ConnectionList& src,
 {
     assert(src.size() == dst.size());
 
-    ConnectionList::const_iterator it = src.begin();
-    ConnectionList::iterator jt = dst.begin();
+    auto it = src.begin();
+    auto jt = dst.begin();
 
     while (it != src.end()) {
         copyInternalPort(it->second, jt->second, parentSrc, parentDst);
@@ -1184,13 +1162,13 @@ CoupledModel::copyInternalPort(const ModelPortList& src,
 {
     using const_iterator = ModelPortList::const_iterator;
 
-    for (const_iterator it = src.begin(); it != src.end(); ++it) {
-        if (it->first == &parentSrc) {
-            dst.add(&parentDst, it->second);
+    for (const auto & it : src) {
+        if (it.first == &parentSrc) {
+            dst.add(&parentDst, it.second);
         } else {
-            BaseModel* dstmodel = findModel(it->first->getName());
+            BaseModel* dstmodel = findModel(it.first->getName());
             assert(dstmodel);
-            dst.add(dstmodel, it->second);
+            dst.add(dstmodel, it.second);
         }
     }
 }
@@ -1200,8 +1178,8 @@ CoupledModel::copyConnection(const ConnectionList& src, ConnectionList& dst)
 {
     assert(src.size() == dst.size());
 
-    ConnectionList::const_iterator it = src.begin();
-    ConnectionList::iterator jt = dst.begin();
+    auto it = src.begin();
+    auto jt = dst.begin();
 
     while (it != src.end()) {
         copyPort(it->second, jt->second);
@@ -1215,10 +1193,10 @@ CoupledModel::copyPort(const ModelPortList& src, ModelPortList& dst)
 {
     using const_iterator = ModelPortList::const_iterator;
 
-    for (const_iterator it = src.begin(); it != src.end(); ++it) {
-        BaseModel* dstmodel = findModel(it->first->getName());
+    for (const auto & it : src) {
+        BaseModel* dstmodel = findModel(it.first->getName());
         assert(dstmodel);
-        dst.add(dstmodel, it->second);
+        dst.add(dstmodel, it.second);
     }
 }
 
@@ -1226,11 +1204,11 @@ CoupledModel::ModelConnections
 CoupledModel::saveInputConnections(ModelList& models)
 {
     ModelConnections listModel;
-    ModelList::iterator it = models.begin();
+    auto it = models.begin();
 
     while (it != models.end()) {
         ConnectionList connectIn;
-        ConnectionList::iterator iter = it->second->getInputPortList().begin();
+        auto iter = it->second->getInputPortList().begin();
 
         while (iter != it->second->getInputPortList().end()) {
             ModelPortList lst(it->second->getInPort(iter->first));
@@ -1248,11 +1226,11 @@ CoupledModel::ModelConnections
 CoupledModel::saveOutputConnections(ModelList& models)
 {
     ModelConnections listModel;
-    ModelList::iterator it = models.begin();
+    auto it = models.begin();
 
     while (it != models.end()) {
         ConnectionList connectOut;
-        ConnectionList::iterator iter =
+        auto iter =
           it->second->getOutputPortList().begin();
 
         while (iter != it->second->getOutputPortList().end()) {
@@ -1446,16 +1424,12 @@ CoupledModel::initConnections()
          ++it) {
         const ConnectionList& outs(it->second->getOutputPortList());
 
-        for (ConnectionList::const_iterator jt = outs.begin();
-             jt != outs.end();
-             ++jt) {
-            const ModelPortList& ports(jt->second);
+        for (const auto & out : outs) {
+            const ModelPortList& ports(out.second);
 
-            for (ModelPortList::const_iterator kt = ports.begin();
-                 kt != ports.end();
-                 ++kt) {
+            for (const auto & port : ports) {
                 m_srcConnections.push_back(it->second);
-                m_dstConnections.push_back(kt->first);
+                m_dstConnections.push_back(port.first);
             }
         }
     }

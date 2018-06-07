@@ -30,6 +30,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 #include <vle/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
@@ -180,7 +181,7 @@ public:
 
 private:
     std::unique_ptr<BaseModel> m_graph;
-    BaseModel* m_node;
+    BaseModel* m_node{nullptr};
 };
 
 /**
@@ -193,15 +194,13 @@ public:
      * @brief Build a Submodels.
      */
     Submodels()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Submodels() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -230,15 +229,13 @@ public:
      * @brief Build a Connections.
      */
     Connections()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Connections() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -267,15 +264,13 @@ public:
      * @brief Build an InternalConnection.
      */
     InternalConnection()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~InternalConnection() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -304,15 +299,13 @@ public:
      * @brief Build an InputConnection.
      */
     InputConnection()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~InputConnection() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -341,15 +334,13 @@ public:
      * @brief Build an OutputConnection.
      */
     OutputConnection()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~OutputConnection() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -379,9 +370,9 @@ public:
      * @param model the name of the model source.
      * @param port the name of the port source.
      */
-    Origin(const std::string& model, const std::string& port)
-      : model(model)
-      , port(port)
+    Origin(std::string  model, std::string  port)
+      : model(std::move(model))
+      , port(std::move(port))
     {
     }
 
@@ -389,8 +380,7 @@ public:
      * @brief Nothing to delete.
      */
     ~Origin() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -423,9 +413,9 @@ public:
      * @param model the name of the destination model.
      * @param port the name of the destination port.
      */
-    Destination(const std::string& model, const std::string& port)
-      : model(model)
-      , port(port)
+    Destination(std::string  model, std::string  port)
+      : model(std::move(model))
+      , port(std::move(port))
     {
     }
 
@@ -433,8 +423,7 @@ public:
      * @brief Nothing to delete.
      */
     ~Destination() override
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.

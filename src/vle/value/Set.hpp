@@ -70,8 +70,7 @@ public:
      * @brief Delete all Value in the set.
      */
     ~Set() override
-    {
-    }
+    = default;
 
     /**
      * @brief Build a new Set.

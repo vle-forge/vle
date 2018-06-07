@@ -44,8 +44,7 @@ public:
      */
     String()
       : m_value()
-    {
-    }
+    {}
 
     /**
      * @brief Build a String object with a specified value.
@@ -53,25 +52,18 @@ public:
      */
     String(std::string value)
       : m_value(std::move(value))
-    {
-    }
+    {}
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    String(const String& value)
-      : Value(value)
-      , m_value(value.m_value)
-    {
-    }
+    String(const String& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~String() override
-    {
-    }
+    ~String() override = default;
 
     ///
     ////

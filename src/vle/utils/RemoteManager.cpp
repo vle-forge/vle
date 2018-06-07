@@ -34,6 +34,7 @@
 #include <regex>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/DownloadManager.hpp>
@@ -114,7 +115,7 @@ class RemoteManager::Pimpl
 {
 public:
     Pimpl(ContextPtr ctx)
-      : mContext(ctx)
+      : mContext(std::move(ctx))
       , mStream(nullptr)
       , mIsStarted(false)
       , mIsFinish(false)
@@ -305,7 +306,7 @@ public:
                  PackageParser* parser,
                  bool* remoteHasError,
                  std::string* remoteMessageError)
-          : context(ctx)
+          : context(std::move(ctx))
           , parser(parser)
           , remoteHasError(remoteHasError)
           , remoteMessageError(remoteMessageError)
@@ -440,7 +441,7 @@ public:
             return;
         }
 
-        PackagesIdSet::const_iterator it = pkgs_range.first;
+        auto it = pkgs_range.first;
         PackageIdUpdate pkgUpdateOp;
         while (pkgs_range.first != pkgs_range.second) {
             if (pkgUpdateOp(*it, *pkgs_range.first)) {
@@ -786,8 +787,7 @@ RemoteManager::RemoteManager(ContextPtr context)
 }
 
 RemoteManager::~RemoteManager() noexcept
-{
-}
+= default;
 
 void
 RemoteManager::start(RemoteManagerActions action,

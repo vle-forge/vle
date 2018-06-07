@@ -47,7 +47,7 @@ test_rename_model()
 
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel* top =
+    auto* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
 
@@ -281,7 +281,7 @@ test_del_port()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel* top =
+    auto* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     if (not top)
@@ -399,7 +399,7 @@ test_clone2()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel* oldtop =
+    auto* oldtop =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(oldtop);
 
@@ -434,9 +434,9 @@ test_clone_different_atomic()
 
     vpz::Vpz file2(file1);
 
-    CoupledModel* top1 =
+    auto* top1 =
       dynamic_cast<CoupledModel*>(file1.project().model().node());
-    CoupledModel* top2 =
+    auto* top2 =
       dynamic_cast<CoupledModel*>(file2.project().model().node());
 
     Ensures(top1 and top2);
@@ -468,7 +468,7 @@ test_get_port_index()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel* top =
+    auto* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
 
     Ensures(top);
@@ -495,7 +495,7 @@ test_rename_port()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel* top =
+    auto* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     if (not top)
@@ -578,7 +578,7 @@ test_bug_rename_port()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel* top =
+    auto* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     if (not top)
@@ -620,7 +620,7 @@ test_bug_duplication_connections()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    CoupledModel* top =
+    auto* top =
       dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     if (not top)

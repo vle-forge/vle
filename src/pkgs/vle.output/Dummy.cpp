@@ -37,8 +37,7 @@ Dummy::Dummy(const std::string& location)
 }
 
 Dummy::~Dummy()
-{
-}
+= default;
 
 void
 Dummy::onParameter(const std::string& /*plugin*/,

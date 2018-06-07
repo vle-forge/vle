@@ -44,8 +44,7 @@ public:
      */
     Xml()
       : m_value()
-    {
-    }
+    {}
 
     /**
      * @brief Build an Xml object with a specified value.
@@ -53,25 +52,18 @@ public:
      */
     Xml(std::string value)
       : m_value(std::move(value))
-    {
-    }
+    {}
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    Xml(const Xml& value)
-      : Value(value)
-      , m_value(value.m_value)
-    {
-    }
+    Xml(const Xml& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Xml() override
-    {
-    }
+    ~Xml() override = default;
 
     ///
     ////

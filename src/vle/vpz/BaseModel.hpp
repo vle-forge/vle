@@ -62,7 +62,7 @@ public:
      * @param parent the parent of this model, can be null if parent does
      * not exist.
      */
-    BaseModel(const std::string& name, CoupledModel* parent);
+    BaseModel(std::string  name, CoupledModel* parent);
 
     BaseModel(const BaseModel& mdl);
 
@@ -71,8 +71,7 @@ public:
     virtual BaseModel* clone() const = 0;
 
     virtual ~BaseModel()
-    {
-    }
+    = default;
 
     ////
     //// Base class.
@@ -632,14 +631,14 @@ public:
       const std::set<std::string>& conditionlist) = 0;
 
 protected:
-    CoupledModel* m_parent;
+    CoupledModel* m_parent{nullptr};
     ConnectionList m_inPortList;
     ConnectionList m_outPortList;
 
-    int m_x;
-    int m_y;
-    int m_width;
-    int m_height;
+    int m_x{-1};
+    int m_y{-1};
+    int m_width{-1};
+    int m_height{-1};
     float m_dx;
     float m_dy;
 

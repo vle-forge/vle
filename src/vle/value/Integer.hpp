@@ -42,10 +42,7 @@ public:
     /**
      * @brief Build an Integer object with a default value as zero.
      */
-    Integer()
-      : m_value(0)
-    {
-    }
+    Integer() = default;
 
     /**
      * @brief Build an Integer object with a specified value.
@@ -53,25 +50,18 @@ public:
      */
     Integer(int32_t value)
       : m_value(value)
-    {
-    }
+    {}
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    Integer(const Integer& value)
-      : Value(value)
-      , m_value(value.m_value)
-    {
-    }
+    Integer(const Integer& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Integer() override
-    {
-    }
+    ~Integer() override = default;
 
     ///
     ////
@@ -163,7 +153,7 @@ public:
     }
 
 private:
-    int32_t m_value;
+    int32_t m_value{ 0 };
 };
 
 inline const Integer&

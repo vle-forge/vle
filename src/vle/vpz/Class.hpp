@@ -52,7 +52,7 @@ public:
      * hierarchy.
      * @param name The name of this Class.
      */
-    Class(const std::string& name);
+    Class(std::string  name);
 
     /**
      * @brief Build a new Class by copying the parameter. The vpz::Model

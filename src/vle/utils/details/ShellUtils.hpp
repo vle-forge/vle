@@ -62,8 +62,8 @@ namespace details {
 class ShellUtils
 {
 public:
-    ShellUtils(){};
-    ~ShellUtils(){};
+    ShellUtils()= default;;
+    ~ShellUtils()= default;;
 
     /* Single quotes preserve the literal string exactly. escape
      * sequences are not allowed; not even \' - if you want a '

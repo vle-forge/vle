@@ -130,9 +130,9 @@ public:
         std::vector<std::string> modelname;
 
         {
-            vpz::ModelList::const_iterator it =
+            auto it =
               coupledmodel().getModelList().begin();
-            vpz::ModelList::const_iterator et =
+            auto et =
               coupledmodel().getModelList().end();
 
             for (; it != et; ++it)
@@ -232,8 +232,7 @@ public:
     }
 
     ~DeleteConnection() override
-    {
-    }
+    = default;
 
     devs::Time init(devs::Time /*time*/) override
     {
@@ -363,7 +362,7 @@ public:
     std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent&) const override
     {
-        return 0;
+        return nullptr;
     }
 };
 
@@ -417,7 +416,7 @@ public:
     std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent&) const override
     {
-        return 0;
+        return nullptr;
     }
     int state;
 };
@@ -707,9 +706,9 @@ public:
         std::vector<std::string> modelname;
 
         {
-            vpz::ModelList::const_iterator it =
+            auto it =
               coupledmodel().getModelList().begin();
-            vpz::ModelList::const_iterator et =
+            auto et =
               coupledmodel().getModelList().end();
 
             for (; it != et; ++it)

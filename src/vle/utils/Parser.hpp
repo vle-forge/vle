@@ -30,6 +30,7 @@
 #include <istream>
 #include <map>
 #include <string>
+#include <utility>
 #include <vle/DllDefines.hpp>
 #include <vle/utils/Exception.hpp>
 
@@ -53,8 +54,8 @@ struct VLE_API Block
     typedef std::pair<Blocks::const_iterator, Blocks::const_iterator>
       BlocksResult;
 
-    Block(const std::string& name)
-      : name(name)
+    Block(std::string  name)
+      : name(std::move(name))
     {}
 
     void addString(const std::string& key, const std::string& str);

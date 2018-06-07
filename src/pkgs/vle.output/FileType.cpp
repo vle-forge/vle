@@ -32,8 +32,7 @@ namespace oov {
 namespace plugin {
 
 CSV::~CSV()
-{
-}
+= default;
 
 std::string
 CSV::extension() const
@@ -51,7 +50,7 @@ void
 CSV::writeHead(std::ostream& out, const std::vector<std::string>& heads)
 {
     if (not heads.empty()) {
-        std::vector<std::string>::const_iterator it = heads.begin();
+        auto it = heads.begin();
         out << *it;
         it++;
 
@@ -64,8 +63,7 @@ CSV::writeHead(std::ostream& out, const std::vector<std::string>& heads)
 }
 
 Text::~Text()
-{
-}
+= default;
 
 std::string
 Text::extension() const
@@ -83,17 +81,14 @@ void
 Text::writeHead(std::ostream& out, const std::vector<std::string>& heads)
 {
     out << '#';
-    for (std::vector<std::string>::const_iterator it = heads.begin();
-         it != heads.end();
-         ++it) {
-        out << "\"" << *it << "\"\t";
+    for (const auto & head : heads) {
+        out << "\"" << head << "\"\t";
     }
     out << '\n';
 }
 
 Rdata::~Rdata()
-{
-}
+= default;
 
 std::string
 Rdata::extension() const
@@ -110,10 +105,8 @@ Rdata::writeSeparator(std::ostream& out)
 void
 Rdata::writeHead(std::ostream& out, const std::vector<std::string>& heads)
 {
-    for (std::vector<std::string>::const_iterator it = heads.begin();
-         it != heads.end();
-         ++it) {
-        out << "\"" << *it << "\"\t";
+    for (const auto & head : heads) {
+        out << "\"" << head << "\"\t";
     }
     out << '\n';
 }

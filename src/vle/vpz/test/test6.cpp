@@ -203,7 +203,7 @@ single_class()
     const vpz::BaseModel* mdl = classe.node();
     Ensures(mdl->isCoupled());
 
-    const vpz::CoupledModel* cpl(dynamic_cast<const vpz::CoupledModel*>(mdl));
+    const auto* cpl(dynamic_cast<const vpz::CoupledModel*>(mdl));
     Ensures(cpl);
 }
 
@@ -376,7 +376,7 @@ single_class_utf8()
     const vpz::BaseModel* mdl = classe.node();
     Ensures(mdl->isCoupled());
 
-    const vpz::CoupledModel* cpl(dynamic_cast<const vpz::CoupledModel*>(mdl));
+    const auto* cpl(dynamic_cast<const vpz::CoupledModel*>(mdl));
     Ensures(cpl);
 }
 

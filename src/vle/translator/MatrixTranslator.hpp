@@ -76,7 +76,7 @@ public:
         connectivity type; /*!< The connectivity between each DEVS model.*/
     };
 
-    regular_graph_generator(const parameter& params);
+    regular_graph_generator(parameter  params);
 
     graph_metrics metrics() const;
 

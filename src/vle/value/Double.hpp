@@ -42,10 +42,7 @@ public:
     /**
      * @brief Build a Double object with a default value as 0.0.
      */
-    Double()
-      : m_value(0.0)
-    {
-    }
+    Double() = default;
 
     /**
      * @brief Build a Double object with a specifiied value.
@@ -53,25 +50,18 @@ public:
      */
     Double(double value)
       : m_value(value)
-    {
-    }
+    {}
 
     /**
      * @brief Copy constuctor.
      * @param value The value to copy.
      */
-    Double(const Double& value)
-      : Value(value)
-      , m_value(value.m_value)
-    {
-    }
+    Double(const Double& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Double() override
-    {
-    }
+    ~Double() override = default;
 
     ///
     ////
@@ -165,7 +155,7 @@ public:
     }
 
 private:
-    double m_value;
+    double m_value{ 0.0 };
 };
 
 inline const Double&

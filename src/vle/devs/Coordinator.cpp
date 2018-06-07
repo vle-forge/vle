@@ -27,6 +27,7 @@
 #include "Thread.hpp"
 #include <boost/bind.hpp>
 #include <functional>
+#include <memory>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/ExternalEvent.hpp>
@@ -569,7 +570,7 @@ Coordinator::finish()
         auto matrix = elem.second.finish(m_currentTime);
         if (matrix) {
             if (not result)
-                result = std::unique_ptr<value::Map>(new value::Map());
+                result = std::make_unique<value::Map>();
 
             result->add(elem.first, std::move(matrix));
         }
@@ -579,7 +580,7 @@ Coordinator::finish()
         auto matrix = elem.second.finish(m_currentTime);
         if (matrix) {
             if (not result)
-                result = std::unique_ptr<value::Map>(new value::Map());
+                result = std::make_unique<value::Map>();
             result->add(elem.first, std::move(matrix));
         }
     }
@@ -597,7 +598,7 @@ Coordinator::getMap() const
 
         if (matrix) {
             if (not result)
-                result = std::unique_ptr<value::Map>(new value::Map());
+                result = std::make_unique<value::Map>();
 
             result->add(elem.first, std::move(matrix));
         }
@@ -608,7 +609,7 @@ Coordinator::getMap() const
 
         if (matrix) {
             if (not result)
-                result = std::unique_ptr<value::Map>(new value::Map());
+                result = std::make_unique<value::Map>();
 
             result->add(elem.first, std::move(matrix));
         }

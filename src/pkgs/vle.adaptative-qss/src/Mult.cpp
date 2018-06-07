@@ -92,8 +92,7 @@ public:
     }
 
     ~Mult() override
-    {
-    }
+    = default;
 
     vd::Time init(vd::Time /*time*/) override
     {

@@ -24,6 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <utility>
 #include <vle/translator/MatrixTranslator.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
@@ -32,8 +33,8 @@
 namespace vle {
 namespace translator {
 
-regular_graph_generator::regular_graph_generator(const parameter& params)
-  : m_params(params)
+regular_graph_generator::regular_graph_generator(parameter  params)
+  : m_params(std::move(params))
   , m_metrics{ -1 }
 {
 }
@@ -52,7 +53,7 @@ make_1d_no_wrap(vle::devs::Executive& executive,
                 const std::vector<std::string>& mask,
                 int x_mask)
 {
-    const int mask_length = vle::utils::numeric_cast<int>(mask.size());
+    const auto mask_length = vle::utils::numeric_cast<int>(mask.size());
 
     for (int i = 0; i != length; ++i) {
         const int i_min = std::max(0, i - x_mask);
@@ -101,7 +102,7 @@ make_1d_wrap(vle::devs::Executive& executive,
              const std::vector<std::string>& mask,
              int x_mask)
 {
-    const int mask_length = vle::utils::numeric_cast<int>(mask.size());
+    const auto mask_length = vle::utils::numeric_cast<int>(mask.size());
 
     for (int i = 0; i != length; ++i) {
         const int x_min = i - x_mask;
@@ -192,8 +193,8 @@ apply_mask(vle::devs::Executive& executive,
            int x_mask,
            int y_mask)
 {
-    const int mask_columns = utils::numeric_cast<int>(mask.columns());
-    const int mask_rows = utils::numeric_cast<int>(mask.rows());
+    const auto mask_columns = utils::numeric_cast<int>(mask.columns());
+    const auto mask_rows = utils::numeric_cast<int>(mask.rows());
     const int x_min = std::max(0, c - x_mask);
     const int x_max = std::min(length.front(), c + mask_columns - x_mask);
     const int y_min = std::max(0, r - y_mask);
@@ -251,8 +252,8 @@ apply_wrap_mask(vle::devs::Executive& executive,
                 int x_mask,
                 int y_mask)
 {
-    const int mask_columns = utils::numeric_cast<int>(mask.columns());
-    const int mask_rows = utils::numeric_cast<int>(mask.rows());
+    const auto mask_columns = utils::numeric_cast<int>(mask.columns());
+    const auto mask_rows = utils::numeric_cast<int>(mask.rows());
     const int x_min = c - x_mask;
     const int x_max = c + mask_columns - x_mask;
     const int y_min = r - y_mask;

@@ -73,8 +73,7 @@ public:
      * @brief Nothing to delete.
      */
     ~Tuple() override
-    {
-    }
+    = default;
 
     ///
     ////

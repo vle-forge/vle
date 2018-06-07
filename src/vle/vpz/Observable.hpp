@@ -30,6 +30,7 @@
 #include <list>
 #include <map>
 #include <string>
+#include <utility>
 #include <vle/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 
@@ -68,8 +69,8 @@ public:
      * @brief Build a new ObservablePort with a specific name.
      * @param portname The name of the port.
      */
-    ObservablePort(const std::string& portname)
-      : m_name(portname)
+    ObservablePort(std::string  portname)
+      : m_name(std::move(portname))
     {
     }
 
@@ -77,8 +78,7 @@ public:
      * @brief Nothing to delete.
      */
     ~ObservablePort() override
-    {
-    }
+    = default;
 
     /**
      * @brief Write the XML representation of this class.
@@ -232,8 +232,8 @@ public:
      * @brief Build a new Observable with specified name.
      * @param name The name of this Observable.
      */
-    Observable(const std::string& name)
-      : m_name(name)
+    Observable(std::string  name)
+      : m_name(std::move(name))
     {
     }
 
@@ -241,8 +241,7 @@ public:
      * @brief Nothing to delete.
      */
     ~Observable() override
-    {
-    }
+    = default;
 
     /**
      * @brief Write the XML representation of this class.

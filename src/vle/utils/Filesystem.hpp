@@ -218,8 +218,8 @@ public:
 
 private:
     std::vector<std::string> m_path;
-    path_type m_type;
-    bool m_absolute;
+    path_type m_type{native_path};
+    bool m_absolute{false};
 };
 
 /**
@@ -249,8 +249,8 @@ class DirectoryIterator;
 class VLE_API DirectoryEntry
 {
     Path m_path;
-    bool m_is_file;
-    bool m_is_directory;
+    bool m_is_file{false};
+    bool m_is_directory{false};
 
 public:
     DirectoryEntry();

@@ -45,10 +45,7 @@ public:
     /**
      * @brief Build a empty Vpz XML file.
      */
-    Vpz()
-      : m_isGzip(true)
-    {
-    }
+    Vpz() = default;
 
     /**
      * @brief Use the filename to build a Vpz XML file.
@@ -66,9 +63,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    ~Vpz() override
-    {
-    }
+    ~Vpz() override = default;
 
     /**
      * @brief Write into the output stream the XML representation of this
@@ -205,7 +200,7 @@ public:
     }
 
 private:
-    bool m_isGzip;
+    bool m_isGzip{ true };
     std::string m_filename;
     vpz::Project m_project;
 };

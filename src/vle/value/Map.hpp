@@ -55,8 +55,7 @@ public:
      * @brief Build a Map object with an empty MapValue.
      */
     Map()
-    {
-    }
+    = default;
 
     /**
      * @brief Copy constructor. All the Value are cloned.
@@ -68,8 +67,7 @@ public:
      * @brief Delete all Value in the Set.
      */
     ~Map() override
-    {
-    }
+    = default;
 
     /**
      * @brief Build a Xml.

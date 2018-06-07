@@ -24,6 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <utility>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vpz/View.hpp>
@@ -31,14 +32,14 @@
 namespace vle {
 namespace vpz {
 
-View::View(const std::string& name,
+View::View(std::string  name,
            View::Type type,
-           const std::string& output,
+           std::string  output,
            double timestep,
            bool enable)
   : m_timestep(timestep)
-  , m_name(name)
-  , m_output(output)
+  , m_name(std::move(name))
+  , m_output(std::move(output))
   , m_enabled(enable)
   , m_type(type)
 {
@@ -52,9 +53,9 @@ View::View(const std::string& name,
     }
 }
 
-View::View(const std::string& name)
+View::View(std::string  name)
   : m_timestep(0.0)
-  , m_name(name)
+  , m_name(std::move(name))
   , m_enabled(true)
   , m_type(static_cast<Type>(View::INTERNAL | View::EXTERNAL | View::CONFLUENT))
 {

@@ -27,6 +27,7 @@
 #ifndef VLE_DEVS_OBSERVATION_EVENT_HPP
 #define VLE_DEVS_OBSERVATION_EVENT_HPP 1
 
+#include <utility>
 #include <vector>
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
@@ -50,11 +51,11 @@ public:
     ObservationEvent& operator=(const ObservationEvent& other) = delete;
 
     ObservationEvent(const Time& time,
-                     const std::string& viewname,
-                     const std::string& portName)
+                     std::string  viewname,
+                     std::string  portName)
       : m_time(time)
-      , m_viewName(viewname)
-      , m_portName(portName)
+      , m_viewName(std::move(viewname))
+      , m_portName(std::move(portName))
     {
     }
 

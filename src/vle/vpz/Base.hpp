@@ -85,15 +85,13 @@ public:
      * @brief Default constructor.
      */
     Base()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     virtual ~Base()
-    {
-    }
+    = default;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -404,7 +402,7 @@ public:
          */
         inline bool operator()(const vpz::Base* base) const
         {
-            return base != 0 and base->getType() == VLE_VPZ_CLASS;
+            return base != nullptr and base->getType() == VLE_VPZ_CLASS;
         }
 
         /**

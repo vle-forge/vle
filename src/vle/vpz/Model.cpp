@@ -34,9 +34,7 @@ namespace vpz {
 
 Model::Model()
   : Base()
-  , m_node(nullptr)
-{
-}
+{}
 
 Model::Model(const Model& mdl)
   : Base(mdl)

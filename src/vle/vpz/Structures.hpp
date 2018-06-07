@@ -43,8 +43,7 @@ public:
      * @brief Build a new Structures.
      */
     Structures()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to output.
@@ -57,8 +56,7 @@ public:
      * @brief Nothing to delete.
      */
     ~Structures() override
-    {
-    }
+    = default;
 
     /**
      * @brief Get the type of this class.

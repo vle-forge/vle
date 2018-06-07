@@ -227,7 +227,7 @@ check_model_unittest_vpz(const vpz::Model& model)
     Ensures(model.node());
     Ensures(model.node()->isCoupled());
 
-    vpz::CoupledModel* cpled((vpz::CoupledModel*)model.node());
+    auto* cpled((vpz::CoupledModel*)model.node());
     EnsuresEqual(cpled->getName(), "top");
     Ensures(cpled->exist("top1"));
     Ensures(cpled->findModel("top1")->isCoupled());
@@ -421,7 +421,7 @@ check_classes_unittest_vpz(vpz::Classes& cls)
         Ensures(c.node());
         Ensures(c.node()->isCoupled());
         EnsuresEqual(c.node()->getName(), "top");
-        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.node());
+        auto* cpled((vpz::CoupledModel*)c.node());
 
         ptr1 = cpled;
 
@@ -442,7 +442,7 @@ check_classes_unittest_vpz(vpz::Classes& cls)
         Ensures(c.node());
         Ensures(c.node()->isCoupled());
         EnsuresEqual(c.node()->getName(), "top");
-        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.node());
+        auto* cpled((vpz::CoupledModel*)c.node());
 
         ptr2 = cpled;
 
@@ -483,7 +483,7 @@ check_classes_unittest_vpz(vpz::Classes& cls)
         Ensures(c.node());
         Ensures(c.node()->isCoupled());
         EnsuresEqual(c.node()->getName(), "top");
-        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.node());
+        auto* cpled((vpz::CoupledModel*)c.node());
 
         Ensures(ptr1 != cpled);
 
@@ -504,7 +504,7 @@ check_classes_unittest_vpz(vpz::Classes& cls)
         Ensures(c.node());
         Ensures(c.node()->isCoupled());
         EnsuresEqual(c.node()->getName(), "top");
-        vpz::CoupledModel* cpled((vpz::CoupledModel*)c.node());
+        auto* cpled((vpz::CoupledModel*)c.node());
 
         Ensures(ptr2 != cpled);
 
@@ -759,7 +759,7 @@ test_connection()
     Ensures(model.node());
     Ensures(model.node()->isCoupled());
 
-    vpz::CoupledModel* cpled((vpz::CoupledModel*)model.node());
+    auto* cpled((vpz::CoupledModel*)model.node());
     EnsuresEqual(cpled->getName(), "top");
     Ensures(cpled->exist("top1"));
     Ensures(cpled->exist("top2"));

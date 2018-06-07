@@ -92,7 +92,7 @@ public:
      * @brief Destructor (nothing to do)
      */
     virtual ~Dynamics()
-    {}
+    = default;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

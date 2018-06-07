@@ -29,12 +29,9 @@
 
 struct gnuplot_log : vle::utils::Context::LogFunctor
 {
-    FILE* fp;
+    FILE* fp{ nullptr };
 
-    gnuplot_log()
-      : fp(nullptr)
-    {
-    }
+    gnuplot_log() = default;
 
     ~gnuplot_log() override
     {
@@ -45,7 +42,7 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
     void try_open(const vle::utils::Context& ctx)
     {
         auto home = ctx.getHomeDir();
-        const std::uintptr_t adr = reinterpret_cast<std::uintptr_t>(&ctx);
+        const auto adr = reinterpret_cast<std::uintptr_t>(&ctx);
         std::string filename("gnuplot-");
         filename += std::to_string(adr);
 
@@ -146,10 +143,12 @@ start_plot(vle::utils::Path command, vle::utils::Path gnuplot_script)
         spawn.start(
           command.string(), vle::utils::Path::current_path().string(), args);
     } catch (const std::exception& e) {
-        vle::devs::Trace(ctx, 3,
-              "Plot error: fail to start GNUplot. Data are stored in file "
-              "`%s'\n",
-              gnuplot_script.string().c_str());
+        vle::devs::Trace(
+          ctx,
+          3,
+          "Plot error: fail to start GNUplot. Data are stored in file "
+          "`%s'\n",
+          gnuplot_script.string().c_str());
     }
 
     std::string output;
@@ -198,11 +197,13 @@ start_plot(vle::utils::Path command, vle::utils::Path gnuplot_script)
     vle::devs::Trace(ctx, 5, "Plot info: spawn msg %s\n", msg.c_str());
 
     if (not success) {
-        vle::devs::Trace(ctx, 3,
-              "Plot error: fail to start GNUplot. Data are stored in file "
-              "`%s'. Error: %s\n",
-              gnuplot_script.string().c_str(),
-              msg.c_str());
+        vle::devs::Trace(
+          ctx,
+          3,
+          "Plot error: fail to start GNUplot. Data are stored in file "
+          "`%s'. Error: %s\n",
+          gnuplot_script.string().c_str(),
+          msg.c_str());
     }
 }
 

@@ -51,7 +51,7 @@ public:
     Project();
 
     ~Project() override
-    {}
+    = default;
 
     /**
      * @brief Set a new name for the experiment and a new date.
@@ -252,7 +252,7 @@ private:
     std::string m_author;
     std::string m_date;
     std::string m_version;
-    int m_instance;
+    int m_instance{-1};
 
     Model m_model;
     Dynamics m_dynamics;

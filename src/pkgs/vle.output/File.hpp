@@ -113,8 +113,7 @@ public:
     {
     public:
         virtual ~FileType()
-        {
-        }
+        = default;
 
         virtual std::string extension() const = 0;
 

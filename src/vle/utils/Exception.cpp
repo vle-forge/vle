@@ -27,6 +27,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <limits>
+#include <utility>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 
@@ -47,7 +48,7 @@ namespace utils {
 
 FileError::FileError(std::string message)
   : std::runtime_error("")
-  , m_message(message)
+  , m_message(std::move(message))
 {
 }
 
@@ -85,7 +86,7 @@ FileError::what() const noexcept
 
 ParseError::ParseError(std::string message)
   : std::runtime_error("")
-  , m_message(message)
+  , m_message(std::move(message))
 {
 }
 
@@ -123,7 +124,7 @@ ParseError::what() const noexcept
 
 ArgError::ArgError(std::string message)
   : std::logic_error("")
-  , m_message(message)
+  , m_message(std::move(message))
 {
 }
 
@@ -162,7 +163,7 @@ ArgError::what() const noexcept
 
 CastError::CastError(std::string message)
   : std::runtime_error("")
-  , m_message(message)
+  , m_message(std::move(message))
 {
 }
 
@@ -201,7 +202,7 @@ CastError::what() const noexcept
 
 InternalError::InternalError(std::string message)
   : std::logic_error("")
-  , m_message(message)
+  , m_message(std::move(message))
 {
 }
 
@@ -240,7 +241,7 @@ InternalError::what() const noexcept
 
 ModellingError::ModellingError(std::string message)
   : std::runtime_error("")
-  , m_message(message)
+  , m_message(std::move(message))
 {
 }
 
@@ -279,7 +280,7 @@ ModellingError::what() const noexcept
 
 NotYetImplemented::NotYetImplemented(std::string message)
   : std::logic_error("")
-  , m_message(message)
+  , m_message(std::move(message))
 {
 }
 
@@ -318,7 +319,7 @@ NotYetImplemented::what() const noexcept
 
 DevsGraphError::DevsGraphError(std::string message)
   : std::runtime_error("")
-  , m_message(message)
+  , m_message(std::move(message))
 {
 }
 
@@ -357,7 +358,7 @@ DevsGraphError::what() const noexcept
 
 SaxParserError::SaxParserError(std::string message)
   : std::runtime_error("")
-  , m_message(message)
+  , m_message(std::move(message))
 {
 }
 

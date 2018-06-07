@@ -82,8 +82,7 @@ public:
      * @brief Destructor (nothing to do).
      */
     ~Executive() override
-    {
-    }
+    = default;
 
     /**
      * @brief If this function return true, then a cast to an Executive object

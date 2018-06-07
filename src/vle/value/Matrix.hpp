@@ -95,8 +95,7 @@ public:
      * @brief Delete all data.
      */
     ~Matrix() override
-    {
-    }
+    = default;
 
     /**
      * @brief Build a new Matrix.
@@ -717,14 +716,14 @@ public:
 
 private:
     MatrixValue m_matrix; /// @brief to store the values.
-    size_type m_nbcol;    /// @brief to store the column number.
-    size_type m_nbrow;    /// @brief to store the row number.
-    size_type m_nbcolmax; /// @brief to store the column number.
-    size_type m_nbrowmax; /// @brief to store the row number.
-    size_type m_stepcol;  /// @brief the column when resize.
-    size_type m_steprow;  /// @brief the row when resize.
-    index m_lastX;        /// @brief the last columns set.
-    index m_lastY;        /// @brief the last row set.
+    size_type m_nbcol{0};    /// @brief to store the column number.
+    size_type m_nbrow{0};    /// @brief to store the row number.
+    size_type m_nbcolmax{256}; /// @brief to store the column number.
+    size_type m_nbrowmax{1024}; /// @brief to store the row number.
+    size_type m_stepcol{1};  /// @brief the column when resize.
+    size_type m_steprow{1};  /// @brief the row when resize.
+    index m_lastX{0};        /// @brief the last columns set.
+    index m_lastY{0};        /// @brief the last row set.
 };
 
 inline const Matrix&

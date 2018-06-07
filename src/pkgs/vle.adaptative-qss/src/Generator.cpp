@@ -88,8 +88,7 @@ public:
     }
 
     ~Generator() override // This is mandatory
-    {
-    }
+    = default;
 
     vd::Time init(vd::Time /* time */) override
     {

@@ -28,6 +28,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <stack>
+#include <utility>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
@@ -37,13 +38,13 @@
 namespace vle {
 namespace vpz {
 
-BaseModel::BaseModel(const std::string& name, CoupledModel* parent)
+BaseModel::BaseModel(std::string name, CoupledModel* parent)
   : m_parent(parent)
   , m_x(-1)
   , m_y(-1)
   , m_width(-1)
   , m_height(-1)
-  , m_name(name)
+  , m_name(std::move(name))
 {
     if (parent) {
         parent->addModel(this);
@@ -249,7 +250,7 @@ BaseModel::getModel(const CoupledModelVector& lst, const std::string& name)
             throw utils::DevsGraphError(_("Bad use of getModel from a list"));
         }
         auto it = lst.rbegin();
-        CoupledModel* top = static_cast<CoupledModel*>(this);
+        auto* top = static_cast<CoupledModel*>(this);
         CoupledModel* other = *it;
 
         if (other->getName() != top->getName()) {
@@ -328,7 +329,7 @@ BaseModel::addInputPort(const std::string& name)
     auto it(m_inPortList.find(name));
     if (it == m_inPortList.end()) {
         if (isCoupled()) {
-            CoupledModel* cpl = static_cast<CoupledModel*>(this);
+            auto* cpl = static_cast<CoupledModel*>(this);
             cpl->getInternalInputPortList().insert(
               ConnectionList::value_type(name, ModelPortList()));
         }
@@ -347,7 +348,7 @@ BaseModel::addOutputPort(const std::string& name)
     auto it(m_outPortList.find(name));
     if (it == m_outPortList.end()) {
         if (isCoupled()) {
-            CoupledModel* cpl = static_cast<CoupledModel*>(this);
+            auto* cpl = static_cast<CoupledModel*>(this);
             cpl->getInternalOutputPortList().insert(
               ConnectionList::value_type(name, ModelPortList()));
         }
@@ -475,7 +476,7 @@ BaseModel::renameInputPort(const std::string& old_name,
     auto it(m_inPortList.find(new_name));
     if (it == m_inPortList.end()) {
         if (isCoupled()) {
-            CoupledModel* cpl = static_cast<CoupledModel*>(this);
+            auto* cpl = static_cast<CoupledModel*>(this);
             cpl->getInternalInputPortList().insert(
               ConnectionList::value_type(new_name, internalConnect));
         }
@@ -506,7 +507,7 @@ BaseModel::renameOutputPort(const std::string& old_name,
     auto it(m_outPortList.find(new_name));
     if (it == m_outPortList.end()) {
         if (isCoupled()) {
-            CoupledModel* cpl = static_cast<CoupledModel*>(this);
+            auto* cpl = static_cast<CoupledModel*>(this);
             cpl->getInternalOutputPortList().insert(
               ConnectionList::value_type(new_name, internalConnect));
         }
@@ -738,11 +739,6 @@ BaseModel::isInList(const ModelList& lst, BaseModel* m)
 }
 
 BaseModel::BaseModel()
-  : m_parent(nullptr)
-  , m_x(-1)
-  , m_y(-1)
-  , m_width(-1)
-  , m_height(-1)
 {
     throw utils::NotYetImplemented("BaseModel::BaseModel not developed");
 }

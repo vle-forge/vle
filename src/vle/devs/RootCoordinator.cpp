@@ -25,13 +25,14 @@
  */
 
 #include <cassert>
+#include <utility>
 #include <vle/devs/RootCoordinator.hpp>
 
 namespace vle {
 namespace devs {
 
 RootCoordinator::RootCoordinator(utils::ContextPtr context)
-  : m_context(context)
+  : m_context(std::move(context))
   , m_rand(0)
   , m_begin(0)
   , m_currentTime(0)

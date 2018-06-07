@@ -126,8 +126,8 @@ public:
     }
 
 private:
-    RootCoordinator(const RootCoordinator& other);
-    RootCoordinator& operator=(const RootCoordinator& other);
+    RootCoordinator(const RootCoordinator& other) = delete;
+    RootCoordinator& operator=(const RootCoordinator& other) = delete;
 
     utils::ContextPtr m_context;
     utils::Rand m_rand;

@@ -31,6 +31,7 @@
 #include <boost/graph/plod_generator.hpp>
 #include <boost/graph/small_world_generator.hpp>
 #include <random>
+#include <utility>
 #include <vle/translator/GraphTranslator.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
@@ -45,8 +46,8 @@ using graphT =
                         boost::bidirectionalS,
                         boost::property<boost::vertex_name_t, std::string>>;
 
-graph_generator::graph_generator(const parameter& params)
-  : m_params(params)
+graph_generator::graph_generator(parameter  params)
+  : m_params(std::move(params))
   , m_metrics{ -1, -1, -1 }
 {}
 

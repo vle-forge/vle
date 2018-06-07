@@ -468,7 +468,7 @@ public:
     {}
 
     ~DescriptionParser()
-    {}
+    = default;
 
     void read_packages(const std::string& distribution, Packages* pkgs)
     {

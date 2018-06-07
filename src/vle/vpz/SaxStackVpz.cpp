@@ -136,7 +136,7 @@ SaxStackVpz::pushModel(const xmlChar** att)
 
     if (parent()->isSubmodels()) {
         vpz::Base* sub = pop();
-        vpz::Model* tmp = static_cast<vpz::Model*>(parent());
+        auto* tmp = static_cast<vpz::Model*>(parent());
         assert(tmp->node());
         cplparent = tmp->node()->toCoupled();
         push(sub);
@@ -288,7 +288,7 @@ SaxStackVpz::pushPort(const xmlChar** att)
             throw utils::SaxParserError(_("Bad file format"));
         }
 
-        vpz::Model* mdl = static_cast<vpz::Model*>(parent());
+        auto* mdl = static_cast<vpz::Model*>(parent());
         vpz::BaseModel* gmdl = nullptr;
 
         if (mdl->node())
@@ -465,13 +465,13 @@ SaxStackVpz::buildConnection()
         throw utils::SaxParserError(_("Bad file format"));
     }
 
-    vpz::Destination* dest = static_cast<vpz::Destination*>(pop());
+    auto* dest = static_cast<vpz::Destination*>(pop());
 
     if (not parent()->isOrigin()) {
         throw utils::SaxParserError(_("Bad file format"));
     }
 
-    vpz::Origin* orig = static_cast<vpz::Origin*>(pop());
+    auto* orig = static_cast<vpz::Origin*>(pop());
 
     if (not(parent()->isInternalConnection() or
             parent()->isInputConnection() or parent()->isOutputConnection())) {
@@ -489,7 +489,7 @@ SaxStackVpz::buildConnection()
         throw utils::SaxParserError(_("Bad file format"));
     }
 
-    vpz::Model* model = static_cast<vpz::Model*>(parent());
+    auto* model = static_cast<vpz::Model*>(parent());
     vpz::CoupledModel* cpl = model->node()->toCoupled();
 
     if (cnt->isInternalConnection()) {
@@ -561,7 +561,7 @@ SaxStackVpz::pushDynamic(const xmlChar** att)
         dyn.setLanguage("");
     }
 
-    vpz::Dynamics* dyns(static_cast<Dynamics*>(parent()));
+    auto* dyns(static_cast<Dynamics*>(parent()));
     dyns->add(dyn);
 }
 
@@ -650,7 +650,7 @@ SaxStackVpz::pushConditionPort(const xmlChar** att)
           _("Condition port tag does not have attribute 'name'"));
     }
 
-    vpz::Condition* cnd(static_cast<vpz::Condition*>(parent()));
+    auto* cnd(static_cast<vpz::Condition*>(parent()));
     cnd->add(xmlCharToString(name));
 }
 
@@ -661,7 +661,7 @@ SaxStackVpz::popConditionPort()
         throw utils::SaxParserError(_("Bad file format"));
     }
 
-    vpz::Condition* cnd(static_cast<vpz::Condition*>(parent()));
+    auto* cnd(static_cast<vpz::Condition*>(parent()));
 
     return cnd->lastAddedPort();
 }
@@ -880,7 +880,7 @@ SaxStackVpz::pushObservablePort(const xmlChar** att)
           _("Observable port tag does not have attribute 'name'"));
     }
 
-    vpz::Observable* out(static_cast<vpz::Observable*>(parent()));
+    auto* out(static_cast<vpz::Observable*>(parent()));
     vpz::ObservablePort& ports(out->add(xmlCharToString(name)));
     push(&ports);
 }
@@ -905,7 +905,7 @@ SaxStackVpz::pushObservablePortOnView(const xmlChar** att)
           _("Observable port view tag does not have attribute 'name'"));
     }
 
-    vpz::ObservablePort* port(static_cast<vpz::ObservablePort*>(parent()));
+    auto* port(static_cast<vpz::ObservablePort*>(parent()));
     port->add(xmlCharToString(name));
 }
 

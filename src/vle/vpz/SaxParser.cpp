@@ -35,6 +35,7 @@
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <sstream>
+#include <utility>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
@@ -175,7 +176,7 @@ struct scope_exit
     std::function<void(void)> fn;
 
     scope_exit(std::function<void(void)> fn_)
-      : fn(fn_)
+      : fn(std::move(fn_))
     {}
 
     ~scope_exit()
@@ -251,7 +252,7 @@ SaxParser::parse(std::istream& is, std::size_t size)
 void
 SaxParser::stopParser(const std::string& error)
 {
-    xmlParserCtxtPtr ctxt = static_cast<xmlParserCtxtPtr>(m_ctxt);
+    auto ctxt = static_cast<xmlParserCtxtPtr>(m_ctxt);
 
     xmlStopParser(ctxt);
     m_error.assign(error);
@@ -279,7 +280,7 @@ SaxParser::parseMemory(const std::string& buffer)
 void
 SaxParser::onStartDocument(void* ctx)
 {
-    SaxParser* sax = static_cast<SaxParser*>(ctx);
+    auto* sax = static_cast<SaxParser*>(ctx);
 
     sax->m_error.clear();
     sax->m_vpzstack.clear();
@@ -294,7 +295,7 @@ SaxParser::onStartDocument(void* ctx)
 void
 SaxParser::onEndDocument(void* ctx)
 {
-    SaxParser* sax = static_cast<SaxParser*>(ctx);
+    auto* sax = static_cast<SaxParser*>(ctx);
 
     if (sax->m_isVPZ == false) {
         if (not sax->m_valuestack.getResults().empty()) {
@@ -306,7 +307,7 @@ SaxParser::onEndDocument(void* ctx)
 void
 SaxParser::onStartElement(void* ctx, const xmlChar* name, const xmlChar** atts)
 {
-    SaxParser* sax = static_cast<SaxParser*>(ctx);
+    auto* sax = static_cast<SaxParser*>(ctx);
 
     sax->clearLastCharactersStored();
 
@@ -326,7 +327,7 @@ SaxParser::onStartElement(void* ctx, const xmlChar* name, const xmlChar** atts)
 void
 SaxParser::onEndElement(void* ctx, const xmlChar* name)
 {
-    SaxParser* sax = static_cast<SaxParser*>(ctx);
+    auto* sax = static_cast<SaxParser*>(ctx);
 
     auto it = ends().find(name);
     if (it != ends().end()) {
@@ -344,7 +345,7 @@ SaxParser::onEndElement(void* ctx, const xmlChar* name)
 void
 SaxParser::onCharacters(void* ctx, const xmlChar* ch, int len)
 {
-    SaxParser* sax = static_cast<SaxParser*>(ctx);
+    auto* sax = static_cast<SaxParser*>(ctx);
 
     std::string buf((const char*)ch, len);
     sax->addToCharacters(buf);
@@ -353,7 +354,7 @@ SaxParser::onCharacters(void* ctx, const xmlChar* ch, int len)
 void
 SaxParser::onCDataBlock(void* ctx, const xmlChar* value, int len)
 {
-    SaxParser* sax = static_cast<SaxParser*>(ctx);
+    auto* sax = static_cast<SaxParser*>(ctx);
 
     std::string buf((const char*)value, len);
     sax->m_cdata.assign(buf);
@@ -362,7 +363,7 @@ SaxParser::onCDataBlock(void* ctx, const xmlChar* value, int len)
 void
 SaxParser::onWarning(void* ctx, const char* msg, ...)
 {
-    SaxParser* sax = static_cast<SaxParser*>(ctx);
+    auto* sax = static_cast<SaxParser*>(ctx);
 
     va_list args;
     va_start(args, msg);
@@ -375,7 +376,7 @@ SaxParser::onWarning(void* ctx, const char* msg, ...)
 void
 SaxParser::onError(void* ctx, const char* msg, ...)
 {
-    SaxParser* sax = static_cast<SaxParser*>(ctx);
+    auto* sax = static_cast<SaxParser*>(ctx);
 
     va_list args;
     va_start(args, msg);
@@ -388,7 +389,7 @@ SaxParser::onError(void* ctx, const char* msg, ...)
 void
 SaxParser::onFatalError(void* ctx, const char* msg, ...)
 {
-    SaxParser* sax = static_cast<SaxParser*>(ctx);
+    auto* sax = static_cast<SaxParser*>(ctx);
 
     va_list args;
     va_start(args, msg);
@@ -988,7 +989,7 @@ void
 SaxParser::onEndOutput()
 {
     if (m_vpzstack.top()->isOutput()) {
-        Output* out = dynamic_cast<Output*>(m_vpzstack.top());
+        auto* out = dynamic_cast<Output*>(m_vpzstack.top());
         auto& lst = getValues();
         if (not lst.empty()) {
             if (lst.size() > 1) {

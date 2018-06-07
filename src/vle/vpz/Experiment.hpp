@@ -53,8 +53,7 @@ public:
      * @brief Nothing to delete.
      */
     ~Experiment() override
-    {
-    }
+    = default;
 
     /**
      * @brief Write Experiment information under specified root node

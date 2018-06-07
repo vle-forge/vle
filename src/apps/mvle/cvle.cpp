@@ -22,6 +22,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
+#include <utility>
 #include <vle/manager/Simulation.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
@@ -400,7 +402,7 @@ struct Access
         for (std::size_t i = 0, e = params.size(); i != e; ++i) {
             if (current->isSet()) {
                 errno = 0;
-                long int val = strtol(params[i].c_str(), NULL, 10);
+                long int val = strtol(params[i].c_str(), nullptr, 10);
 
                 if (errno or val < 0 or
                     val >= static_cast<long int>(current->toSet().size()))
@@ -475,7 +477,7 @@ public:
     struct KeepColumnDefinition
     {
         KeepColumnDefinition(std::string str_)
-          : str(str_)
+          : str(std::move(str_))
         {}
 
         std::string str;
@@ -667,7 +669,7 @@ struct ConditionsBackup
                 vle::vpz::Condition& toup_cond = toup_conds.get(cond.first);
                 for (auto port : cond.second) {
 
-                    vle::vpz::ConditionValues::iterator toup_port =
+                    auto toup_port =
                       toup_cond.conditionvalues().find(port.first);
                     if (toup_port != toup_cond.conditionvalues().end()) {
                         toup_cond.conditionvalues().erase(toup_port);
@@ -703,7 +705,7 @@ struct ConditionsBackup
             return "no_id";
         }
         const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
-        vle::vpz::ConditionValues::const_iterator it_id =
+        auto it_id =
           cond_cvle.conditionvalues().find("id");
         if (it_id == cond_cvle.conditionvalues().end()) {
             return "no_id";
@@ -801,7 +803,7 @@ private:
             } else {
                 os << error.message << "\n";
             }
-        } else if (result == NULL) {
+        } else if (result == nullptr) {
             if (m_warnings) {
                 fprintf(stderr,
                         _("Simulation without result (try storage as"
@@ -814,42 +816,41 @@ private:
                    << " (try storage as output plugin)\n";
             }
         } else {
-            for (auto it = result->begin(), et = result->end(); it != et;
-                 ++it) {
-                if (it->second && it->second->isMatrix()) {
-                    it->second->writeFile(os);
+            for (auto & it : *result) {
+                if (it.second && it.second->isMatrix()) {
+                    it.second->writeFile(os);
                 }
             }
         }
     }
 
 public:
-    Worker(const std::string& package,
+    Worker(std::string  package,
            std::chrono::milliseconds timeout,
            const std::string& vpz,
            bool withoutspawn,
            bool warnings)
       : m_context(vle::utils::make_context())
       , m_timeout(timeout)
-      , m_packagename(package)
+      , m_packagename(std::move(package))
       , m_simulator(nullptr)
       , m_warnings(warnings)
     {
         if (not withoutspawn) {
-            m_simulator.reset(new vle::manager::Simulation(
+            m_simulator = std::make_unique<vle::manager::Simulation>(
               m_context,
               vle::manager::LOG_NONE,
               vle::manager::SIMULATION_NONE |
                 vle::manager::SIMULATION_SPAWN_PROCESS,
               m_timeout,
-              nullptr));
+              nullptr);
         } else {
-            m_simulator.reset(
-              new vle::manager::Simulation(m_context,
+            m_simulator = std::make_unique<vle::manager::Simulation>(
+              m_context,
                                            vle::manager::LOG_NONE,
                                            vle::manager::SIMULATION_NONE,
                                            m_timeout,
-                                           nullptr));
+                                           nullptr);
         }
         m_context->set_log_priority(3);
         vle::utils::Package pack(m_context);
@@ -861,11 +862,11 @@ public:
     void init(const std::string& header)
     {
         if (header == "_cvle_complex_values") {
-            m_conditions.reset(new ConditionsBackup(*m_vpz));
+            m_conditions = std::make_unique<ConditionsBackup>(*m_vpz);
         } else {
             namespace ba = boost::algorithm;
 
-            m_columns.reset(new Columns());
+            m_columns = std::make_unique<Columns>();
             std::vector<std::string> tokens;
             ba::split(tokens, header, ba::is_any_of(","));
 
@@ -1187,7 +1188,7 @@ main(int argc, char* argv[])
         { "withoutspawn", 0, &withoutspawn, 1 },
         { "warnings", 0, &warnings, 1 },
         { "block-size", 1, nullptr, 'b' },
-        { 0, 0, nullptr, 0 }
+        { nullptr, 0, nullptr, 0 }
     };
     int opt_index;
 

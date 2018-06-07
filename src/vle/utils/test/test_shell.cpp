@@ -139,7 +139,7 @@ g_shell()
     input = "'\\''";
     EnsuresThrow(su.g_shell_unquote(input), vle::utils::CastError);
 
-    input = "\"\\\"\"";
+    input = R"("\"")";
     res = su.g_shell_unquote(input);
     Ensures((res == "\""));
 
@@ -149,15 +149,15 @@ g_shell()
     input = "'";
     EnsuresThrow(su.g_shell_unquote(input), vle::utils::CastError);
 
-    input = "\x22\\\\\"";
+    input = R"("\\")";
     res = su.g_shell_unquote(input);
     Ensures((res == "\\"));
 
-    input = "\x22\\`\"";
+    input = R"("\`")";
     res = su.g_shell_unquote(input);
     Ensures((res == "`"));
 
-    input = "\x22\\$\"";
+    input = R"("\$")";
     res = su.g_shell_unquote(input);
     Ensures((res == "$"));
 
@@ -165,7 +165,7 @@ g_shell()
     res = su.g_shell_unquote(input);
     Ensures((res == "\n"));
 
-    input = "\"\\'\"";
+    input = R"("\'")";
     res = su.g_shell_unquote(input);
     Ensures((res == "\\'"));
 
@@ -173,7 +173,7 @@ g_shell()
     res = su.g_shell_unquote(input);
     Ensures((res == "\\\r"));
 
-    input = "\x22\\n\"";
+    input = R"("\n")";
     res = su.g_shell_unquote(input);
     Ensures((res == "\\n"));
 
@@ -246,7 +246,7 @@ g_shell()
     res = argvp[2];
     Ensures((res == "bar"));
 
-    input = "foo \"bar\"'baz'blah'foo'\\''blah'\"boo\"";
+    input = R"(foo "bar"'baz'blah'foo'\''blah'"boo")";
     su.g_shell_parse_argv(input, argc, argvp);
     EnsuresEqual(argc, 2);
     res = argvp[0];
@@ -320,7 +320,7 @@ g_shell()
     res = argvp[3];
     Ensures((res == "woo "));
 
-    input = "foo \"yada yada \\$\\\"\"";
+    input = R"(foo "yada yada \$\"")";
     su.g_shell_parse_argv(input, argc, argvp);
     EnsuresEqual(argc, 2);
     res = argvp[0];
@@ -328,7 +328,7 @@ g_shell()
     res = argvp[1];
     Ensures((res == "yada yada $\""));
 
-    input = "foo \"c:\\\\\"";
+    input = R"(foo "c:\\")";
     su.g_shell_parse_argv(input, argc, argvp);
     EnsuresEqual(argc, 2);
     res = argvp[0];

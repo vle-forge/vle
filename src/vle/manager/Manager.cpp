@@ -24,8 +24,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <sstream>
 #include <thread>
+#include <utility>
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/Simulation.hpp>
@@ -134,7 +136,7 @@ public:
           SimulationOptions simulationoptions,
           std::chrono::milliseconds timeout,
           std::ostream* output)
-      : mContext(context)
+      : mContext(std::move(context))
       , mTimeout(timeout)
       , mOutputStream(output)
       , mLogOption(logoptions)
@@ -186,7 +188,7 @@ public:
                uint32_t threads,
                value::Matrix* result,
                Error* error)
-          : context(context)
+          : context(std::move(context))
           , vpz(vpz)
           , mTimeout(timeout)
           , expgen(expgen)
@@ -199,7 +201,7 @@ public:
         {}
 
         ~worker()
-        {}
+        = default;
 
         void operator()()
         {
@@ -211,7 +213,7 @@ public:
                   context, mLogOption, mSimulationOption, mTimeout, nullptr);
                 Error err;
 
-                auto file = std::unique_ptr<vpz::Vpz>(new vpz::Vpz(*vpz));
+                auto file = std::make_unique<vpz::Vpz>(*vpz);
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
@@ -239,8 +241,8 @@ public:
         ExperimentGenerator expgen(*vpz, rank, world);
         std::string vpzname(vpz->project().experiment().name());
 
-        auto result = std::unique_ptr<value::Matrix>(
-          new value::Matrix(expgen.size(), 1, expgen.size(), 1));
+        auto result = std::make_unique<value::Matrix>(
+          expgen.size(), 1, expgen.size(), 1);
 
         std::vector<std::thread> gp;
         for (uint32_t i = 0; i < threads; ++i) {
@@ -283,7 +285,7 @@ public:
         if (mSimulationOption == manager::SIMULATION_NO_RETURN) {
             for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
                 Error err;
-                auto file = std::unique_ptr<vpz::Vpz>(new vpz::Vpz(*vpz));
+                auto file = std::make_unique<vpz::Vpz>(*vpz);
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 
@@ -299,12 +301,12 @@ public:
                 }
             }
         } else {
-            result = std::unique_ptr<value::Matrix>(
-              new value::Matrix(expgen.size(), 1, expgen.size(), 1));
+            result = std::make_unique<value::Matrix>(
+              expgen.size(), 1, expgen.size(), 1);
 
             for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
                 Error err;
-                auto file = std::unique_ptr<vpz::Vpz>(new vpz::Vpz(*vpz));
+                auto file = std::make_unique<vpz::Vpz>(*vpz);
                 setExperimentName(file, vpzname, i);
                 expgen.get(i, &file->project().experiment().conditions());
 

@@ -27,6 +27,7 @@
 #ifndef VLE_VPZ_DYNAMIC_HPP
 #define VLE_VPZ_DYNAMIC_HPP
 
+#include <utility>
 #include <vle/DllDefines.hpp>
 #include <vle/vpz/Base.hpp>
 
@@ -57,20 +58,20 @@ public:
      * @brief Build a new local Dynamic with a specific name.
      * @param name Name of the Dynamic.
      */
-    Dynamic(const std::string& name)
-      : m_name(name)
+    Dynamic(std::string  name)
+      : m_name(std::move(name))
       , m_ispermanent(true)
     {
     }
 
-    Dynamic(const std::string& name,
-            const std::string& package,
-            const std::string& library,
-            const std::string& language = std::string())
-      : m_name(name)
-      , m_package(package)
-      , m_library(library)
-      , m_language(language)
+    Dynamic(std::string  name,
+            std::string  package,
+            std::string  library,
+            std::string  language = std::string())
+      : m_name(std::move(name))
+      , m_package(std::move(package))
+      , m_library(std::move(library))
+      , m_language(std::move(language))
       , m_ispermanent(true)
     {
     }
@@ -79,8 +80,7 @@ public:
      * @brief Nothing to clean.
      */
     ~Dynamic() override
-    {
-    }
+    = default;
 
     /**
      * @brief Write the XML representation of this class in the output

@@ -52,8 +52,8 @@ namespace manager {
 
 class ExperimentGenerator::Pimpl
 {
-    Pimpl(const Pimpl& other);
-    Pimpl& operator=(const Pimpl& other);
+    Pimpl(const Pimpl& other) = delete;
+    Pimpl& operator=(const Pimpl& other) = delete;
 
     int computeMaximumValue()
     {
@@ -71,7 +71,7 @@ class ExperimentGenerator::Pimpl
                      jt != cnd.conditionvalues().end();
                      ++jt) {
 
-                    int conditionsize =
+                    auto conditionsize =
                       utils::numeric_cast<int>(jt->second.size());
 
                     if (result == 0 or result == 1) {

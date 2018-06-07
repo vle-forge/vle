@@ -84,13 +84,13 @@ public:
                   rows,
                   static_cast<std::size_t>(std::floor(elem.second[i].first)));
 
-        auto matrix = std::unique_ptr<vle::value::Matrix>(
-          new vle::value::Matrix{ columns, rows + 1, 100, 100 });
+        auto matrix = std::make_unique<vle::value::Matrix>(
+          columns, rows + 1, 100, 100 );
 
         size_t col = 1;
         for (auto& elem : ppD) {
             for (std::size_t i = 0, e = elem.second.size(); i != e; ++i) {
-                std::size_t row =
+                auto row =
                   static_cast<std::size_t>(std::floor(elem.second[i].first));
 
                 if (elem.second[i].second)

@@ -15,6 +15,7 @@
  */
 
 #include <deque>
+#include <memory>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Tuple.hpp>
@@ -75,8 +76,7 @@ public:
     }
 
     ~Integrator() override
-    {
-    }
+    = default;
 
     vd::Time init(vd::Time /* time */) override
     {
@@ -237,7 +237,7 @@ public:
         observation_time = event.getTime();
         value = current_value(observation_time);
 
-        auto t = std::unique_ptr<vv::Tuple>(new vv::Tuple());
+        auto t = std::make_unique<vv::Tuple>();
         t->add(value);
         t->add(m_last_output_value);
         t->add(observation_time == m_last_output_date);

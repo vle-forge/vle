@@ -24,6 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <utility>
 #include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/DynamicsDbg.hpp>
@@ -49,7 +50,7 @@ ModelFactory::ModelFactory(utils::ContextPtr context,
                            const vpz::Dynamics& dyn,
                            const vpz::Classes& cls,
                            const vpz::Experiment& exp)
-  : mContext(context)
+  : mContext(std::move(context))
   , mEventViews(eventviews)
   , mDynamics(dyn)
   , mClasses(cls)
@@ -174,7 +175,7 @@ buildNewDynamicsWrapper(utils::ContextPtr context,
       vle::devs::Dynamics* (*)(const vle::devs::DynamicsWrapperInit&,
                                const vle::devs::InitEventList&);
 
-    fctdw fct = utils::functionCast<fctdw>(symbol);
+    auto fct = utils::functionCast<fctdw>(symbol);
 
     try {
         utils::PackageTable pkg_table;
@@ -276,7 +277,7 @@ buildNewDynamics(utils::ContextPtr context,
     using fctdyn = vle::devs::Dynamics* (*)(const vle::devs::DynamicsInit&,
                                             const vle::devs::InitEventList&);
 
-    fctdyn fct = utils::functionCast<fctdyn>(symbol);
+    auto fct = utils::functionCast<fctdyn>(symbol);
 
     try {
         utils::PackageTable pkg_table;
@@ -336,7 +337,7 @@ buildNewExecutive(utils::ContextPtr context,
     using fctexe = vle::devs::Dynamics* (*)(const vle::devs::ExecutiveInit&,
                                             const vle::devs::InitEventList&);
 
-    fctexe fct = utils::functionCast<fctexe>(symbol);
+    auto fct = utils::functionCast<fctexe>(symbol);
 
     try {
         utils::PackageTable pkg_table;

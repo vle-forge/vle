@@ -56,15 +56,13 @@ public:
      * @brief Empty constructor.
      */
     Classes()
-    {
-    }
+    = default;
 
     /**
      * @brief Nothing to delete.
      */
     ~Classes() override
-    {
-    }
+    = default;
 
     /**
      * @brief Write the classes XML representation into the output stream.

@@ -78,8 +78,7 @@ public:
      * @return none
      */
     ~DynamicsWrapper() override
-    {
-    }
+    = default;
 
     /**
      * @brief If this function return true, then a cast to a DynamicsWrapper

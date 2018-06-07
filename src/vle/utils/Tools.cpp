@@ -326,8 +326,7 @@ tokenize(const std::string& str,
             pos = length;
         }
         if (pos != lastPos || !trimEmpty)
-            tokens.push_back(
-              value_type(str.data() + lastPos, (size_type)pos - lastPos));
+            tokens.emplace_back(str.data() + lastPos, (size_type)pos - lastPos);
         lastPos = pos + 1;
     }
 }

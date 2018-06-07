@@ -25,15 +25,16 @@
  */
 
 #include <cassert>
+#include <utility>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/Class.hpp>
 
 namespace vle {
 namespace vpz {
 
-Class::Class(const std::string& name)
+Class::Class(std::string  name)
   : Base()
-  , m_name(name)
+  , m_name(std::move(name))
   , m_node(nullptr)
 {
 }

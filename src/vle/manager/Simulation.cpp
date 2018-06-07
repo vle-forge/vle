@@ -27,7 +27,9 @@
 #include <boost/progress.hpp>
 #include <boost/timer.hpp>
 #include <fstream>
+#include <memory>
 #include <sstream>
+#include <utility>
 #include <vle/DllDefines.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/manager/Simulation.hpp>
@@ -70,7 +72,7 @@ read_value(const utils::Path& p)
 
         auto v = vpz::Vpz::parseValue(buffer);
         if (v and v->isMap()) {
-            return std::unique_ptr<value::Map>(new value::Map(v->toMap()));
+            return std::make_unique<value::Map>(v->toMap());
         }
     }
 
@@ -93,7 +95,7 @@ public:
           SimulationOptions simulationoptionts,
           std::chrono::milliseconds timeout,
           std::ostream* output)
-      : m_context(context)
+      : m_context(std::move(context))
       , m_timeout(timeout)
       , m_out(output)
       , m_vpz_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.vpz"))
@@ -147,7 +149,7 @@ public:
             long previous = 0;
 
             while (root.run()) {
-                long pc = static_cast<long>(std::floor(
+                auto pc = static_cast<long>(std::floor(
                   100. * (root.getCurrentTime() - begin) / duration));
 
                 display += pc - previous;

@@ -118,18 +118,12 @@ namespace value {
 
 Matrix::Matrix()
   : m_matrix(256 * 1024)
-  , m_nbcol(0)
-  , m_nbrow(0)
-  , m_nbcolmax(256)
-  , m_nbrowmax(1024)
-  , m_stepcol(1)
-  , m_steprow(1)
-  , m_lastX(0)
-  , m_lastY(0)
-{
-}
+{}
 
-Matrix::Matrix(index columns, index rows, index resizeColumns, index resizeRows)
+Matrix::Matrix(index columns,
+               index rows,
+               index resizeColumns,
+               index resizeRows)
   : m_matrix(columns * rows)
   , m_nbcol(columns)
   , m_nbrow(rows)
@@ -139,8 +133,7 @@ Matrix::Matrix(index columns, index rows, index resizeColumns, index resizeRows)
   , m_steprow(resizeRows)
   , m_lastX(0)
   , m_lastY(0)
-{
-}
+{}
 
 Matrix::Matrix(index columns,
                index rows,
@@ -387,7 +380,10 @@ Matrix::getTuple(index column, index row)
 }
 
 Table&
-Matrix::addTable(index column, index row, std::size_t width, std::size_t height)
+Matrix::addTable(index column,
+                 index row,
+                 std::size_t width,
+                 std::size_t height)
 {
     return ::pp_add<Table>(*this, column, row, width, height);
 }
@@ -463,7 +459,8 @@ Matrix::reserve(size_type columnmax, size_type rowmax)
 {
     if (columnmax * rowmax <= 0)
         throw utils::ArgError(
-          (fmt(_("Matrix: bad reserve operation %1%x%2%")) % columnmax % rowmax)
+          (fmt(_("Matrix: bad reserve operation %1%x%2%")) % columnmax %
+           rowmax)
             .str());
 
     if (columnmax <= m_nbcolmax and rowmax <= m_nbrowmax)

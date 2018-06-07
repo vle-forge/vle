@@ -43,7 +43,7 @@ namespace plugin {
 
 File::File(const std::string& location)
   : Plugin(location)
-  , m_filetype(0)
+  , m_filetype(nullptr)
   , m_time(-1.0)
   , m_isstart(false)
   , m_havefirstevent(false)
@@ -252,7 +252,7 @@ File::finish(const double& time)
     finalFlush(time);
     std::vector<std::string> array(m_columns.size());
 
-    Columns::iterator it = m_columns.begin();
+    auto it = m_columns.begin();
     for (it = m_columns.begin(); it != m_columns.end(); ++it) {
         array[it->second] = it->first;
     }
@@ -323,7 +323,7 @@ File::finalFlush(double trame_time)
             }
         }
         m_filetype->writeSeparator(m_file);
-        for (value::Set::iterator it = m_buffer.begin(); it != m_buffer.end();
+        for (auto it = m_buffer.begin(); it != m_buffer.end();
              ++it) {
             if (*it) {
                 (*it)->writeFile(m_file);

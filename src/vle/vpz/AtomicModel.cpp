@@ -27,6 +27,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <utility>
 #include <vle/vpz/AtomicModel.hpp>
 
 namespace vle {
@@ -41,12 +42,12 @@ AtomicModel::AtomicModel(const std::string& name, CoupledModel* parent)
 AtomicModel::AtomicModel(const std::string& name,
                          CoupledModel* parent,
                          const std::string& condition,
-                         const std::string& dynamic,
-                         const std::string& observable)
+                         std::string  dynamic,
+                         std::string  observable)
   : BaseModel(name, parent)
   , m_simulator(nullptr)
-  , m_dynamics(dynamic)
-  , m_observables(observable)
+  , m_dynamics(std::move(dynamic))
+  , m_observables(std::move(observable))
   , m_debug(false)
 {
     std::string conditionList(condition);
@@ -100,7 +101,7 @@ AtomicModel::findModel(const std::string& name) const
 void
 AtomicModel::writeXML(std::ostream& out) const
 {
-    out << "<model name=\"" << getName().c_str() << "\" type=\"atomic\""
+    out << "<model name=\"" << getName().c_str() << R"(" type="atomic")"
         << ">\n";
     writePortListXML(out);
     out << "</model>\n";

@@ -147,8 +147,8 @@ coupledmodel_vpz()
     if (not mdl2)
         return;
 
-    vpz::AtomicModel* atom1 = dynamic_cast<vpz::AtomicModel*>(mdl1);
-    vpz::AtomicModel* atom2 = dynamic_cast<vpz::AtomicModel*>(mdl2);
+    auto* atom1 = dynamic_cast<vpz::AtomicModel*>(mdl1);
+    auto* atom2 = dynamic_cast<vpz::AtomicModel*>(mdl2);
     Ensures(atom1 != nullptr);
     if (not atom1)
         return;

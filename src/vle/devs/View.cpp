@@ -63,7 +63,7 @@ View::open(utils::ContextPtr ctx,
         else
             symbol = ctx->get_symbol(pluginname);
 
-        oov::OovPluginSlot fct(utils::functionCast<oov::OovPluginSlot>(symbol));
+        auto fct(utils::functionCast<oov::OovPluginSlot>(symbol));
         m_plugin = std::unique_ptr<oov::Plugin>(fct(location));
     } catch (const std::exception& e) {
         throw utils::FileError(

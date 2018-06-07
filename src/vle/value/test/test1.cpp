@@ -30,6 +30,7 @@
 #include <functional>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <stdexcept>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/unit-test.hpp>
@@ -54,35 +55,35 @@ void
 check_simple_value()
 {
     {
-        auto b = std::unique_ptr<value::Boolean>(new value::Boolean(true));
+        auto b = std::make_unique<value::Boolean>(true);
         EnsuresEqual(b->value(), true);
         b->set(false);
         EnsuresEqual(b->value(), false);
     }
 
     {
-        auto d = std::unique_ptr<value::Double>(new value::Double(12.34));
+        auto d = std::make_unique<value::Double>(12.34);
         EnsuresApproximatelyEqual(d->value(), 12.34, 1e-10);
         d->set(43.21);
         EnsuresApproximatelyEqual(d->value(), 43.21, 1e-10);
     }
 
     {
-        auto i = std::unique_ptr<value::Integer>(new value::Integer(1234));
+        auto i = std::make_unique<value::Integer>(1234);
         EnsuresEqual(i->value(), 1234);
         i->set(4321);
         EnsuresEqual(i->value(), 4321);
     }
 
     {
-        auto s = std::unique_ptr<value::String>(new value::String("1234"));
+        auto s = std::make_unique<value::String>("1234");
         EnsuresEqual(s->value(), "1234");
         s->set("4321");
         EnsuresEqual(s->value(), "4321");
     }
 
     {
-        auto x = std::unique_ptr<value::Xml>(new value::Xml("test"));
+        auto x = std::make_unique<value::Xml>("test");
         EnsuresEqual(x->value(), "test");
         x->set("tset");
         EnsuresEqual(x->value(), "tset");
@@ -92,7 +93,7 @@ check_simple_value()
 void
 check_map_value()
 {
-    auto mp = std::unique_ptr<value::Map>(new value::Map());
+    auto mp = std::make_unique<value::Map>();
 
     EnsuresEqual(mp->empty(), true);
     mp->addBoolean("boolean", true);
@@ -118,7 +119,7 @@ check_map_value()
 void
 check_set_value()
 {
-    auto st = std::unique_ptr<value::Set>(new value::Set());
+    auto st = std::make_unique<value::Set>();
 
     EnsuresEqual(st->empty(), true);
     st->addBoolean(true);
@@ -147,7 +148,7 @@ check_clone()
     std::unique_ptr<value::Value> clone;
 
     {
-        auto mp = std::unique_ptr<value::Map>(new value::Map());
+        auto mp = std::make_unique<value::Map>();
         mp->add("x1", value::String::create("toto"));
         mp->add("x2", value::String::create("toto"));
         mp->add("x3", value::String::create("toto"));
@@ -161,7 +162,7 @@ check_clone()
     }
 
     {
-        auto st = std::unique_ptr<value::Set>(new value::Set());
+        auto st = std::make_unique<value::Set>();
         st->add(value::String::create("toto"));
         st->add(value::String::create("toto"));
         st->add(value::String::create("toto"));
@@ -179,7 +180,7 @@ check_clone()
 void
 check_null()
 {
-    auto st = std::unique_ptr<value::Set>(new value::Set());
+    auto st = std::make_unique<value::Set>();
     st->addString("toto1");
     st->addNull();
     st->addString("toto2");
@@ -214,8 +215,7 @@ check_null()
 void
 check_matrix()
 {
-    auto mx =
-      std::unique_ptr<value::Matrix>(new value::Matrix(100, 100, 10, 10));
+    auto mx = std::make_unique<value::Matrix>(100, 100, 10, 10);
     EnsuresEqual(mx->rows(), (value::Matrix::size_type)100);
     EnsuresEqual(mx->columns(), (value::Matrix::size_type)100);
 
@@ -232,7 +232,7 @@ check_matrix()
     EnsuresEqual(mx->get(0, 0)->isInteger(), true);
     EnsuresEqual(mx->get(0, 0)->toInteger().value(), 10);
 
-    auto cpy = std::unique_ptr<value::Matrix>(new value::Matrix(*mx));
+    auto cpy = std::make_unique<value::Matrix>(*mx);
 
     EnsuresEqual(cpy->get(0, 0)->isInteger(), true);
 
@@ -267,16 +267,12 @@ namespace test {
 class MyData : public vle::value::User
 {
 public:
-    double x, y, z;
+    double x{ 0.0 }, y{ 0.0 }, z{ 0.0 };
     std::string name;
 
     MyData()
       : vle::value::User()
-      , x(0.0)
-      , y(0.0)
-      , z(0.0)
-    {
-    }
+    {}
 
     MyData(double x, double y, double z, std::string name)
       : vle::value::User()
@@ -284,21 +280,11 @@ public:
       , y(y)
       , z(z)
       , name(std::move(name))
-    {
-    }
+    {}
 
-    MyData(const MyData& value)
-      : vle::value::User(value)
-      , x(value.x)
-      , y(value.y)
-      , z(value.z)
-      , name(value.name)
-    {
-    }
+    MyData(const MyData& value) = default;
 
-    ~MyData() override
-    {
-    }
+    ~MyData() override = default;
 
     size_t id() const override
     {
@@ -338,7 +324,7 @@ check_user_value(vle::value::Value& to_check)
     EnsuresEqual(user.getType(), vle::value::Value::USER);
     EnsuresEqual(user.id(), 15978462u);
 
-    test::MyData* mydata = dynamic_cast<test::MyData*>(&user);
+    auto* mydata = dynamic_cast<test::MyData*>(&user);
     Ensures(mydata);
 
     if (not mydata)

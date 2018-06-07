@@ -50,24 +50,18 @@ public:
      */
     User()
       : Value()
-    {
-    }
+    {}
 
     /**
      * @brief Copy constructor.
      * @param value The value to copy.
      */
-    User(const User& value)
-      : Value(value)
-    {
-    }
+    User(const User& value) = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~User() override
-    {
-    }
+    ~User() override = default;
 
     /**
      * @brief To identify your own data.

@@ -136,11 +136,9 @@ struct vle_log_standard : vle::utils::Context::LogFunctor
 
 struct vle_log_file : vle::utils::Context::LogFunctor
 {
-    FILE* fp;
+    FILE* fp{nullptr};
 
-    vle_log_file()
-      : fp(nullptr)
-    {}
+    vle_log_file() = default;
 
     ~vle_log_file() override
     {
@@ -873,7 +871,7 @@ main(int argc, char** argv)
                                         { "package", 0, nullptr, 'P' },
                                         { "remote", 0, nullptr, 'R' },
                                         { "config", 0, nullptr, 'C' },
-                                        { 0, 0, nullptr, 0 } };
+                                        { nullptr, 0, nullptr, 0 } };
 
     for (;;) {
         const auto opt =

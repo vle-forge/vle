@@ -27,6 +27,7 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <vle/devs/Time.hpp>
@@ -89,8 +90,7 @@ public:
      * m_matrix.
      */
     ~Storage() override
-    {
-    }
+    = default;
 
     /**
      * Return a clone of the current matrix
@@ -99,8 +99,8 @@ public:
     std::unique_ptr<value::Matrix> matrix() const override
     {
         if (m_matrix) {
-            return std::unique_ptr<value::Matrix>(
-              new value::Matrix(*m_matrix));
+            return std::make_unique<value::Matrix>(
+              *m_matrix);
         }
         return {};
     }
@@ -143,15 +143,15 @@ public:
             parameters.reset();
         }
         if (m_headertype == STORAGE_HEADER_TOP) {
-            m_matrix.reset(
-              new value::Matrix(1, 1, rzcolumns, rzrows, rzcolumns, rzrows));
+            m_matrix = std::make_unique<value::Matrix>(
+              1, 1, rzcolumns, rzrows, rzcolumns, rzrows);
             m_matrix->add(
               0,
               0,
               std::unique_ptr<value::Value>(new vle::value::String("time")));
         } else {
-            m_matrix.reset(
-              new value::Matrix(1, 0, rzcolumns, rzrows, rzcolumns, rzrows));
+            m_matrix = std::make_unique<value::Matrix>(
+              1, 0, rzcolumns, rzrows, rzcolumns, rzrows);
         }
     }
 

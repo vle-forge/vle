@@ -119,8 +119,8 @@ public:
     uint32_t size() const;
 
 private:
-    ExperimentGenerator(const ExperimentGenerator& other);
-    ExperimentGenerator& operator=(const ExperimentGenerator& other);
+    ExperimentGenerator(const ExperimentGenerator& other) = delete;
+    ExperimentGenerator& operator=(const ExperimentGenerator& other) = delete;
 
     class Pimpl;
     Pimpl* mPimpl;

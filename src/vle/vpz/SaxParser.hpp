@@ -57,8 +57,7 @@ public:
      * @brief Nothing to delete.
      */
     virtual ~SaxParser()
-    {
-    }
+    = default;
 
     /**
      * @brief Open the VPZ file and parse it with @c parse function.

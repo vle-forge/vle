@@ -32,6 +32,7 @@
 #include <cstring>
 #include <iostream>
 #include <thread>
+#include <utility>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/details/ShellUtils.hpp>
@@ -86,7 +87,7 @@ convert_string_str_array(const std::vector<std::string>& args)
 }
 
 static char**
-prepare_environment_variable(void)
+prepare_environment_variable()
 {
     char** it = ::environ;
     char** jt = nullptr;
@@ -157,7 +158,7 @@ public:
     std::string m_command;
 
     Pimpl(ContextPtr ctx, std::chrono::milliseconds waitchildtimeout)
-      : m_context(ctx)
+      : m_context(std::move(ctx))
       , m_waitchildtimeout(waitchildtimeout)
       , m_pid(-1)
       , m_status(0)
