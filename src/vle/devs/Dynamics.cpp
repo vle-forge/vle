@@ -29,6 +29,7 @@
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
@@ -197,19 +198,18 @@ Dynamics::getPackageExpFile(const std::string& name) const
 }
 
 void
-Dynamics::Trace(int priority, const char* format, ...) const 
+Dynamics::Trace(int priority, const char* format, ...) const
 {
     if (m_context->get_log_priority() < priority)
         return;
 
     va_list ap;
+    va_start(ap, format);
     try {
-        va_start(ap, format);
-        m_context->log(priority, nullptr, -1, nullptr, format, ap);
-        va_end(ap);
+        m_context->log(priority, utils::vformat(format, ap));
     } catch (...) {
-        va_end(ap);
     }
+    va_end(ap);
 }
 
 void
@@ -228,14 +228,12 @@ Trace(utils::ContextPtr ctx, int priority, const char* format, ...)
         return;
 
     va_list ap;
+    va_start(ap, format);
     try {
-        va_start(ap, format);
-        ctx->log(priority, nullptr, -1, nullptr, format, ap);
-        va_end(ap);
+        ctx->log(priority, utils::vformat(format, ap));
     } catch (...) {
-        va_end(ap);
     }
+    va_end(ap);
 }
-
 }
 } // namespace vle devs
