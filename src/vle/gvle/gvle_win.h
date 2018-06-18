@@ -55,6 +55,8 @@ class gvleWin;
 namespace vle {
 namespace gvle {
 
+class notification;
+
 class gvle_win : public QMainWindow
 {
     Q_OBJECT
@@ -149,6 +151,7 @@ private:
     utils::Package mCurrPackage;
     utils::Spawn mSpawn;
     Distributions mDistributions;
+    notification* mPopup;
 
 protected:
     void newProject(QString pathName);

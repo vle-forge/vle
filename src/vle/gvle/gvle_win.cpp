@@ -41,6 +41,7 @@
 #include "gvle_file.h"
 #include "gvle_win.h"
 #include "help.h"
+#include "notification.h"
 #include "plugin_cond.h"
 #include "plugin_mainpanel.h"
 #include "plugin_output.h"
@@ -66,8 +67,8 @@ struct gvle_ctx_log : vle::utils::Context::LogFunctor
     ~gvle_ctx_log() override = default;
 
     void write(const vle::utils::Context& /*ctx*/,
-            int priority,
-            const std::string& str) noexcept override
+               int priority,
+               const std::string& str) noexcept override
     {
         QString msg = QString::fromStdString(str);
 
@@ -140,6 +141,7 @@ gvle_win::gvle_win(QWidget* parent)
 {
     // GUI init
     ui->setupUi(this);
+    mPopup = new notification(this);
 
     // log init (gvle::Logger and Ctx logger)
     mLogger = new Logger();
@@ -291,6 +293,9 @@ gvle_win::showEvent(QShowEvent* event)
 void
 gvle_win::onNewProject()
 {
+    mPopup->setPopupText("gvle_win::onNewProject");
+    mPopup->show();
+
     if (not closeProject()) {
         return;
     }
@@ -1021,67 +1026,69 @@ gvle_win::menuPackagesInstallRefresh()
     // update packages to install
     utils::RemoteManager rm(mCtx);
     {
-		rm.start(utils::REMOTE_MANAGER_UPDATE, "", &std::cout);
-		rm.join();
-		if (rm.hasError()) {
-			mLogger->logExt(QString(rm.messageError().c_str()), true);
-			return;
-		}
+        rm.start(utils::REMOTE_MANAGER_UPDATE, "", &std::cout);
+        rm.join();
+        if (rm.hasError()) {
+            mLogger->logExt(QString(rm.messageError().c_str()), true);
+            return;
+        }
 
-		vle::utils::Packages res;
+        vle::utils::Packages res;
         rm.getResult(&res);
         vle::utils::Packages::const_iterator itb = res.begin();
         vle::utils::Packages::const_iterator ite = res.end();
         if (itb == ite) {
-			mLogger->logExt(QString("No package has to be updated\n"), true);
+            mLogger->logExt(QString("No package has to be updated\n"), true);
         } else {
-			mLogger->log(QString("Packages to update (re-install them):"));
+            mLogger->log(QString("Packages to update (re-install them):"));
             for (; itb != ite; itb++) {
-                mLogger->log(QString(utils::format("%s\tfrom %s\t (new version: %d.%d.%d)\n",
-                           itb->name.c_str(),
-                           itb->url.c_str(),
-                           itb->major,
-                           itb->minor,
-                           itb->patch).c_str()));
-			}
+                mLogger->log(QString(
+                  utils::format("%s\tfrom %s\t (new version: %d.%d.%d)\n",
+                                itb->name.c_str(),
+                                itb->url.c_str(),
+                                itb->major,
+                                itb->minor,
+                                itb->patch)
+                    .c_str()));
+            }
         }
-	}
+    }
 
-	{
-		rm.start(utils::REMOTE_MANAGER_SEARCH, ".*", &std::cout);
-		rm.join();
-		if (rm.hasError()) {
-			mLogger->logExt(QString(rm.messageError().c_str()), true);
-			return;
-		}
+    {
+        rm.start(utils::REMOTE_MANAGER_SEARCH, ".*", &std::cout);
+        rm.join();
+        if (rm.hasError()) {
+            mLogger->logExt(QString(rm.messageError().c_str()), true);
+            return;
+        }
 
-		vle::utils::Packages res;
-		rm.getResult(&res);
-		std::sort(res.begin(),
-				  res.end(),
-				  [](const utils::PackageId& a, const utils::PackageId& b) {
-					  return a.name < b.name;
-				  });
+        vle::utils::Packages res;
+        rm.getResult(&res);
+        std::sort(res.begin(),
+                  res.end(),
+                  [](const utils::PackageId& a, const utils::PackageId& b) {
+                      return a.name < b.name;
+                  });
 
-		vle::utils::Packages::const_iterator itb = res.begin();
-		vle::utils::Packages::const_iterator ite = res.end();
-		ui->menuInstall->clear();
-		for (; itb != ite; itb++) {
-			QString distrib = "";
-			for (auto& d : mDistributions) {
-				if (d.second.first == itb->url) {
-					distrib = QString(d.first.c_str());
-				}
-			}
-			QString el = itb->name.c_str();
-			el += " from ";
-			el += distrib;
-			QAction* action = ui->menuInstall->addAction(el);
-			action->setData(QString(itb->name.c_str()));
-			QObject::connect(
-			  action, SIGNAL(triggered()), this, SLOT(onPackageInstall()));
-		}
-	}
+        vle::utils::Packages::const_iterator itb = res.begin();
+        vle::utils::Packages::const_iterator ite = res.end();
+        ui->menuInstall->clear();
+        for (; itb != ite; itb++) {
+            QString distrib = "";
+            for (auto& d : mDistributions) {
+                if (d.second.first == itb->url) {
+                    distrib = QString(d.first.c_str());
+                }
+            }
+            QString el = itb->name.c_str();
+            el += " from ";
+            el += distrib;
+            QAction* action = ui->menuInstall->addAction(el);
+            action->setData(QString(itb->name.c_str()));
+            QObject::connect(
+              action, SIGNAL(triggered()), this, SLOT(onPackageInstall()));
+        }
+    }
 }
 
 void
@@ -1295,7 +1302,6 @@ gvle_win::onTreeDblClick(QModelIndex index)
         return;
     }
 
-
     PluginMainPanel* newPanel = gf.newInstanceMainPanel(mGvlePlugins);
 
     if (newPanel) {
@@ -1305,7 +1311,9 @@ gvle_win::onTreeDblClick(QModelIndex index)
             QString logMessage = QString("%1").arg(e.what());
             mLogger->logExt(logMessage, true);
             mLogger->log(tr("File opening failed"));
-            return;
+
+            mPopup->setPopupText(logMessage);
+            mPopup->show();
         }
     }
     // set undo redo enabled
@@ -1514,8 +1522,7 @@ void gvle_win::onDataChanged(QModelIndex /*indexTL*/, QModelIndex /*indexBR*/)
 
 void
 gvle_win::onItemChanged(QTreeWidgetItem* /*item*/, int /*col*/)
-{
-}
+{}
 
 bool
 gvle_win::removeDir(const QString& dirName)
@@ -1771,6 +1778,10 @@ gvle_win::onPackageInstall()
         mSpawn.start(
           exe, vle::utils::Path::temp_directory_path().string(), argv);
     } catch (const std::exception& e) {
+        QString message("Remote install error");
+
+        mPopup->setPopupText(message);
+        mPopup->show();
 
         mLogger->logExt("Remote install error ", true);
     }
@@ -1782,6 +1793,7 @@ gvle_win::onPackageInstall()
 void
 gvle_win::onPackageUninstall()
 {
+
     QAction* senderAct = qobject_cast<QAction*>(QObject::sender());
     QString pkg = senderAct->data().toString();
 
