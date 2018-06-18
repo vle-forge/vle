@@ -168,7 +168,7 @@ const char* vpz_test_model_ports =
   "<out/>\n"
   "<submodels>\n"
   "<model observables=\"\" dynamics=\"\" conditions=\"\" name=\"atomic\""
-  "type=\"atomic\">\n"
+  " type=\"atomic\">\n"
   "<in>\n"
   "<port name=\"NewPort\"/>\n"
   "</in>\n"
@@ -204,7 +204,6 @@ const char* vpz_test_model_ports =
   "</condition>\n"
   "</conditions>\n"
   "<views/>\n"
-  "</views>\n"
   "</experiment>\n"
   "</vle_project>\n";
 
