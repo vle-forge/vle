@@ -273,13 +273,19 @@ template VLE_API int8_t
 convert<int8_t>(const std::string& value, bool locale, const std::string& loc);
 
 template VLE_API int16_t
-convert<int16_t>(const std::string& value, bool locale, const std::string& loc);
+convert<int16_t>(const std::string& value,
+                 bool locale,
+                 const std::string& loc);
 
 template VLE_API int32_t
-convert<int32_t>(const std::string& value, bool locale, const std::string& loc);
+convert<int32_t>(const std::string& value,
+                 bool locale,
+                 const std::string& loc);
 
 template VLE_API uint8_t
-convert<uint8_t>(const std::string& value, bool locale, const std::string& loc);
+convert<uint8_t>(const std::string& value,
+                 bool locale,
+                 const std::string& loc);
 
 template VLE_API uint16_t
 convert<uint16_t>(const std::string& value,
@@ -318,15 +324,14 @@ tokenize(const std::string& str,
          bool trimEmpty)
 {
     std::string::size_type pos, lastPos = 0, length = str.length();
-    using value_type = typename std::vector<std::string>::value_type;
-    using size_type = typename std::vector<std::string>::size_type;
+
     while (lastPos < length + 1) {
         pos = str.find_first_of(delim, lastPos);
         if (pos == std::string::npos) {
             pos = length;
         }
         if (pos != lastPos || !trimEmpty)
-            tokens.emplace_back(str.data() + lastPos, (size_type)pos - lastPos);
+            tokens.emplace_back(str.data() + lastPos, pos - lastPos);
         lastPos = pos + 1;
     }
 }
