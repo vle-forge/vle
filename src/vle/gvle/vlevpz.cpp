@@ -103,7 +103,10 @@ vleVpz::vleVpz(QXmlInputSource& source)
   , maxPrecision(std::numeric_limits<double>::digits10)
 {
     QXmlSimpleReader reader;
-    mDoc.setContent(&source, &reader);
+
+    if (not mDoc.setContent(&source, &reader))
+        throw std::runtime_error("Fail to parse VPZ file");
+
     mVdo = new vleDomVpz(&mDoc);
     undoStack = new DomDiffStack(mVdo);
     undoStack->init(getDomDoc());
@@ -151,7 +154,9 @@ vleVpz::vleVpz(const QString& vpzpath,
         mDocVpm = new QDomDocument("vle_project_metadata");
         QXmlInputSource source(&file);
         QXmlSimpleReader reader;
-        mDocVpm->setContent(&source, &reader);
+
+        if (not mDocVpm->setContent(&source, &reader))
+            throw std::runtime_error("Fail to parse VPM file");
     } else {
         xCreateDomMetadata();
     }
@@ -4204,7 +4209,9 @@ vleVpz::xReadDom()
     QFile file(mFilename);
     QXmlInputSource source(&file);
     QXmlSimpleReader reader;
-    mDoc.setContent(&source, &reader);
+
+    if (not mDoc.setContent(&source, &reader))
+        throw std::runtime_error("Fail to parse VPZ file");
 }
 
 void
@@ -4212,7 +4219,9 @@ vleVpz::xReadDomMetadata()
 {
     if (mDocVpm) {
         QFile file(mFileNameVpm);
-        mDocVpm->setContent(&file);
+
+        if (not mDocVpm->setContent(&file))
+            throw std::runtime_error("Fail to parse VPM file");
     }
 }
 
