@@ -21,11 +21,12 @@ QT5_WRAP_UI(help_h help.ui)
 
 SET(gvle_SOURCES_HPP ${ui_gvle_win_h} ${aboutbox_h} ${help_h} gvle_widgets.h
    logger.h plugin_cond.h plugin_mainpanel.h plugin_simpanel.h plugin_output.h
-   dom_tools.hpp vle_dom.hpp vlevpz.hpp gvle_plugins.h gvle_file.h)
+   dom_tools.hpp vle_dom.hpp vlevpz.hpp gvle_plugins.h gvle_file.h
+   notification.h)
 
 SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
   helpbrowser.cpp logger.cpp dom_tools.cpp vle_dom.cpp vlevpz.cpp
-  gvle_plugins.cpp gvle_file.cpp)
+  gvle_plugins.cpp gvle_file.cpp notification.cpp)
 
 if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
