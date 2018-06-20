@@ -34,6 +34,8 @@
 #include <vector>
 #include <vle/DllDefines.hpp>
 
+#include <ciso646>
+
 #if defined(__GNUC__)
 #define GCC_ATTRIBUTE_FORMAT(idformat, idarg)                                  \
     __attribute__((format(printf, (idformat), (idarg))))

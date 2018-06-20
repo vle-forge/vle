@@ -28,7 +28,10 @@
 #define VLE_UTILS_ARRAY_HPP
 
 #include <vector>
+
 #include <vle/utils/Exception.hpp>
+
+#include <ciso646>
 
 namespace vle {
 namespace utils {

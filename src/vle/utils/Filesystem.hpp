@@ -18,7 +18,10 @@
 #include <memory>
 #include <string>
 #include <vector>
+
 #include <vle/DllDefines.hpp>
+
+#include <ciso646>
 
 namespace vle {
 namespace utils {

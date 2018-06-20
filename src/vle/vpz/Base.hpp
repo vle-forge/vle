@@ -30,6 +30,8 @@
 #include <ostream>
 #include <vle/DllDefines.hpp>
 
+#include <ciso646>
+
 namespace vle {
 namespace vpz {
 

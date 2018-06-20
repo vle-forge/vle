@@ -33,6 +33,8 @@
 #include <vle/DllDefines.hpp>
 #include <vle/vpz/BaseModel.hpp>
 
+#include <ciso646>
+
 namespace vle {
 namespace vpz {
 

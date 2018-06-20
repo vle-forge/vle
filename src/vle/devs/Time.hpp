@@ -27,10 +27,12 @@
 #ifndef VLE_DEVS_TIME_HPP
 #define VLE_DEVS_TIME_HPP
 
-#include <cmath> /* for isnan */
 #include <limits>
 #include <string>
 #include <vle/DllDefines.hpp>
+
+#include <cmath>
+#include <ciso646>
 
 namespace vle {
 namespace devs {

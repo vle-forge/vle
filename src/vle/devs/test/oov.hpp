@@ -27,11 +27,15 @@
 #ifndef VLE_DEVS_TEST_OOV_HPP
 #define VLE_DEVS_TEST_OOV_HPP
 
-#include <cassert>
-#include <cmath>
-#include <memory>
 #include <vle/oov/Plugin.hpp>
 #include <vle/value/Double.hpp>
+
+#include <algorithm>
+#include <memory>
+
+#include <cassert>
+#include <cmath>
+#include <ciso646>
 
 namespace vletest {
 inline std::string

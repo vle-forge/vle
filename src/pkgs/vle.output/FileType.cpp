@@ -27,6 +27,8 @@
 
 #include "FileType.hpp"
 
+#include <ciso646>
+
 namespace vle {
 namespace oov {
 namespace plugin {

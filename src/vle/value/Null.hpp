@@ -30,6 +30,8 @@
 #include <vle/DllDefines.hpp>
 #include <vle/value/Value.hpp>
 
+#include <ciso646>
+
 namespace vle {
 namespace value {
 
