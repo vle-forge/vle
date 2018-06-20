@@ -392,7 +392,8 @@ Path::current_path()
     return Path(temp);
 #else
     std::wstring buffer(MAX_PATH, '\0');
-    DWORD ret = ::GetCurrentDirectoryW(buffer.size(), &buffer[0]);
+    DWORD ret = ::GetCurrentDirectoryW(
+        static_cast<DWORD>(buffer.size()), &buffer[0]);
 
     while (ret > buffer.size()) {
         buffer.resize(ret, '\0');
@@ -438,11 +439,13 @@ Path::temp_directory_path()
     return { "/tmp" };
 #else
     std::wstring buffer(MAX_PATH, '\0');
-    auto ret = ::GetTempPathW(buffer.size(), &buffer[0]);
+    auto ret = ::GetTempPathW(
+        static_cast<DWORD>(buffer.size()), &buffer[0]);
 
     while (ret > buffer.size()) {
         buffer.resize(ret, '\0');
-        ret = ::GetTempPathW(buffer.size(), &buffer[0]);
+        ret = ::GetTempPathW(
+            static_cast<DWORD>(buffer.size()), &buffer[0]);
     }
 
     if (ret == 0)
