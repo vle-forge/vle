@@ -24,8 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <iterator>

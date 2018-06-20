@@ -24,6 +24,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <tchar.h>
+
+#include <Windows.h>
+
 #include <vle/utils/details/UtilsWin.hpp>
 
 #include <algorithm>
@@ -398,10 +402,9 @@ struct Spawn::Pimpl
 
     void format(const char* function, DWORD error)
     {
-        vErr(m_context,
-             "%s failed: %s\n",
-             function,
-             format_message(error).c_str());
+        m_context->error("%s failed: %s\n",
+                         function,
+                         format_message(error).c_str());
     }
 
     bool wait()
@@ -478,13 +481,13 @@ Spawn::start(const Path& exe,
 {
     m_pimpl->init(waitchildtimeout);
 
-    vDbg(m_pimpl->m_context,
+    m_pimpl->m_context->debug(
          _("Spawn: command: `%s' chdir: `%s'\n"),
          exe.string().c_str(),
          workingdir.string().c_str());
 
     for (const auto& elem : args) {
-        vDbg(m_pimpl->m_context, _("[%s]\n"), elem.c_str());
+        m_pimpl->m_context->debug(_("[%s]\n"), elem.c_str());
     }
 
     return m_pimpl->start(exe, workingdir, args);
@@ -536,9 +539,8 @@ Spawn::splitCommandLine(const std::string& command)
 
     if (argv.empty())
         throw utils::ArgError(
-          (fmt(_("Package command line: error, empty command `%1%'")) %
-           command)
-            .str());
+          _("Package command line: error, empty command `%s'"),
+           command.c_str());
 
     argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();
 

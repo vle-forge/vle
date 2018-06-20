@@ -162,8 +162,7 @@ void
 Experiment::setCombination(const std::string& name)
 {
     if (name != "linear" and name != "total") {
-        throw utils::ArgError(
-          (fmt(_("Unknow combination '%1%'")) % name).str());
+        throw utils::ArgError(_("Unknow combination '%s'"), name.c_str());
     }
 
     m_combination.assign(name);

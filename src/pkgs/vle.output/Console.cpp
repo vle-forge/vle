@@ -25,10 +25,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/format.hpp>
-#include <iostream>
 #include <vle/oov/Plugin.hpp>
-
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
@@ -36,6 +33,11 @@
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
+
+#include <algorithm>
+#include <iostream>
+
+#include <ciso646>
 
 namespace vle {
 namespace oov {
@@ -72,11 +74,9 @@ public:
       , mTime(-1.0)
       , mHaveFirstEvent(false)
       , mHeader(true)
-    {
-    }
+    {}
 
-    ~Console() override
-    = default;
+    ~Console() override = default;
 
     void onParameter(const std::string& /*plugin*/,
                      const std::string& /*location*/,
@@ -144,13 +144,9 @@ public:
 
         std::string name(buildname(parent, simulator, portname));
 
-        if (mColumns.find(name) != mColumns.end()) {
+        if (mColumns.find(name) != mColumns.end())
             throw utils::InternalError(
-              (boost::format(
-                 "Output plug-in: observable '%1%' already exist") %
-               name)
-                .str());
-        }
+              "Output plug-in: observable '%s' already exist", name.c_str());
 
         mNewBagWatcher[name] = -1.0;
         mColumns[name] = utils::numeric_cast<int>(mBuffer.size());
@@ -163,8 +159,7 @@ public:
                          const std::string& /* portname */,
                          const std::string& /* view */,
                          const double& /* time */) override
-    {
-    }
+    {}
 
     /**
      * Call when an external event is send to the view.
@@ -185,11 +180,9 @@ public:
 
             if (it == mColumns.end()) {
                 throw utils::InternalError(
-                  (boost::format(
-                     "Output plugin: columns '%1%' does not exist. "
-                     "No observable ?") %
-                   name)
-                    .str());
+                  "Output plugin: columns '%s' does not exist. "
+                  "No observable ?",
+                  name.c_str());
             }
 
             if (mIsStart) {
@@ -289,9 +282,7 @@ public:
         if (mValid.empty() or
             std::find(mValid.begin(), mValid.end(), true) != mValid.end()) {
             std::cout << trameTime << '\t';
-            for (auto it = mBuffer.begin();
-                 it != mBuffer.end();
-                 ++it) {
+            for (auto it = mBuffer.begin(); it != mBuffer.end(); ++it) {
                 if (*it) {
                     (*it)->writeFile(std::cout);
                 } else {

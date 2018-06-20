@@ -30,6 +30,7 @@
 #include <set>
 #include <stack>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
@@ -626,9 +627,9 @@ CoupledModel::getBasicConnections(const ModelList& models) const
 
         if (model.second->getParent() != this) {
             throw utils::DevsGraphError(
-              (fmt(_("The model %1% is not the child of %2%")) %
-               model.second->getName() % getName())
-                .str());
+              _("The model %s is not the child of %s"),
+              model.second->getName().c_str(),
+              getName().c_str());
         }
 
         const ConnectionList& cnts(model.second->getOutputPortList());
@@ -667,9 +668,11 @@ CoupledModel::setBasicConnections(const std::vector<std::string>& lst)
                 delInternalConnection(*jt, *(jt + 1), *(jt + 2), *(jt + 3));
             }
             throw utils::DevsGraphError(
-              (fmt(_("Cannot displace the connection %1% %2% to %3% %4%")) %
-               source % portsource % destination % portdestination)
-                .str());
+              _("Cannot displace the connection %s %s to %s %s"),
+              source.c_str(),
+              portsource.c_str(),
+              destination.c_str(),
+              portdestination.c_str());
         }
     }
 }
@@ -747,10 +750,10 @@ CoupledModel::addModel(BaseModel* model)
 {
     if (exist(model->getName())) {
         throw utils::DevsGraphError(
-          (fmt(_("Cannot add the model '%1%' into the coupled model "
-                 "'%2%' (it already exists)")) %
-           model->getName() % getName())
-            .str());
+          _("Cannot add the model '%s' into the coupled model '%s' (it "
+            "already exists)"),
+          model->getName().c_str(),
+          getName().c_str());
     }
 
     model->setParent(this);
@@ -762,10 +765,10 @@ CoupledModel::addModel(BaseModel* model, const std::string& name)
 {
     if (exist(name)) {
         throw utils::DevsGraphError(
-          (fmt(_("Cannot add the model '%1%' into the coupled model "
-                 "'%2%' (it already exists)")) %
-           name % getName())
-            .str());
+          _("Cannot add the model '%s' into the coupled model '%s' (it "
+            "already exists)"),
+          name.c_str(),
+          getName().c_str());
     }
 
     BaseModel::rename(model, name);
@@ -778,10 +781,10 @@ CoupledModel::addAtomicModel(const std::string& name)
 {
     if (exist(name)) {
         throw utils::DevsGraphError(
-          (fmt(_("Cannot add the model '%1%' into the coupled model "
-                 "'%2%' (it already exists)")) %
-           name % getName())
-            .str());
+          _("Cannot add the model '%s' into the coupled model '%s' (it "
+            "already exists)"),
+          name.c_str(),
+          getName().c_str());
     }
 
     auto* x = new AtomicModel(name, this);
@@ -794,10 +797,10 @@ CoupledModel::addCoupledModel(const std::string& name)
 {
     if (exist(name)) {
         throw utils::DevsGraphError(
-          (fmt(_("Cannot add the model '%1%' into the coupled model "
-                 "'%2%' (it already exists)")) %
-           name % getName())
-            .str());
+          _("Cannot add the model '%s' into the coupled model '%s' (it "
+            "already exists)"),
+          name.c_str(),
+          getName().c_str());
     }
 
     auto* x = new CoupledModel(name, this);
@@ -854,9 +857,9 @@ CoupledModel::detachModel(BaseModel* model)
         m_modelList.erase(it);
     } else {
         throw utils::DevsGraphError(
-          (fmt(_("Model %1% is not attached to the coupled model %2%")) %
-           model->getName() % getName())
-            .str());
+          _("Model %s is not attached to the coupled model %s"),
+          model->getName().c_str(),
+          getName().c_str());
     }
 }
 
@@ -1065,7 +1068,7 @@ CoupledModel::buildNewName(const std::string& prefix) const
     int i = 0;
     std::string newname;
     do {
-        newname.assign((fmt("%1%-%2%") % name % i).str());
+        newname.assign(utils::format("%s-%d", name.c_str(), i));
         ++i;
     } while (exist(name));
 
@@ -1078,9 +1081,9 @@ CoupledModel::getInternalInPort(const std::string& name)
     auto it = m_internalInputList.find(name);
     if (it == m_internalInputList.end()) {
         throw utils::DevsGraphError(
-          (fmt(_("Coupled model %1% have no input port %2%")) % getName() %
-           name)
-            .str());
+          _("Coupled model %s have no input port %s"),
+          getName().c_str(),
+          name.c_str());
     }
 
     return it->second;
@@ -1092,9 +1095,9 @@ CoupledModel::getInternalInPort(const std::string& name) const
     auto it = m_internalInputList.find(name);
     if (it == m_internalInputList.end()) {
         throw utils::DevsGraphError(
-          (fmt(_("Coupled model %1% have no input port %2%")) % getName() %
-           name)
-            .str());
+          _("Coupled model %s have no input port %s"),
+          getName().c_str(),
+          name.c_str());
     }
 
     return it->second;
@@ -1106,9 +1109,9 @@ CoupledModel::getInternalOutPort(const std::string& name)
     auto it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
         throw utils::DevsGraphError(
-          (fmt(_("Coupled model %1% have no output port %2%")) % getName() %
-           name)
-            .str());
+          _("Coupled model %s have no output port %s"),
+          getName().c_str(),
+          name.c_str());
     }
 
     return it->second;
@@ -1120,9 +1123,9 @@ CoupledModel::getInternalOutPort(const std::string& name) const
     auto it = m_internalOutputList.find(name);
     if (it == m_internalOutputList.end()) {
         throw utils::DevsGraphError(
-          (fmt(_("Coupled model %1% have no output port %2%")) % getName() %
-           name)
-            .str());
+          _("Coupled model %s have no output port %s"),
+          getName().c_str(),
+          name.c_str());
     }
 
     return it->second;
@@ -1281,9 +1284,10 @@ CoupledModel::restoreInputConnections(ModelList& models,
 
                         if (it == inputPorts.end()) {
                             indexes[iterModel->second]++;
-                            portName = (fmt("%1%_%2%") % iterModel->second %
-                                        (indexes[iterModel->second]))
-                                         .str();
+                            portName =
+                              utils::format("%s_%u",
+                                            iterModel->second.c_str(),
+                                            indexes[iterModel->second]);
                             destination->addInputPort(portName);
                             inputPorts[std::make_pair(
                               iterModel->first->getName(),
@@ -1362,9 +1366,10 @@ CoupledModel::restoreOutputConnections(CoupledModel* destination,
 
                         if (it == outputPorts.end()) {
                             indexes[iterModel->second]++;
-                            portName = (fmt("%1%_%2%") % iterModel->second %
-                                        (indexes[iterModel->second]))
-                                         .str();
+                            portName =
+                              utils::format("%s_%u",
+                                            iterModel->second.c_str(),
+                                            indexes[iterModel->second]);
                             destination->addOutputPort(portName);
                             outputPorts[std::make_pair(
                               iterModel->first->getName(),

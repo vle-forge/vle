@@ -24,9 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/assign.hpp>
 #include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/version.hpp>
 #include <chrono>
 #include <fstream>
@@ -82,8 +80,7 @@ struct F
             throw std::runtime_error("Fails to found temporary directory");
 
 #ifdef _WIN32
-        ::_putenv(
-          (vle::fmt("VLE_HOME=%1%") % current_path.string()).str().c_str());
+        ::_putenv(vle::utils::format("VLE_HOME=%s", current_path.string().c_str()).c_str());
 #else
         ::setenv("VLE_HOME", current_path.string().c_str(), 1);
 #endif
@@ -289,7 +286,7 @@ remote_package_read_write(vle::utils::ContextPtr ctx)
             utils::PackageId pkg;
 
             pkg.size = i;
-            pkg.name = (fmt("name-%1%") % i).str();
+            pkg.name = vle::utils::format("name-%d", i);
             pkg.distribution = "distribution";
             pkg.maintainer = "me";
             pkg.description = "too good";

@@ -24,19 +24,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vle/utils/ContextPrivate.hpp>
+#include <vle/utils/Spawn.hpp>
+#include <vle/utils/Tools.hpp>
+#include <vle/utils/details/ShellUtils.hpp>
+#include <vle/utils/i18n.hpp>
+
 #include <algorithm>
+#include <iostream>
+#include <thread>
+#include <utility>
+
 #include <cassert>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
-#include <thread>
-#include <utility>
-#include <vle/utils/ContextPrivate.hpp>
-#include <vle/utils/Spawn.hpp>
-#include <vle/utils/details/ShellUtils.hpp>
-#include <vle/utils/i18n.hpp>
 
 #include <sys/wait.h>
 #include <unistd.h>
@@ -211,9 +214,9 @@ public:
             m_finish = false;
             return true;
         case -1:
-            vErr(m_context,
-                 _("Spawn: check running child fail: %s\n"),
-                 strerror(errno));
+            m_context->log(VLE_LOG_ALERT,
+                           _("Spawn: check running child fail: %s\n"),
+                           strerror(errno));
             return false;
         default:
             m_finish = true;
@@ -259,10 +262,10 @@ public:
                    std::vector<std::string> args)
     {
         if (::chdir(workingdir.string().c_str())) {
-            vErr(m_context,
-                 _("Spawn: child fails to change current directory:"
-                   " to `%s'\n"),
-                 workingdir.string().c_str());
+            m_context->error(
+              _("Spawn: child fails to change current directory:"
+                " to `%s'\n"),
+              workingdir.string().c_str());
             std::abort();
         }
 
@@ -338,7 +341,7 @@ public:
         ::close(m_pipeout[0]);
         ::close(m_pipeout[1]);
     m_pipeout_failed:
-        vErr(m_context, _("Spawn: failure `%s'\n"), strerror(err));
+        m_context->error(_("Spawn: failure `%s'\n"), strerror(err));
         m_msg.assign(strerror(err));
         return false;
     }
@@ -392,23 +395,28 @@ public:
         assert(m_finish);
 
         if (WIFEXITED(m_status)) {
-            m_msg += (fmt("[%1%] (%2%) exited, status=%3%\n") % m_command %
-                      m_pid % WEXITSTATUS(m_status))
-                       .str();
+            m_msg += utils::format(_("[%s] (%d) exited, status=%d\n"),
+                                   m_command.c_str(),
+                                   static_cast<int>(m_pid),
+                                   WEXITSTATUS(m_status));
             *success = !WEXITSTATUS(m_status);
         } else if (WIFSIGNALED(m_status)) {
-            m_msg += (fmt("[%1%] (%2%) killed by signal %3%\n") % m_command %
-                      m_pid % WTERMSIG(m_status))
-                       .str();
+            m_msg += utils::format(_("[%s] (%d) killed by signal %d\n"),
+                                   m_command.c_str(),
+                                   static_cast<int>(m_pid),
+                                   WTERMSIG(m_status));
             *success = false;
         } else if (WIFSTOPPED(m_status)) {
-            m_msg += (fmt("[%1%] (%2%) stopped by signal %3%\n") % m_command %
-                      m_pid % WSTOPSIG(m_status))
-                       .str();
+            m_msg += utils::format(_("[%s] (%d) stopped by signal %d\n"),
+                                   m_command.c_str(),
+                                   static_cast<int>(m_pid),
+                                   WSTOPSIG(m_status));
+
             *success = false;
         } else if (WIFCONTINUED(m_status)) {
-            m_msg +=
-              (fmt("[%1%] (%2%) continued\n") % m_command % m_pid).str();
+            m_msg += utils::format(_("[%s] (%d) continued\n"),
+                                   m_command.c_str(),
+                                   static_cast<int>(m_pid));
             *success = false;
         }
 
@@ -433,13 +441,12 @@ Spawn::start(const Path& exe,
 {
     m_pimpl->init(waitchildtimeout);
 
-    vDbg(m_pimpl->m_context,
-         _("Spawn: command: `%s' chdir: `%s'\n"),
-         exe.string().c_str(),
-         workingdir.string().c_str());
+    m_pimpl->m_context->debug(_("Spawn: command: `%s' chdir: `%s'\n"),
+                              exe.string().c_str(),
+                              workingdir.string().c_str());
 
     for (const auto& elem : args) {
-        vDbg(m_pimpl->m_context, _("[%s]\n"), elem.c_str());
+        m_pimpl->m_context->debug(_("[%s]\n"), elem.c_str());
     }
 
     return m_pimpl->start(exe, workingdir, args);
@@ -491,9 +498,8 @@ Spawn::splitCommandLine(const std::string& command)
 
     if (argv.empty())
         throw utils::ArgError(
-          (fmt(_("Package command line: error, empty command `%1%'")) %
-           command)
-            .str());
+          _("Package command line: error, empty command `%s'"),
+          command.c_str());
 
     argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();
 

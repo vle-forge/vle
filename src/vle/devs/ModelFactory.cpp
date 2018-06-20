@@ -55,8 +55,7 @@ ModelFactory::ModelFactory(utils::ContextPtr context,
   , mDynamics(dyn)
   , mClasses(cls)
   , mExperiment(exp)
-{
-}
+{}
 
 void
 ModelFactory::createModel(Coordinator& coordinator,
@@ -79,10 +78,9 @@ ModelFactory::createModel(Coordinator& coordinator,
             for (auto& elem : vl) {
                 if (initValues.exist(elem.first))
                     throw utils::InternalError(
-                      (fmt(_("Multiples condition with the same init port "
-                             "name '%1%'")) %
-                       elem.first)
-                        .str());
+                      _("Multiples condition with the same init port "
+                        "name '%s'"),
+                      elem.first.c_str());
 
                 initValues.add(elem.first, elem.second);
             }
@@ -188,13 +186,15 @@ buildNewDynamicsWrapper(utils::ContextPtr context,
               events));
     } catch (const std::exception& e) {
         throw utils::ModellingError(
-          (fmt(_("Atomic model wrapper `%1%:%2%' (from dynamics `%3%'"
-                 " library `%4%' package `%5%') throws error in"
-                 " constructor: `%6%'")) %
-           atom->getStructure()->getParentName() %
-           atom->getStructure()->getName() % dyn.name() % dyn.library() %
-           dyn.package() % e.what())
-            .str());
+          _("Atomic model wrapper `%s:%s' (from dynamics `%s'"
+            " library `%s' package `%s') throws error in"
+            " constructor: `%s'"),
+          atom->getStructure()->getParentName().c_str(),
+          atom->getStructure()->getName().c_str(),
+          dyn.name().c_str(),
+          dyn.library().c_str(),
+          dyn.package().c_str(),
+          e.what());
     }
 }
 
@@ -313,13 +313,15 @@ buildNewDynamics(utils::ContextPtr context,
         }
     } catch (const std::exception& e) {
         throw utils::ModellingError(
-          (fmt(_("Atomic model `%1%:%2%' (from dynamics `%3%' library"
-                 " `%4%' package `%5%') throws error in constructor:"
-                 " `%6%'")) %
-           atom->getStructure()->getParentName() %
-           atom->getStructure()->getName() % dyn.name() % dyn.library() %
-           dyn.package() % e.what())
-            .str());
+          _("Atomic model `%s:%s' (from dynamics `%s' library"
+            " `%s' package `%s') throws error in constructor:"
+            " `%s'"),
+          atom->getStructure()->getParentName().c_str(),
+          atom->getStructure()->getName().c_str(),
+          dyn.name().c_str(),
+          dyn.library().c_str(),
+          dyn.package().c_str(),
+          e.what());
     }
 }
 
@@ -379,13 +381,15 @@ buildNewExecutive(utils::ContextPtr context,
         }
     } catch (const std::exception& e) {
         throw utils::ModellingError(
-          (fmt(_("Executive model `%1%:%2%' (from dynamics `%3%'"
-                 " library `%4%' package `%5%') throws error in"
-                 " constructor: `%6%'")) %
-           atom->getStructure()->getParentName() %
-           atom->getStructure()->getName() % dyn.name() % dyn.library() %
-           dyn.package() % e.what())
-            .str());
+          _("Executive model `%s:%s' (from dynamics `%s'"
+            " library `%s' package `%s') throws error in"
+            " constructor: `%s'"),
+          atom->getStructure()->getParentName().c_str(),
+          atom->getStructure()->getName().c_str(),
+          dyn.name().c_str(),
+          dyn.library().c_str(),
+          dyn.package().c_str(),
+          e.what());
     }
 }
 
@@ -425,11 +429,13 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
         }
     } catch (const std::exception& e) {
         throw utils::ModellingError(
-          (fmt(_("Dynamic library loading problem: cannot get any"
-                 " dynamics, executive or wrapper '%1%' in library"
-                 " '%2%' package '%3%'\n:%4%")) %
-           dyn.name() % dyn.library() % dyn.package() % e.what())
-            .str());
+          _("Dynamic library loading problem: cannot get any"
+            " dynamics, executive or wrapper '%s' in library"
+            " '%s' package '%s'\n:%s"),
+          dyn.name().c_str(),
+          dyn.library().c_str(),
+          dyn.package().c_str(),
+          e.what());
     }
 
     switch (type) {

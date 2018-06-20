@@ -43,31 +43,49 @@ namespace utils {
 
 struct vle_log_stderr : Context::LogFunctor
 {
-    void write(const Context& ctx,
+    void write(const Context& /*ctx*/,
                int priority,
-               const char* file,
-               int line,
-               const char* fn,
                const char* format,
                va_list args) noexcept override
     {
-        (void)ctx;
-        (void)priority;
-        (void)file;
-        (void)line;
+        auto* stream = stderr;
 
-        fprintf(stderr, "%s: ", fn);
-        vfprintf(stderr, format, args);
+        if (priority == 7)
+            fputs("debug: ", stream);
+        else if (priority == 4)
+            fputs("warning: ", stream);
+        else if (priority == 3)
+            fputs("error: ", stream);
+        else if (priority == 2)
+            fputs("critical: ", stream);
+        else if (priority == 1)
+            fputs("alert: ", stream);
+        else if (priority == 0)
+            fputs("emergency: ", stream);
+        else
+            stream = stdout;
+
+        vfprintf(stream, format, args);
     }
 
-    void write(const Context& ctx,
+    void write(const Context& /*ctx*/,
                int priority,
                const std::string& str) noexcept override
     {
-        (void)ctx;
-        (void)priority;
-
-        fprintf(stderr, "%s\n", str.c_str());
+        if (priority == 7)
+            fprintf(stderr, "debug: %s", str.c_str());
+        else if (priority == 4)
+            fprintf(stderr, "warning: %s", str.c_str());
+        else if (priority == 3)
+            fprintf(stderr, "error: %s", str.c_str());
+        else if (priority == 2)
+            fprintf(stderr, "critical: %s", str.c_str());
+        else if (priority == 1)
+            fprintf(stderr, "alert: %s", str.c_str());
+        else if (priority == 0)
+            fprintf(stderr, "emergency: %s", str.c_str());
+        else
+            fprintf(stdout, "%s", str.c_str());
     }
 };
 
@@ -162,7 +180,7 @@ Context::Context(const Path& /* prefix */)
     }
 
     {
-        vDbg(this, "Environment\n");
+        this->debug(_("Environment\n"));
         LPWCH env = ::GetEnvironmentStringsW();
         for (LPWSTR vars = static_cast<PWSTR>(env); *vars;
              vars += wcslen(vars) + 1) {
@@ -171,7 +189,7 @@ Context::Context(const Path& /* prefix */)
 
                 if (not str.empty() or str[0] != L'=' or
                     str.find(L'=') != str.npos)
-                    vDbg(this, "%s\n", from_wide_to_utf8(str).c_str());
+                    this->debug(_("%s\n"), from_wide_to_utf8(str).c_str());
             } catch (const std::exception& /*e*/) {
             }
         }
@@ -180,10 +198,9 @@ Context::Context(const Path& /* prefix */)
     }
 #endif
 
-    vInfo(this,
-          "Context initialized [prefix=%s] [home=%s]\n",
-          m_pimpl->m_prefix.string().c_str(),
-          m_pimpl->m_home.string().c_str());
+    this->info("Context initialized [prefix=%s] [home=%s]\n",
+               m_pimpl->m_prefix.string().c_str(),
+               m_pimpl->m_home.string().c_str());
 
 #if defined(VLE_HAVE_NLS)
     bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
@@ -218,11 +235,10 @@ Context::Context(std::string locale, const Path& /* prefix */)
     else if (not setlocale(LC_ALL, locale.c_str()))
         setlocale(LC_ALL, "C");
 
-    vInfo(this,
-          "Context initialized [prefix=%s] [home=%s] [locale=%s]\n",
-          m_pimpl->m_prefix.string().c_str(),
-          m_pimpl->m_home.string().c_str(),
-          locale.c_str());
+    this->info("Context initialized [prefix=%s] [home=%s] [locale=%s]\n",
+               m_pimpl->m_prefix.string().c_str(),
+               m_pimpl->m_home.string().c_str(),
+               locale.c_str());
 
 #if defined(VLE_HAVE_NLS)
     bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
@@ -335,9 +351,8 @@ Context::getBinaryPackages() const
 
     for (const auto& elem : paths) {
         if (not elem.is_directory()) {
-            vErr(this,
-                 _("Package error: '%s' is not a directory\n"),
-                 elem.string().c_str());
+            this->error(_("Package error: '%s' is not a directory\n"),
+                        elem.string().c_str());
             continue;
         }
 
@@ -401,15 +416,12 @@ Context::initVleHomeDirectory()
 
     if (not homedir.is_directory()) {
         if (homedir.is_file())
-            throw FileError(
-              (fmt(_("VLE_HOME must be a directory (%1%)")) % homedir.string())
-                .str());
+            throw FileError(_("VLE_HOME must be a directory (%s)"),
+                            homedir.string().c_str());
 
         if (not Path::create_directories(homedir))
-            throw FileError(
-              (fmt(_("Failed to build VLE_HOME directory (%1%)")) %
-               homedir.string())
-                .str());
+            throw FileError(_("Failed to build VLE_HOME directory (%s)"),
+                            homedir.string().c_str());
     }
 }
 
@@ -470,9 +482,8 @@ Context::readHomeDir()
             return;
         }
 
-        vInfo(this,
-              "$VLE_HOME (%s) defined but not usable.\n",
-              home.string().c_str());
+        this->info("$VLE_HOME (%s) defined but not usable.\n",
+                   home.string().c_str());
     }
 
     char* chome = std::getenv("HOME");
@@ -490,7 +501,7 @@ Context::readHomeDir()
             return;
         }
 
-        vInfo(this, "$HOME/.vle (%s) not usable.\n", home.string().c_str());
+        this->info("$HOME/.vle (%s) not usable.\n", home.string().c_str());
     }
 #endif
 
@@ -508,7 +519,7 @@ Context::set_log_function(std::unique_ptr<LogFunctor> fn) noexcept
 {
     m_pimpl->log_fn = std::move(fn);
 
-    vInfo(this, "custom logging function registered\n");
+    this->info("custom logging function registered\n");
 }
 
 void
@@ -530,24 +541,172 @@ Context::get_log_priority() const noexcept
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void
-Context::log(int priority, const std::string& str)
+Context::log(int priority, const std::string& str) const
 {
     m_pimpl->log_fn->write(*this, priority, str);
 }
 
 void
-Context::log(int priority,
-             const char* file,
-             int line,
-             const char* fn,
-             const char* format,
-             ...) const noexcept
+Context::log(int priority, const char* format, ...) const
 {
     va_list args;
 
     va_start(args, format);
-    m_pimpl->log_fn->write(*this, priority, file, line, fn, format, args);
+    m_pimpl->log_fn->write(*this, priority, format, args);
     va_end(args);
 }
+
+void
+Context::emergency(const std::string& str) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_EMERG)
+        m_pimpl->log_fn->write(*this, VLE_LOG_EMERG, str);
+}
+
+void
+Context::emergency(const char* format, ...) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_EMERG) {
+        va_list args;
+
+        va_start(args, format);
+        m_pimpl->log_fn->write(*this, VLE_LOG_EMERG, format, args);
+        va_end(args);
+    }
+}
+
+void
+Context::alert(const std::string& str) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_ALERT)
+        m_pimpl->log_fn->write(*this, VLE_LOG_ALERT, str);
+}
+
+void
+Context::alert(const char* format, ...) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_ALERT) {
+        va_list args;
+        va_start(args, format);
+        m_pimpl->log_fn->write(*this, VLE_LOG_ALERT, format, args);
+        va_end(args);
+    }
+}
+
+void
+Context::critical(const std::string& str) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_CRIT)
+        m_pimpl->log_fn->write(*this, VLE_LOG_CRIT, str);
+}
+
+void
+Context::critical(const char* format, ...) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_CRIT) {
+        va_list args;
+        va_start(args, format);
+        m_pimpl->log_fn->write(*this, VLE_LOG_CRIT, format, args);
+        va_end(args);
+    }
+}
+
+void
+Context::error(const std::string& str) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_ERR)
+        m_pimpl->log_fn->write(*this, VLE_LOG_ERR, str);
+}
+
+void
+Context::error(const char* format, ...) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_ERR) {
+        va_list args;
+        va_start(args, format);
+        m_pimpl->log_fn->write(*this, VLE_LOG_ERR, format, args);
+        va_end(args);
+    }
+}
+
+void
+Context::warning(const std::string& str) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_WARNING)
+        m_pimpl->log_fn->write(*this, VLE_LOG_WARNING, str);
+}
+
+void
+Context::warning(const char* format, ...) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_WARNING) {
+        va_list args;
+        va_start(args, format);
+        m_pimpl->log_fn->write(*this, VLE_LOG_WARNING, format, args);
+        va_end(args);
+    }
+}
+
+void
+Context::notice(const std::string& str) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_NOTICE)
+        m_pimpl->log_fn->write(*this, VLE_LOG_NOTICE, str);
+}
+
+void
+Context::notice(const char* format, ...) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_NOTICE) {
+        va_list args;
+        va_start(args, format);
+        m_pimpl->log_fn->write(*this, VLE_LOG_NOTICE, format, args);
+        va_end(args);
+    }
+}
+
+void
+Context::info(const std::string& str) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_INFO)
+        m_pimpl->log_fn->write(*this, VLE_LOG_INFO, str);
+}
+
+void
+Context::info(const char* format, ...) const
+{
+    if (m_pimpl->log_priority >= VLE_LOG_INFO) {
+        va_list args;
+        va_start(args, format);
+        m_pimpl->log_fn->write(*this, VLE_LOG_INFO, format, args);
+        va_end(args);
+    }
+}
+
+void
+Context::debug(const std::string& str) const
+{
+#ifdef VLE_DISABLE_DEBUG
+    (void)str;
+#else
+    if (m_pimpl->log_priority >= VLE_LOG_DEBUG)
+        m_pimpl->log_fn->write(*this, VLE_LOG_DEBUG, str);
+#endif
+}
+
+void
+Context::debug(const char* format, ...) const
+{
+#ifdef VLE_DISABLE_DEBUG
+    (void)format;
+#else
+    if (m_pimpl->log_priority >= VLE_LOG_DEBUG) {
+        va_list args;
+        va_start(args, format);
+        m_pimpl->log_fn->write(*this, VLE_LOG_DEBUG, format, args);
+        va_end(args);
+    }
+}
+#endif
 }
 } // namespace vle utils

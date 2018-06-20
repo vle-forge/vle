@@ -25,7 +25,11 @@
  */
 
 #ifdef _WIN32
+#include <tchar.h>
+
 #include <vle/utils/details/UtilsWin.hpp>
+
+#include <Windows.h>
 #else
 #include <dlfcn.h>
 #endif
@@ -38,6 +42,8 @@
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
+
+
 
 namespace vle {
 namespace utils {
@@ -153,14 +159,12 @@ struct Module
                         if (!(mFunction =
                                 (getSymbol("vle_make_new_dynamics_wrapper"))))
                             throw utils::InternalError(
-                              (fmt(_("Module `%1%' is not a dynamic module"
-                                     " (symbol vle_make_new_dynamics,"
-                                     " vle_make_new_executive or"
-                                     " vle_make_new_dynamics_wrapper are not"
-                                     " found")) %
-                               mPath.string())
-                                .str());
-
+                              _("Module `%s' is not a dynamic module"
+                                " (symbol vle_make_new_dynamics,"
+                                " vle_make_new_executive or"
+                                " vle_make_new_dynamics_wrapper are not"
+                                " found"),
+                              mPath.string().c_str());
                         else
                             mType =
                               Context::ModuleType::MODULE_DYNAMICS_WRAPPER;
@@ -172,10 +176,9 @@ struct Module
             case Context::ModuleType::MODULE_OOV:
                 if (not(mFunction = (getSymbol("vle_make_new_oov"))))
                     throw utils::InternalError(
-                      (fmt(_("Module `%1%' is not an oov module (symbol"
-                             " vle_make_new_oov not found)")) %
-                       mPath.string())
-                        .str());
+                      _("Module `%s' is not an oov module (symbol"
+                        " vle_make_new_oov not found)"),
+                      mPath.string().c_str());
                 break;
             default:
                 throw utils::InternalError(_("Missing type"));
@@ -218,9 +221,9 @@ struct Module
             }
 #endif
             throw utils::InternalError(
-              (fmt(_("Module can not open shared library `%1%': %2%")) %
-               mPath.string() % extra)
-                .str());
+              _("Module can not open shared library `%s': %s"),
+              mPath.string().c_str(),
+              extra.c_str());
         } else {
             mHandle = handle;
         }
@@ -241,10 +244,9 @@ struct Module
 
         if (not symbol) {
             throw utils::InternalError(
-              (fmt(_("Module `%1%' does not have a vle_api_level symbol. "
-                     "This module seems to be too old.")) %
-               mPath.string())
-                .str());
+              _("Module `%s' does not have a vle_api_level symbol. "
+                "This module seems to be too old."),
+              mPath.string().c_str());
         }
 
 #ifdef _WIN32
@@ -257,12 +259,16 @@ struct Module
         if (major != static_cast<std::uint32_t>(std::get<0>(version)) or
             minor != static_cast<std::uint32_t>(std::get<1>(version))) {
             throw utils::InternalError(
-              (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and is"
-                     " not API/ABI compatible with the current VLE"
-                     " %5%.%6%.%7%")) %
-               mPath.string() % major % minor % patch % std::get<0>(version) %
-               std::get<1>(version) % std::get<2>(version))
-                .str());
+              _("Module: `%s' was produced with VLE %u.%u.%u and is"
+                " not API/ABI compatible with the current VLE"
+                " %d.%d.%d"),
+              mPath.string().c_str(),
+              static_cast<std::uint32_t>(major),
+              static_cast<std::uint32_t>(minor),
+              static_cast<std::uint32_t>(patch),
+              std::get<0>(version),
+              std::get<1>(version),
+              std::get<2>(version));
         } else if (patch != static_cast<std::uint32_t>(std::get<2>(version))) {
             // utils::Trace::send(
             //     (fmt(_("Module: `%1%' was produced with VLE %2%.%3%.%4% and
@@ -330,8 +336,7 @@ public:
 
         if (not result)
             throw utils::InternalError(
-              (fmt(_("Module: `%1%' not found in global space")) % symbol)
-                .str());
+              _("Module: `%s' not found in global space"), symbol.c_str());
 
         auto ret = mLst.emplace(symbol, result);
 
@@ -368,30 +373,30 @@ struct ModuleManager
 
         for (const auto& elem : mTableSimulator)
             if (elem.second) {
-                vDbg(mContext,
-                     _("ModuleManager: simulator unload %s (%s %s %s)\n"),
-                     elem.first.c_str(),
-                     elem.second->mPath.string().c_str(),
-                     elem.second->mPackage.c_str(),
-                     elem.second->mLibrary.c_str());
+                mContext->debug(
+                  _("ModuleManager: simulator unload %s (%s %s %s)\n"),
+                  elem.first.c_str(),
+                  elem.second->mPath.string().c_str(),
+                  elem.second->mPackage.c_str(),
+                  elem.second->mLibrary.c_str());
             } else {
-                vDbg(mContext,
-                     _("ModuleManager: simulator unload %s (not loaded)\n"),
-                     elem.first.c_str());
+                mContext->debug(
+                  _("ModuleManager: simulator unload %s (not loaded)\n"),
+                  elem.first.c_str());
             }
 
         for (const auto& elem : mTableOov)
             if (elem.second) {
-                vDbg(mContext,
-                     _("ModuleManager: output unload %s (%s %s %s)\n"),
-                     elem.first.c_str(),
-                     elem.second->mPath.string().c_str(),
-                     elem.second->mPackage.c_str(),
-                     elem.second->mLibrary.c_str());
+                mContext->debug(
+                  _("ModuleManager: output unload %s (%s %s %s)\n"),
+                  elem.first.c_str(),
+                  elem.second->mPath.string().c_str(),
+                  elem.second->mPackage.c_str(),
+                  elem.second->mLibrary.c_str());
             } else {
-                vDbg(mContext,
-                     _("ModuleManager: output unload %s (not loaded)\n"),
-                     elem.first.c_str());
+                mContext->debug(
+                  _("ModuleManager: output unload %s (not loaded)\n"),
+                  elem.first.c_str());
             }
     }
 
@@ -540,12 +545,11 @@ struct ModuleManager
             current /= filename;
 
             if (not current.is_file()) {
-                vDbg(mContext,
-                     _("ModuleManager: library %s is missing"
-                       " in binary package %s in %s\n"),
-                     library.c_str(),
-                     package.c_str(),
-                     current.string().c_str());
+                mContext->debug(_("ModuleManager: library %s is missing"
+                                  " in binary package %s in %s\n"),
+                                library.c_str(),
+                                package.c_str(),
+                                current.string().c_str());
                 continue;
             }
 
@@ -553,10 +557,10 @@ struct ModuleManager
         }
 
         throw utils::FileError(
-          (fmt(_("ModuleManager: library %1% package %2% not found"
-                 "in binary repositories")) %
-           library % package)
-            .str());
+          _("ModuleManager: library %s package %s not found"
+            "in binary repositories"),
+          library.c_str(),
+          package.c_str());
     }
 
     /*
@@ -575,10 +579,9 @@ struct ModuleManager
             Path pathoov = "plugins/output";
 
             if (not packages.is_directory()) {
-                vErr(mContext,
-                     _("ModuleManager: %s is not a packages "
-                       "directory\n"),
-                     elem.string().c_str());
+                mContext->error(_("ModuleManager: %s is not a packages "
+                                  "directory\n"),
+                                elem.string().c_str());
                 continue;
             }
 
@@ -589,11 +592,10 @@ struct ModuleManager
 
                 std::string package = it->path().filename();
                 if (exists(it->path().string())) {
-                    vInfo(mContext,
-                          _("ModuleManager: package `%s' already"
-                            " exists. Forget this path: `%s'\n"),
-                          package.c_str(),
-                          it->path().string().c_str());
+                    mContext->notice(_("ModuleManager: package `%s' already"
+                                       " exists. Forget this path: `%s'\n"),
+                                     package.c_str(),
+                                     it->path().string().c_str());
                     continue;
                 }
 

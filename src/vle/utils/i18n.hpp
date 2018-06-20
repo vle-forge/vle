@@ -27,13 +27,6 @@
 #ifndef VLE_UTILS_I18N_HPP
 #define VLE_UTILS_I18N_HPP
 
-#include <boost/format.hpp>
-
-namespace vle {
-
-using fmt = boost::format;
-}
-
 #ifdef VLE_HAVE_NLS
 #ifndef ENABLE_NLS
 #define ENABLE_NLS

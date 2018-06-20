@@ -70,17 +70,24 @@ struct vle_log_manager_thread : vle::utils::Context::LogFunctor
 
         if (fp) {
             if (priority == 7)
-                fprintf(fp, "[dbg] %s\n", str.c_str());
+                fprintf(fp, "debug: %s", str.c_str());
+            else if (priority == 4)
+                fprintf(fp, "warning: %s", str.c_str());
+            else if (priority == 3)
+                fprintf(fp, "error: %s", str.c_str());
+            else if (priority == 2)
+                fprintf(fp, "critical: %s", str.c_str());
+            else if (priority == 1)
+                fprintf(fp, "alert: %s", str.c_str());
+            else if (priority == 0)
+                fprintf(fp, "emergency: %s", str.c_str());
             else
-                fprintf(fp, "%s\n", str.c_str());
+                fprintf(fp, "%s", str.c_str());
         }
     }
 
     void write(const vle::utils::Context& /*ctx*/,
                int priority,
-               const char* file,
-               int line,
-               const char* fn,
                const char* format,
                va_list args) noexcept override
     {
@@ -93,11 +100,17 @@ struct vle_log_manager_thread : vle::utils::Context::LogFunctor
 
         if (fp) {
             if (priority == 7)
-                fprintf(fp, "[dbg] %s:%d %s: ", file, line, fn);
-            else if (priority == 6)
-                fprintf(fp, "%s: ", fn);
-            else
-                fprintf(fp, "[Error] %s: ", fn);
+                fprintf(fp, "debug: ");
+            else if (priority == 4)
+                fprintf(fp, "warning: ");
+            else if (priority == 3)
+                fprintf(fp, "error: ");
+            else if (priority == 2)
+                fprintf(fp, "critical: ");
+            else if (priority == 1)
+                fprintf(fp, "alert: ");
+            else if (priority == 0)
+                fprintf(fp, "emergency: ");
 
             vfprintf(fp, format, args);
         }
@@ -200,8 +213,7 @@ public:
           , error(error)
         {}
 
-        ~worker()
-        = default;
+        ~worker() = default;
 
         void operator()()
         {
@@ -241,8 +253,8 @@ public:
         ExperimentGenerator expgen(*vpz, rank, world);
         std::string vpzname(vpz->project().experiment().name());
 
-        auto result = std::make_unique<value::Matrix>(
-          expgen.size(), 1, expgen.size(), 1);
+        auto result =
+          std::make_unique<value::Matrix>(expgen.size(), 1, expgen.size(), 1);
 
         std::vector<std::thread> gp;
         for (uint32_t i = 0; i < threads; ++i) {
@@ -371,23 +383,21 @@ Manager::run(std::unique_ptr<vpz::Vpz> exp,
 
     if (thread <= 0) {
         throw vle::utils::ArgError(
-          (fmt(_("Manager error: thread must be superior to 0 (%1%)")) %
-           thread)
-            .str());
+          _("Manager error: thread must be superior to 0 (%u)"),
+          static_cast<unsigned>(thread));
     }
 
     if (world <= rank) {
         throw vle::utils::ArgError(
-          (fmt(_("Manager error: rank (%1%) must be inferior"
-                 " to world (%2%)")) %
-           rank % world)
-            .str());
+          _("Manager error: rank (%u) must be inferior to world (%u)"),
+          static_cast<unsigned>(rank),
+          static_cast<unsigned>(world));
     }
 
     if (world <= 0) {
         throw vle::utils::ArgError(
-          (fmt(_("Manager error: world (%1%) must be superior to 0.")) % world)
-            .str());
+          _("Manager error: world (%u) must be superior to 0"),
+          static_cast<unsigned>(world));
     }
 
     mPimpl->writeSummaryLog(_("Manager started"));

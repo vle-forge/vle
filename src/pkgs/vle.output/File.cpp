@@ -27,15 +27,17 @@
 
 #include "File.hpp"
 #include "FileType.hpp"
-#include <boost/format.hpp>
-#include <iomanip>
-#include <iostream>
+
 #include <vle/utils/DateTime.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/String.hpp>
+
+#include <algorithm>
+#include <iomanip>
+#include <iostream>
 
 namespace vle {
 namespace oov {
@@ -50,8 +52,7 @@ File::File(const std::string& location)
   , m_julian(false)
   , m_type(File::FILE)
   , m_flushbybag(false)
-{
-}
+{}
 
 File::~File()
 {
@@ -96,10 +97,9 @@ File::onParameter(const std::string& plugin,
             } else if (type == "text") {
                 m_filetype = new Text();
             } else {
-                throw utils::ArgError(
-                  (boost::format("Output plug-in '%1%': unknow type '%2%'") %
-                   plugin % type)
-                    .str());
+                throw utils::ArgError("Output plug-in '%s': unknow type '%s'",
+                                      plugin.c_str(),
+                                      type.c_str());
             }
         }
 
@@ -112,10 +112,9 @@ File::onParameter(const std::string& plugin,
             } else if (type == "file") {
                 m_type = File::FILE;
             } else {
-                throw utils::ArgError(
-                  (boost::format("Output plug-in '%1%': unknow type '%2%'") %
-                   plugin % type)
-                    .str());
+                throw utils::ArgError("Output plug-in '%s': unknow type '%s'",
+                                      plugin.c_str(),
+                                      type.c_str());
             }
         }
 
@@ -148,10 +147,9 @@ File::onParameter(const std::string& plugin,
     m_file.open(m_filenametmp.c_str());
 
     if (not m_file.is_open()) {
-        throw utils::ArgError(
-          (boost::format("Output plug-in '%1%': cannot open file '%2%'\n") %
-           plugin % m_filenametmp)
-            .str());
+        throw utils::ArgError("Output plug-in '%s': cannot open file '%s'\n",
+                              plugin.c_str(),
+                              m_filename.c_str());
     }
 
     m_file << std::setprecision(std::numeric_limits<double>::digits10);
@@ -181,9 +179,7 @@ File::onNewObservable(const std::string& simulator,
 
     if (m_columns.find(name) != m_columns.end()) {
         throw utils::InternalError(
-          (boost::format("Output plug-in: observable '%1%' already exist") %
-           name)
-            .str());
+          "Output plug-in: observable '%s' already exist", name.c_str());
     }
 
     m_newbagwatcher[name] = -1.0;
@@ -198,8 +194,7 @@ File::onDelObservable(const std::string& /* simulator */,
                       const std::string& /* portname */,
                       const std::string& /* view */,
                       const double& /* time */)
-{
-}
+{}
 
 void
 File::onValue(const std::string& simulator,
@@ -216,13 +211,10 @@ File::onValue(const std::string& simulator,
         name = buildname(parent, simulator, port);
         it = m_columns.find(name);
 
-        if (it == m_columns.end()) {
+        if (it == m_columns.end())
             throw utils::InternalError(
-              (boost::format("Output plugin: columns '%1%' does not exist. "
-                             "No observable ?") %
-               name)
-                .str());
-        }
+              "Output plugin: columns '%s' does not exist. No observable ?",
+              name.c_str());
 
         if (m_isstart) {
             if (time != m_time ||
@@ -323,8 +315,7 @@ File::finalFlush(double trame_time)
             }
         }
         m_filetype->writeSeparator(m_file);
-        for (auto it = m_buffer.begin(); it != m_buffer.end();
-             ++it) {
+        for (auto it = m_buffer.begin(); it != m_buffer.end(); ++it) {
             if (*it) {
                 (*it)->writeFile(m_file);
             } else {

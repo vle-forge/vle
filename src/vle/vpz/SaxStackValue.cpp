@@ -223,7 +223,8 @@ ValueStackSax::getResult(size_t i) const
 {
     if (m_result.size() < i)
         throw utils::SaxParserError(
-          (fmt(_("Get result value with to big index %1%.")) % i).str());
+          _("Get result value with to big index %ld."),
+          static_cast<unsigned long>(i));
 
     return m_result[i];
 }

@@ -320,7 +320,7 @@ SaxParser::onStartElement(void* ctx, const xmlChar* name, const xmlChar** atts)
         }
     } else {
         sax->stopParser(
-          (fmt(_("Unknown tag '%1%'")) % (const char*)name).str());
+          utils::format(_("Unknown tag '%s'"), (const char*)name));
     }
 }
 
@@ -338,7 +338,7 @@ SaxParser::onEndElement(void* ctx, const xmlChar* name)
         }
     } else {
         sax->stopParser(
-          (fmt(_("Unknown end tag '%1%'")) % (const char*)name).str());
+          utils::format(_("Unknown end tag '%s'"), (const char*)name));
     }
 }
 
@@ -478,10 +478,7 @@ SaxParser::onMatrix(const xmlChar** att)
           numeric_cast<m_t>(rowstep ? xmlCharToInt(rowstep) : 0));
     } catch (const std::exception& e) {
         throw utils::SaxParserError(
-          (fmt(_("Matrix tag does not convert a attribute "
-                 "'%1%'")) %
-           e.what())
-            .str());
+          _("Matrix tag does not convert a attribute '%s'"), e.what());
     }
 }
 
@@ -538,13 +535,9 @@ SaxParser::onTable(const xmlChar** att)
     try {
         m_valuestack.pushTable(xmlCharToInt(width), xmlCharToInt(height));
     } catch (const std::exception& e) {
-        throw utils::SaxParserError(
-          (fmt(_("Table value tag can not convert attributes "
-                 "'width' or "
-
-                 "'height': %1%")) %
-           e.what())
-            .str());
+        throw utils::SaxParserError(_("Table value tag can not convert "
+                                      "attributes 'width' or 'height': %s"),
+                                    e.what());
     }
 }
 
@@ -802,10 +795,9 @@ SaxParser::onEndTable()
         size = boost::numeric_cast<size_t>(table.width() * table.height());
     } catch (const std::exception& /*e*/) {
         throw utils::SaxParserError(
-          (fmt(_("VPZ parser: bad height (%1%) or width (%2%) "
-                 "table ")) %
-           table.width() % table.height())
-            .str());
+          _("VPZ parser: bad height (%lu) or width (%lu) table "),
+          static_cast<unsigned long>(table.width()),
+          static_cast<unsigned long>(table.height()));
     }
 
     if (result.size() != size) {

@@ -43,7 +43,8 @@ extract(vle::utils::ContextPtr ctx,
     vle::utils::PackageParser parser;
 
     if (not pkg.is_file()) {
-        vErr(ctx, _("Package: can not open file `%s'\n"), pkg.string().c_str());
+        ctx->error(_("Package: can not open file `%s'\n"),
+                   pkg.string().c_str());
     } else {
         parser.extract(pkg.string(), std::string());
         out->reserve(parser.size());
@@ -59,9 +60,8 @@ rebuild(vle::utils::ContextPtr ctx, vle::utils::Packages* out)
     vle::utils::PackageParser parser;
 
     if (not pkgsdir.is_directory()) {
-        vErr(ctx,
-             _("Remote: failed to open directory `%s'\n"),
-             pkgsdir.string().c_str());
+        ctx->error(_("Remote: failed to open directory `%s'\n"),
+                   pkgsdir.string().c_str());
         return;
     }
 
@@ -74,16 +74,14 @@ rebuild(vle::utils::ContextPtr ctx, vle::utils::Packages* out)
                 if (descfile.is_file()) {
                     parser.extract(descfile.string(), std::string());
                 } else {
-                    vErr(ctx,
-                         _("Remote: failed to open Description.txt "
-                           "from `%s'\n"),
-                         descfile.string().c_str());
+                    ctx->error(_("Remote: failed to open Description.txt "
+                                 "from `%s'\n"),
+                               descfile.string().c_str());
                 }
             } catch (const std::exception& e) {
-                vErr(ctx,
-                     _("Remote: error reading file `%s': %s\n"),
-                     descfile.string().c_str(),
-                     e.what());
+                ctx->error(_("Remote: error reading file `%s': %s\n"),
+                           descfile.string().c_str(),
+                           e.what());
             }
         }
     }
@@ -103,10 +101,9 @@ LocalPackageManager::extract(ContextPtr ctx, Packages* out)
     try {
         ::extract(ctx, out, ctx->getLocalPackageFilename().string());
     } catch (const std::exception& e) {
-        vErr(ctx,
-             _("Remote: internal error when reading local package:"
-               " %s\n"),
-             e.what());
+        ctx->error(_("Remote: internal error when reading local package:"
+                     " %s\n"),
+                   e.what());
 
         return false;
     }
@@ -120,10 +117,9 @@ LocalPackageManager::rebuild(ContextPtr ctx, Packages* out)
     try {
         ::rebuild(ctx, out);
     } catch (const std::exception& e) {
-        vErr(ctx,
-             _("Remote: failed to rebuild cache of installed"
-               " package: %s\n"),
-             e.what());
+        ctx->error(_("Remote: failed to rebuild cache of installed"
+                     " package: %s\n"),
+                   e.what());
 
         return false;
     }
@@ -137,10 +133,9 @@ RemotePackageManager::extract(ContextPtr ctx, Packages* out)
     try {
         ::extract(ctx, out, ctx->getRemotePackageFilename().string());
     } catch (const std::exception& e) {
-        vErr(ctx,
-             _("Remote: internal error when reading remote"
-               " package: %s\n"),
-             e.what());
+        ctx->error(_("Remote: internal error when reading remote"
+                     " package: %s\n"),
+                   e.what());
 
         return false;
     }

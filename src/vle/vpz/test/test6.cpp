@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <vle/utils/unit-test.hpp>
 #include <vle/value/Value.hpp>

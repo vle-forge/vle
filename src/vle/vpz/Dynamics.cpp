@@ -24,13 +24,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iterator>
-#include <set>
-#include <vector>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vpz/Dynamics.hpp>
+
+#include <algorithm>
+#include <iterator>
+#include <set>
+#include <vector>
 
 namespace vle {
 namespace vpz {
@@ -76,8 +78,8 @@ Dynamics::add(const Dynamic& dynamic)
     auto r = m_list.insert(std::make_pair(dynamic.name(), dynamic));
 
     if (not r.second)
-        throw utils::ArgError(
-          (fmt(_("The dynamics '%1%' already exists")) % dynamic.name()).str());
+        throw utils::ArgError(_("The dynamics '%s' already exists"),
+                              dynamic.name().c_str());
 
     return r.first->second;
 }
@@ -94,8 +96,8 @@ Dynamics::get(const std::string& name) const
     auto it = m_list.find(name);
 
     if (it == end()) {
-        throw utils::ArgError(
-          (fmt(_("The dynamics %1% does not exist")) % name).str());
+        throw utils::ArgError(_("The dynamics %s does not exist"),
+                              name.c_str());
     }
 
     return it->second;
@@ -107,8 +109,8 @@ Dynamics::get(const std::string& name)
     auto it = m_list.find(name);
 
     if (it == end()) {
-        throw utils::ArgError(
-          (fmt(_("The dynamics %1% does not exist")) % name).str());
+        throw utils::ArgError(_("The dynamics %s does not exist"),
+                              name.c_str());
     }
 
     return it->second;

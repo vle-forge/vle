@@ -39,8 +39,7 @@ SymbolString::append(const std::string& key, const std::string& value)
 {
     auto it = lst_.find(key);
     if (it != end()) {
-        throw utils::ArgError(
-          (fmt(_("Symbol '%1%' already exist")) % key).str());
+        throw utils::ArgError(_("Symbol '%s' already exist"), key.c_str());
     }
     lst_.insert(std::make_pair(key, value));
 }
@@ -59,8 +58,7 @@ SymbolString::get(const std::string& key) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(
-          (fmt(_("Unknown single symbol '%1%'")) % key).str());
+        throw utils::ArgError(_("Unknown single symbol '%s'"), key.c_str());
     }
     return it->second;
 }
@@ -72,8 +70,7 @@ SymbolBool::append(const std::string& key, bool value)
 {
     auto it = lst_.find(key);
     if (it != end()) {
-        throw utils::ArgError(
-          (fmt(_("Symbol '%1%' already exist")) % key).str());
+        throw utils::ArgError(_("Symbol '%s' already exist"), key.c_str());
     }
     lst_.insert(std::make_pair(key, value));
 }
@@ -92,8 +89,7 @@ SymbolBool::get(const std::string& key) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(
-          (fmt(_("Unknown bool symbol '%1%'")) % key).str());
+        throw utils::ArgError(_("Unknown bool symbol '%s'"), key.c_str());
     }
     return it->second;
 }
@@ -136,12 +132,11 @@ SymbolList::get(const std::string& key, value_t::size_type i) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(
-          (fmt(_("Unknown list symbol '%1%'")) % key).str());
+        throw utils::ArgError(_("Unknown list symbol '%s'"), key.c_str());
     }
 
     if (it->second.size() < i) {
-        throw utils::ArgError("Too short symbol list");
+        throw utils::ArgError(_("Too short symbol list"));
     }
 
     return it->second[i];
@@ -152,8 +147,7 @@ SymbolList::size(const std::string& key) const
 {
     auto it = lst_.find(key);
     if (it == end()) {
-        throw utils::ArgError(
-          (fmt(_("Unknown list symbol '%1%'")) % key).str());
+        throw utils::ArgError(_("Unknown list symbol '%s'"), key.c_str());
     }
 
     return it->second.size();
@@ -175,8 +169,8 @@ Template::open(const std::string& filename)
 
         buffer_ = output.str();
     } catch (const std::ios_base::failure& e) {
-        throw utils::ArgError(
-          (fmt(_("Template error, can not open file '%1%'")) % filename).str());
+        throw utils::ArgError(_("Template error, can not open file '%s'"),
+                              filename.c_str());
     }
 }
 

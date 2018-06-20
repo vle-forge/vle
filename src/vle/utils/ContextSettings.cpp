@@ -142,10 +142,9 @@ Context::load_settings() noexcept
 {
     std::ifstream ifs(getConfigurationFile().string());
     if (not ifs.is_open()) {
-        vErr(this,
-             _("Settings: fail to read configuration file `%s'."
-               " Use default settings instead.\n"),
-             getConfigurationFile().string().c_str());
+        this->error(_("Settings: fail to read configuration file `%s'."
+                      " Use default settings instead.\n"),
+                    getConfigurationFile().string().c_str());
         return false;
     }
 
@@ -155,10 +154,9 @@ Context::load_settings() noexcept
         auto equalchar = line.find_first_of('=', 0);
         if (equalchar == std::string::npos or equalchar == 0 or
             equalchar == line.size()) {
-            vErr(this,
-                 _("Settings: fail while reading '%s' line '%d'\n"),
-                 getConfigurationFile().string().c_str(),
-                 l);
+            this->error(_("Settings: fail while reading '%s' line '%d'\n"),
+                        getConfigurationFile().string().c_str(),
+                        l);
             return false;
         }
 
@@ -167,7 +165,7 @@ Context::load_settings() noexcept
 
         auto it = m_pimpl->settings.find(key);
         if (it == m_pimpl->settings.end()) {
-            vInfo(this, _("Settings: unknown key `%s'\n"), key.c_str());
+            this->info(_("Settings: unknown key `%s'\n"), key.c_str());
             continue;
         }
 
@@ -179,11 +177,10 @@ Context::load_settings() noexcept
                      value == "False")
                 it->second = false;
             else
-                vErr(this,
-                     _("Settings: fail reading boolean value"
-                       " at line %d in %s\n"),
-                     l,
-                     value.c_str());
+                this->error(_("Settings: fail reading boolean value"
+                              " at line %d in %s\n"),
+                            l,
+                            value.c_str());
         } else if (boost::get<std::string>(&it->second)) {
             it->second = value;
         } else if (boost::get<long>(&it->second)) {
@@ -191,22 +188,20 @@ Context::load_settings() noexcept
                 long r = std::stol(value);
                 it->second = r;
             } catch (const std::exception& /* e */) {
-                vErr(this,
-                     _("Settings: fail reading integer value"
-                       " at line %d in %s\n"),
-                     l,
-                     value.c_str());
+                this->error(_("Settings: fail reading integer value"
+                              " at line %d in %s\n"),
+                            l,
+                            value.c_str());
             }
         } else if (boost::get<long>(&it->second)) {
             try {
                 double r = std::stod(value);
                 it->second = r;
             } catch (const std::exception& /* e */) {
-                vErr(this,
-                     _("Settings: fail reading double value"
-                       " at line %d in %s\n"),
-                     l,
-                     value.c_str());
+                this->error(_("Settings: fail reading double value"
+                              " at line %d in %s\n"),
+                            l,
+                            value.c_str());
             }
         }
         l++;
@@ -220,9 +215,8 @@ Context::write_settings() const noexcept
 {
     std::ofstream ofs(getConfigurationFile().string());
     if (not ofs.is_open()) {
-        vErr(this,
-             _("Settings: fail to write configuration file `%s'\n"),
-             getConfigurationFile().string().c_str());
+        this->error(_("Settings: fail to write configuration file `%s'\n"),
+                    getConfigurationFile().string().c_str());
         return false;
     }
 
@@ -231,9 +225,9 @@ Context::write_settings() const noexcept
         ofs << elem.first << '=' << elem.second << '\n';
 
     if (ofs.bad()) {
-        vErr(this,
-             _("Settings: fail while writing configuration file `%s'\n"),
-             getConfigurationFile().string().c_str());
+        this->error(
+          _("Settings: fail while writing configuration file `%s'\n"),
+          getConfigurationFile().string().c_str());
         return false;
     }
 

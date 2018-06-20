@@ -24,11 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iterator>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vpz/Observable.hpp>
+
+#include <algorithm>
+#include <iterator>
 
 namespace vle {
 namespace vpz {
@@ -51,9 +53,9 @@ void
 ObservablePort::add(const std::string& portname)
 {
     if (exist(portname)) {
-        throw utils::ArgError(
-          (fmt(_("The port %1% have already a view %2%")) % m_name % portname)
-            .str());
+        throw utils::ArgError(_("The port %s have already a view %s"),
+                              m_name.c_str(),
+                              portname.c_str());
     }
 
     m_list.push_back(portname);
@@ -72,10 +74,10 @@ ObservablePort::del(const std::string& portname)
 bool
 ObservablePort::exist(const std::string& portname) const
 {
-    return std::find_if(begin(),
-                        end(),
-                        std::bind2nd(std::equal_to<std::string>(), portname)) !=
-           end();
+    return std::find_if(
+             begin(),
+             end(),
+             std::bind2nd(std::equal_to<std::string>(), portname)) != end();
 }
 
 void
@@ -101,10 +103,9 @@ Observable::add(const std::string& portname)
     x = m_list.insert(value_type(portname, ObservablePort(portname)));
 
     if (not x.second) {
-        throw utils::ArgError(
-          (fmt(_("The observable %1% have already a port %2%")) % m_name %
-           portname)
-            .str());
+        throw utils::ArgError(_("The observable %s have already a port %s"),
+                              m_name.c_str(),
+                              portname.c_str());
     }
 
     return x.first->second;
@@ -118,10 +119,9 @@ Observable::add(const ObservablePort& obs)
     x = m_list.insert(value_type(obs.name(), obs));
 
     if (not x.second) {
-        throw utils::ArgError(
-          (fmt(_("The observable %1% have already a port %2%")) % m_name %
-           obs.name())
-            .str());
+        throw utils::ArgError(_("The observable %s have already a port %s"),
+                              m_name.c_str(),
+                              obs.name().c_str());
     }
 
     return x.first->second;
@@ -133,9 +133,9 @@ Observable::get(const std::string& portname)
     auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(
-          (fmt(_("The observable %1% have not port %2%")) % m_name % portname)
-            .str());
+        throw utils::ArgError(_("The observable %s have not port %s"),
+                              m_name.c_str(),
+                              portname.c_str());
     }
 
     return it->second;
@@ -147,9 +147,9 @@ Observable::get(const std::string& portname) const
     auto it = m_list.find(portname);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(
-          (fmt(_("The observable %1% have not port %2%")) % m_name % portname)
-            .str());
+        throw utils::ArgError(_("The observable %s have not port %s"),
+                              m_name.c_str(),
+                              portname.c_str());
     }
 
     return it->second;

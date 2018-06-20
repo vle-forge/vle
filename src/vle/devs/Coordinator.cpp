@@ -105,9 +105,9 @@ Coordinator::run()
     if (not bag.dynamics.empty() or not bag.executives.empty())
         m_currentTime = m_eventTable.getCurrentTime();
     else
-        vDbg(m_context, "Coordinator::run bag is empty...\n");
+        m_context->debug(_("Coordinator::run bag is empty...\n"));
 
-    vDbg(m_context, _("-------- BAG [%f] --------\n"), m_currentTime);
+    m_context->debug(_("-------- BAG [%f] --------\n"), m_currentTime);
 
     //
     // Call output functions for all executives and dynamics models then

@@ -37,8 +37,7 @@ namespace devs {
 Executive::Executive(const ExecutiveInit& init, const InitEventList& events)
   : Dynamics(DynamicsInit{ init.context, init.model, init.packageid }, events)
   , m_coordinator(init.coordinator)
-{
-}
+{}
 
 const vpz::Dynamics&
 Executive::dynamics() const
@@ -91,16 +90,14 @@ Executive::addObservableToView(const std::string& model,
     vpz::BaseModel* mdl = cpled()->findModel(model);
 
     if (mdl == nullptr) {
-        throw utils::DevsGraphError(
-          (fmt(_("Executive error: unknown model `%1%'")) % model).str());
+        throw utils::DevsGraphError(_("Executive error: unknown model `%s'"),
+                                    model.c_str());
     }
 
     if (mdl->isCoupled()) {
         throw utils::DevsGraphError(
-          (fmt(_("Executive error: can not add observable to coupled "
-                 "model %1%")) %
-           model)
-            .str());
+          _("Executive error: can not add observable to coupled model %s"),
+          model.c_str());
     }
 
     vpz::AtomicModel* atom = mdl->toAtomic();
@@ -131,7 +128,8 @@ Executive::createModel(const std::string& name,
         model->addOutputPort(*it);
     }
 
-    m_coordinator.createModel(model, conditions(), dynamics, conds, observable);
+    m_coordinator.createModel(
+      model, conditions(), dynamics, conds, observable);
 
     return model;
 }
@@ -162,28 +160,29 @@ Executive::renameModel(const std::string& oldname, const std::string& newname)
 {
     vpz::BaseModel* mdl = cpled()->findModel(oldname);
     if (mdl == nullptr) {
-        throw utils::DevsGraphError(
-          (fmt(_("Executive error: rename `%1%' into `%2%' failed, `%1%' "
-                 "does not exist")) %
-           oldname % newname)
-            .str());
+        throw utils::DevsGraphError(_("Executive error: rename `%s' into `%s' "
+                                      "failed, `%s' does not exist"),
+                                    oldname.c_str(),
+                                    newname.c_str(),
+                                    oldname.c_str());
     }
 
     if (cpled()->exist(newname)) {
-        throw utils::DevsGraphError(
-          (fmt(_("Executive error: rename `%1%' into `%2%' failed, `%2%' "
-                 "already exists")) %
-           oldname % newname)
-            .str());
+        throw utils::DevsGraphError(_("Executive error: rename `%s' into `%s' "
+                                      "failed, `%s' already exists"),
+                                    oldname.c_str(),
+                                    newname.c_str(),
+                                    newname.c_str());
     }
 
     try {
         vpz::BaseModel::rename(mdl, newname);
     } catch (const std::exception& e) {
         throw utils::DevsGraphError(
-          (fmt(_("Executive error: rename `%1%' into `%2%' failed: `%3%' ")) %
-           oldname % newname % e.what())
-            .str());
+          _("Executive error: rename `%s' into `%s' failed: `%s' "),
+          oldname.c_str(),
+          newname.c_str(),
+          e.what());
     }
 }
 
@@ -222,11 +221,12 @@ Executive::addConnection(const std::string& srcModelName,
 
         m_coordinator.updateSimulatorsTarget(toupdate);
     } else {
-        throw utils::DevsGraphError(
-          (fmt(_("Executive error: cannot add connection (`%1%', `%2%') to "
-                 "(`%3%', `%4%'")) %
-           srcModelName % srcPortName % dstModelName % dstPortName)
-            .str());
+        throw utils::DevsGraphError(_("Executive error: cannot add connection "
+                                      "(`%s', `%s') to (`%s', `%s'"),
+                                    srcModelName.c_str(),
+                                    srcPortName.c_str(),
+                                    dstModelName.c_str(),
+                                    dstPortName.c_str());
     }
 }
 
@@ -263,11 +263,12 @@ Executive::removeConnection(const std::string& srcModelName,
 
         m_coordinator.updateSimulatorsTarget(toupdate);
     } else {
-        throw utils::DevsGraphError(
-          (fmt(_("Executive error: cannot remove connection (%1%, %2%) to "
-                 "(`%3%', `%4%')")) %
-           srcModelName % srcPortName % dstModelName % dstPortName)
-            .str());
+        throw utils::DevsGraphError(_("Executive error: cannot remove "
+                                      "connection (%s, %s) to (`%s', `%s')"),
+                                    srcModelName.c_str(),
+                                    srcPortName.c_str(),
+                                    dstModelName.c_str(),
+                                    dstPortName.c_str());
     }
 }
 
@@ -277,8 +278,8 @@ Executive::addInputPort(const std::string& modelName,
 {
     vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
-        throw utils::DevsGraphError(
-          (fmt(_("Executive error: unknown model `%1%'")) % modelName).str());
+        throw utils::DevsGraphError(_("Executive error: unknown model `%s'"),
+                                    modelName.c_str());
     }
 
     mdl->addInputPort(portName);
@@ -290,8 +291,8 @@ Executive::addOutputPort(const std::string& modelName,
 {
     vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
-        throw utils::DevsGraphError(
-          (fmt(_("Executive error: unknown model `%1%'")) % modelName).str());
+        throw utils::DevsGraphError(_("Executive error: unknown model `%s'"),
+                                    modelName.c_str());
     }
 
     mdl->addOutputPort(portName);
@@ -303,8 +304,8 @@ Executive::removeInputPort(const std::string& modelName,
 {
     vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
-        throw utils::DevsGraphError(
-          (fmt(_("Executive error: unknown model `%1%'")) % modelName).str());
+        throw utils::DevsGraphError(_("Executive error: unknown model `%s'"),
+                                    modelName.c_str());
     }
 
     std::vector<std::pair<Simulator*, std::string>> toupdate;
@@ -319,8 +320,8 @@ Executive::removeOutputPort(const std::string& modelName,
 {
     vpz::BaseModel* mdl = cpled()->findModel(modelName);
     if (not mdl) {
-        throw utils::DevsGraphError(
-          (fmt(_("Executive error: unknown model `%1%'")) % modelName).str());
+        throw utils::DevsGraphError(_("Executive error: unknown model `%s'"),
+                                    modelName.c_str());
     }
 
     if (mdl->isAtomic()) {

@@ -24,7 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/lexical_cast.hpp>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -44,22 +44,23 @@ using namespace vle;
 void
 atomicmodel_vpz()
 {
-    const char* xml = "<?xml version=\"1.0\"?>\n"
-                      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-                      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-                      " <structures>\n"
-                      "  <model name=\"test1\" type=\"atomic\" >\n"
-                      "   <in>\n"
-                      "    <port name=\"in1\" />\n"
-                      "    <port name=\"in2\" />\n"
-                      "   </in>\n"
-                      "   <out>\n"
-                      "    <port name=\"out1\" />\n"
-                      "    <port name=\"out2\" />\n"
-                      "   </out>\n"
-                      "  </model>\n"
-                      " </structures>\n"
-                      "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <structures>\n"
+      "  <model name=\"test1\" type=\"atomic\" >\n"
+      "   <in>\n"
+      "    <port name=\"in1\" />\n"
+      "    <port name=\"in2\" />\n"
+      "   </in>\n"
+      "   <out>\n"
+      "    <port name=\"out1\" />\n"
+      "    <port name=\"out2\" />\n"
+      "   </out>\n"
+      "  </model>\n"
+      " </structures>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);
@@ -199,38 +200,39 @@ dynamic_vpz()
 void
 experiment_vpz()
 {
-    const char* xml = "<?xml version=\"1.0\"?>\n"
-                      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
-                      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
-                      " <experiment name=\"test1\">\n"
-                      "  <conditions>"
-                      "   <condition name=\"simulation_engine\" >"
-                      "    <port name=\"begin\" >"
-                      "     <double>123.</double>"
-                      "    </port>"
-                      "    <port name=\"duration\" >"
-                      "     <double>0.33</double><integer>2</integer>"
-                      "    </port>"
-                      "   </condition>"
-                      "   <condition name=\"cond1\" >"
-                      "    <port name=\"init1\" >"
-                      "     <double>123.</double><integer>1</integer>"
-                      "    </port>"
-                      "    <port name=\"init2\" >"
-                      "     <double>456.</double><integer>2</integer>"
-                      "    </port>"
-                      "   </condition>"
-                      "   <condition name=\"cond2\" >"
-                      "    <port name=\"init3\" >"
-                      "     <double>.123</double><integer>-1</integer>"
-                      "    </port>"
-                      "    <port name=\"init4\" >"
-                      "     <double>.456</double><integer>-2</integer>"
-                      "    </port>"
-                      "   </condition>"
-                      "  </conditions>"
-                      " </experiment>\n"
-                      "</vle_project>\n";
+    const char* xml =
+      "<?xml version=\"1.0\"?>\n"
+      "<vle_project version=\"0.5\" author=\"Gauthier Quesnel\""
+      " date=\"Mon, 12 Feb 2007 23:40:31 +0100\" >\n"
+      " <experiment name=\"test1\">\n"
+      "  <conditions>"
+      "   <condition name=\"simulation_engine\" >"
+      "    <port name=\"begin\" >"
+      "     <double>123.</double>"
+      "    </port>"
+      "    <port name=\"duration\" >"
+      "     <double>0.33</double><integer>2</integer>"
+      "    </port>"
+      "   </condition>"
+      "   <condition name=\"cond1\" >"
+      "    <port name=\"init1\" >"
+      "     <double>123.</double><integer>1</integer>"
+      "    </port>"
+      "    <port name=\"init2\" >"
+      "     <double>456.</double><integer>2</integer>"
+      "    </port>"
+      "   </condition>"
+      "   <condition name=\"cond2\" >"
+      "    <port name=\"init3\" >"
+      "     <double>.123</double><integer>-1</integer>"
+      "    </port>"
+      "    <port name=\"init4\" >"
+      "     <double>.456</double><integer>-2</integer>"
+      "    </port>"
+      "   </condition>"
+      "  </conditions>"
+      " </experiment>\n"
+      "</vle_project>\n";
 
     vpz::Vpz vpz;
     vpz.parseMemory(xml);

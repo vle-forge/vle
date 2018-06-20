@@ -32,16 +32,14 @@
 namespace vle {
 namespace vpz {
 
-ModelPortList::~ModelPortList()
-= default;
+ModelPortList::~ModelPortList() = default;
 
 void
 ModelPortList::add(BaseModel* model, const std::string& portname)
 {
     if (not model) {
         throw utils::DevsGraphError(
-          (fmt(_("Cannot add model port %1% in an empty model")) % portname)
-            .str());
+          _("Cannot add model port %s in an empty model"), portname.c_str());
     }
 
     m_lst.insert(value_type(model, portname));
@@ -52,8 +50,8 @@ ModelPortList::remove(BaseModel* model, const std::string& portname)
 {
     if (not model) {
         throw utils::DevsGraphError(
-          (fmt(_("Cannot remove model port %1% in an empty model")) % portname)
-            .str());
+          _("Cannot remove model port %s in an empty model"),
+          portname.c_str());
     }
 
     std::pair<iterator, iterator> its = m_lst.equal_range(model);

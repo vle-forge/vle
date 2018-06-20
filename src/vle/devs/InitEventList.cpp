@@ -48,8 +48,8 @@ pp_get(const vle::devs::InitEventList::container_type& m,
     auto it = m.find(name);
 
     if (it == m.end())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
+        throw vle::utils::ArgError(_("Map: the key '%s' does not exist"),
+                                   name.c_str());
 
     return it;
 }
@@ -62,8 +62,7 @@ pp_get_value(const vle::devs::InitEventList::container_type& m,
 
     if (not it->second)
         throw vle::utils::ArgError(
-          (vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name)
-            .str());
+          _("Map: the key '%s' have empty (null) value"), name.c_str());
 
     return *it->second.get();
 }

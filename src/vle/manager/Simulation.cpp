@@ -24,12 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/progress.hpp>
-#include <boost/timer.hpp>
-#include <fstream>
-#include <memory>
-#include <sstream>
-#include <utility>
 #include <vle/DllDefines.hpp>
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/manager/Simulation.hpp>
@@ -37,6 +31,15 @@
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
+
+#include <boost/format.hpp>
+#include <boost/progress.hpp>
+#include <boost/timer.hpp>
+
+#include <fstream>
+#include <memory>
+#include <sstream>
+#include <utility>
 
 namespace vle {
 namespace manager {
@@ -126,7 +129,7 @@ public:
             const double duration = vpz->project().experiment().duration();
             const double begin = vpz->project().experiment().begin();
 
-            write(fmt(_("[%1%]\n")) % vpz->filename());
+            write(utils::format(_("[%s]\n"), vpz->filename().c_str()));
             write(_(" - Coordinator load models ......: "));
 
             root.load(*vpz);
@@ -162,8 +165,8 @@ public:
             result = root.finish();
             write(_("ok\n"));
 
-            write(fmt(_(" - Time spent in kernel .........: %1% s")) %
-                  timer.elapsed());
+            write(utils::format(_(" - Time spent in kernel .........: %f s"),
+                                timer.elapsed()));
 
             error->code = 0;
         } catch (const std::exception& e) {
@@ -185,7 +188,7 @@ public:
         try {
             devs::RootCoordinator root(m_context);
 
-            write(fmt(_("[%1%]\n")) % vpz->filename());
+            write(utils::format(_("[%s]\n"), vpz->filename().c_str()));
             write(_(" - Coordinator load models ......: "));
 
             root.load(*vpz);
@@ -211,8 +214,8 @@ public:
             result = root.finish();
             write(_("ok\n"));
 
-            write(fmt(_(" - Time spent in kernel .........: %1% s")) %
-                  timer.elapsed());
+            write(utils::format(_(" - Time spent in kernel .........: %f s"),
+                                timer.elapsed()));
 
             error->code = 0;
         } catch (const std::exception& e) {
@@ -261,7 +264,7 @@ public:
 
         try {
             m_context->get_setting("vle.command.vle.simulation", &command);
-            command = (vle::fmt(command) % m_output_file.string() %
+            command = (boost::format(command) % m_output_file.string() %
                        m_vpz_file.string())
                         .str();
             vle::utils::Spawn spawn(m_context);
@@ -286,10 +289,10 @@ public:
                 while (not spawn.isfinish()) {
                     if (spawn.get(&output, &err)) {
                         if (not output.empty()) {
-                            vInfo(m_context, "%s", output.c_str());
+                            m_context->info("%s", output.c_str());
                         }
                         if (not err.empty()) {
-                            vErr(m_context, "%s", err.c_str());
+                            m_context->error("%s", err.c_str());
                         }
                         output.clear();
                         err.clear();
@@ -312,10 +315,10 @@ public:
                 while (not spawn.isfinish()) {
                     if (spawn.get(&output, &err)) {
                         if (not output.empty()) {
-                            vInfo(m_context, "%s", output.c_str());
+                            m_context->info("%s", output.c_str());
                         }
                         if (not err.empty()) {
-                            vErr(m_context, "%s", err.c_str());
+                            m_context->error("%s", err.c_str());
                         }
                         output.clear();
                         err.clear();
@@ -331,7 +334,7 @@ public:
             spawn.status(&message, &success);
 
             if (not success and not message.empty()) {
-                vErr(m_context, "VLE failure: %s\n", message.c_str());
+                m_context->error(_("VLE failure: %s\n"), message.c_str());
                 error->code = -1;
                 error->message = message;
 
@@ -342,14 +345,13 @@ public:
             m_vpz_file.remove();
             return results;
         } catch (const std::exception& e) {
-            vErr(m_context,
-                 _("VLE sub process: unable to start "
-                   "'%s' in '%s' with "
-                   "the '%s' command (%s)\n"),
-                 m_vpz_file.string().c_str(),
-                 pwd.string().c_str(),
-                 command.c_str(),
-                 e.what());
+            m_context->error(_("VLE sub process: unable to start "
+                               "'%s' in '%s' with "
+                               "the '%s' command (%s)\n"),
+                             m_vpz_file.string().c_str(),
+                             pwd.string().c_str(),
+                             command.c_str(),
+                             e.what());
 
             error->code = -1;
             error->message = "fail to run";

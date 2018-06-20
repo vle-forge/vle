@@ -105,8 +105,8 @@ Vpz::parseValue(const std::string& buffer)
     sax.parseMemory(buffer);
 
     if (not sax.isValue()) {
-        throw utils::ArgError(
-          (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
+        throw utils::ArgError(_("The buffer [%s] is not a value."),
+                              buffer.c_str());
     }
 
     return sax.getValues()[0];
@@ -120,8 +120,8 @@ Vpz::parseValues(const std::string& buffer)
     sax.parseMemory(buffer);
 
     if (not sax.isValue()) {
-        throw utils::ArgError(
-          (fmt(_("The buffer [%1%] is not a value.")) % buffer).str());
+        throw utils::ArgError(_("The buffer [%s] is not a value."),
+                              buffer.c_str());
     }
 
     return sax.getValues();
@@ -133,9 +133,8 @@ Vpz::write()
     std::ofstream out(m_filename.c_str());
 
     if (out.fail() or out.bad()) {
-        throw utils::FileError(
-          (fmt(_("Vpz: cannot open file '%1%' for writing")) % m_filename)
-            .str());
+        throw utils::FileError(_("Vpz: cannot open file '%s' for writing"),
+                               m_filename.c_str());
         ;
     }
 

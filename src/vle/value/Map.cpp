@@ -46,8 +46,8 @@ pp_get(vle::value::MapValue& m, const std::string& name)
     auto it = m.find(name);
 
     if (it == m.end())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
+        throw vle::utils::ArgError(_("Map: the key '%s' does not exist"),
+                                   name.c_str());
 
     return it;
 }
@@ -58,8 +58,8 @@ pp_get(const vle::value::MapValue& m, const std::string& name)
     auto it = m.find(name);
 
     if (it == m.end())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Map: the key '%1%' does not exist")) % name).str());
+        throw vle::utils::ArgError(_("Map: the key '%s' does not exist"),
+                                   name.c_str());
 
     return it;
 }
@@ -71,8 +71,7 @@ pp_get_value(vle::value::MapValue& m, const std::string& name)
 
     if (not it->second)
         throw vle::utils::ArgError(
-          (vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name)
-            .str());
+          _("Map: the key '%s' have empty (null) value"), name.c_str());
 
     return *it->second.get();
 }
@@ -84,8 +83,7 @@ pp_get_value(const vle::value::MapValue& m, const std::string& name)
 
     if (not it->second)
         throw vle::utils::ArgError(
-          (vle::fmt(_("Map: the key '%1%' have empty (null) value")) % name)
-            .str());
+          _("Map: the key '%s' have empty (null) value"), name.c_str());
 
     return *it->second.get();
 }

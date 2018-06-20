@@ -24,14 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/lexical_cast.hpp>
-#include <boost/utility.hpp>
+#include <algorithm>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <stdexcept>
+
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/unit-test.hpp>
 #include <vle/value/Boolean.hpp>

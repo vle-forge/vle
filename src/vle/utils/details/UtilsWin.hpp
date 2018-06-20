@@ -27,13 +27,9 @@
 #ifndef VLE_UTILS_DETAILS_UTILS_WIN_HPP
 #define VLE_UTILS_DETAILS_UTILS_WIN_HPP
 
-#include <direct.h>
-#include <tchar.h>
-#include <windows.h>
+#include <vle/utils/Filesystem.hpp>
 
 #include <string>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Filesystem.hpp>
 
 namespace vle {
 namespace utils {
@@ -71,28 +67,8 @@ struct tchar_type<wchar_t>
  * @exception @c std::bad_alloc.
  * @exception @c CastError if an error occurred in low API.
  */
-inline std::wstring
-from_utf8_to_wide(std::string str)
-{
-    if (str.empty())
-        return {};
-
-    DWORD size = MAX_PATH;
-    std::wstring ret;
-
-    do {
-        ret.resize(MAX_PATH);
-        size = ::MultiByteToWideChar(
-          CP_UTF8, 0, str.c_str(), (int)str.size(), &ret[0], (int)ret.size());
-    } while (size > ret.size());
-
-    if (size <= 0)
-        throw CastError("Fail to convert `%s' to multibyte string",
-                        str.c_str());
-
-    ret.resize(size);
-    return ret;
-}
+std::wstring
+from_utf8_to_wide(std::string str);
 
 /**
  * Convert wide @c std::wstring into utf8 std::string.
@@ -102,33 +78,8 @@ from_utf8_to_wide(std::string str)
  * @exception @c std::bad_alloc.
  * @exception @c CastError if an error occurred in low API.
  */
-inline std::string
-from_wide_to_utf8(std::wstring wstr)
-{
-    if (wstr.empty())
-        return {};
-
-    DWORD size = MAX_PATH;
-    std::string ret;
-
-    do {
-        ret.resize(size);
-        size = ::WideCharToMultiByte(CP_UTF8,
-                                     0,
-                                     wstr.c_str(),
-                                     (int)wstr.size(),
-                                     &ret[0],
-                                     (int)ret.size(),
-                                     NULL,
-                                     NULL);
-    } while (size > ret.size());
-
-    if (size <= 0)
-        throw CastError("Fail to convert a wide char string");
-
-    ret.resize(size);
-    return ret;
-}
+std::string
+from_wide_to_utf8(std::wstring wstr);
 
 /**
  * Convert a wide @c TCHAR string using @c wchar_t type into a utf8 string
@@ -139,11 +90,8 @@ from_wide_to_utf8(std::wstring wstr)
  * @exception @c std::bad_alloc.
  * @exception @c CastError if an error occurred in low API.
  */
-inline std::string
-from_tchar(const wchar_t* wstr)
-{
-    return from_wide_to_utf8(std::wstring(wstr));
-}
+std::string
+from_tchar(const wchar_t* wstr);
 
 /**
  * Convert a @c TCHAR string using @c char type into a utf8 string stored in
@@ -153,11 +101,8 @@ from_tchar(const wchar_t* wstr)
  *
  * @exception @c std::bad_alloc.
  */
-inline std::string
-from_tchar(const char* str)
-{
-    return std::string(str);
-}
+std::string
+from_tchar(const char* str);
 
 /**
  * Convert a file system pathname into a short path name.
@@ -168,24 +113,8 @@ from_tchar(const char* str)
  * @exception @c std::bad_alloc.
  * @exception @c CastError if an error occurred in low API.
  */
-inline Path
-convert_to_short_pathname(const Path& path)
-{
-    DWORD size = MAX_PATH;
-    std::wstring buffer;
-
-    do {
-        buffer.resize(size);
-        size = ::GetShortPathNameW(
-          path.wstring().c_str(), &buffer[0], buffer.size());
-    } while (size > buffer.size());
-
-    if (size <= 0)
-        throw CastError("Fail to convert a Path to short path");
-
-    buffer.resize(size);
-    return Path(buffer);
-}
+Path
+convert_to_short_pathname(const Path& path);
 
 /**
  * Get the value of a environment variable.
@@ -194,28 +123,8 @@ convert_to_short_pathname(const Path& path)
  *
  * @exception @c std::bad_alloc.
  */
-inline std::wstring
-get_environment_variable_wide(std::wstring name)
-{
-    if (name.empty())
-        return {};
-
-    std::wstring buffer;
-    DWORD size = MAX_PATH;
-
-    do {
-        buffer.resize(size);
-        size =
-          ::GetEnvironmentVariableW(name.c_str(), &buffer[0], buffer.size());
-    } while (size > buffer.size());
-
-    if (size <= 0)
-        return {};
-
-    buffer.resize(size);
-
-    return buffer;
-}
+std::wstring
+get_environment_variable_wide(std::wstring name);
 
 /**
  * Get the value of a environment variable.
@@ -224,12 +133,8 @@ get_environment_variable_wide(std::wstring name)
  *
  * @exception @c std::bad_alloc.
  */
-inline std::string
-get_environment_variable(std::string name)
-{
-    return from_wide_to_utf8(
-      get_environment_variable_wide(from_utf8_to_wide(name)));
-}
+std::string
+get_environment_variable(std::string name);
 
 /**
  * Assign the value for a environment variable.
@@ -240,12 +145,8 @@ get_environment_variable(std::string name)
  *
  * @exception @c CastError if an error occurred in low API.
  */
-inline bool
-set_environment_variable(std::string name, std::string value)
-{
-    return ::SetEnvironmentVariableW(from_utf8_to_wide(name).c_str(),
-                                     from_utf8_to_wide(value).c_str());
-}
+bool
+set_environment_variable(std::string name, std::string value);
 
 /**
  * Assign the value for a environment variable.
@@ -256,11 +157,8 @@ set_environment_variable(std::string name, std::string value)
  *
  * @exception @c CastError if an error occurred in low API.
  */
-inline bool
-set_environment_variable_wide(std::wstring name, std::wstring value)
-{
-    return ::SetEnvironmentVariableW(name.c_str(), value.c_str());
-}
+bool
+set_environment_variable_wide(std::wstring name, std::wstring value);
 
 /**
  * Retrieves the Win32 system message for the error id.
@@ -270,36 +168,8 @@ set_environment_variable_wide(std::wstring name, std::wstring value)
  * @exception std::bad_alloc.
  * @exception @c CastError if an error occurred in low API.
  */
-inline std::string
-format_message(DWORD error_id)
-{
-    LPWSTR buffer = NULL;
-
-    DWORD size = ::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                                    FORMAT_MESSAGE_FROM_SYSTEM |
-                                    FORMAT_MESSAGE_IGNORE_INSERTS,
-                                  NULL,
-                                  error_id,
-                                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                  (LPWSTR)&buffer,
-                                  BUFSIZ,
-                                  NULL);
-    if (size <= 0)
-        return {};
-
-    buffer[size] = '\0';
-
-    std::string ret;
-
-    try {
-        ret = from_wide_to_utf8(buffer);
-    } catch (const std::bad_alloc& e) {
-        LocalFree(buffer);
-        throw e;
-    }
-
-    return ret;
-}
+std::string
+format_message(unsigned long error_id);
 
 /**
  * Shows an error message box using the Win32 API on current display with the
@@ -309,14 +179,8 @@ format_message(DWORD error_id)
  * @exception std::bad_alloc.
  * @exception @c CastError if an error occurred in low API.
  */
-inline void
-show_message_box(std::string description)
-{
-    ::MessageBoxW(NULL,
-                  from_utf8_to_wide(description).c_str(),
-                  (LPCWSTR)L"VLE Error",
-                  MB_ICONERROR | MB_OK);
-}
+void
+show_message_box(std::string description);
 }
 } // namespace vle utils
 

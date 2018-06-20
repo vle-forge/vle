@@ -24,8 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstring>
-#include <libxml/xpath.h>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
@@ -37,6 +35,11 @@
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Vpz.hpp>
 
+#include <algorithm>
+
+#include <cstring>
+#include <libxml/xpath.h>
+
 namespace {
 
 template<typename T>
@@ -44,7 +47,7 @@ inline void
 checkEmptyStack(const T& t)
 {
     if (not t.empty())
-        throw vle::utils::SaxParserError("Not empty vpz stack");
+        throw vle::utils::SaxParserError(_("Not empty vpz stack"));
 }
 
 template<typename T>
@@ -52,7 +55,7 @@ inline void
 checkNotEmptyStack(const T& t)
 {
     if (t.empty())
-        throw vle::utils::SaxParserError("Empty vpz stack");
+        throw vle::utils::SaxParserError(_("Empty vpz stack"));
 }
 }
 
@@ -137,7 +140,6 @@ SaxStackVpz::pushModel(const xmlChar** att)
     if (parent()->isSubmodels()) {
         vpz::Base* sub = pop();
         auto* tmp = static_cast<vpz::Model*>(parent());
-        assert(tmp->node());
         cplparent = tmp->node()->toCoupled();
         push(sub);
     }
@@ -179,7 +181,7 @@ SaxStackVpz::pushModel(const xmlChar** att)
 
     if (type == nullptr) {
         throw utils::SaxParserError(
-          (fmt(_("Attribute type not defined for model '%1%'")) % name).str());
+          _("Attribute type not defined for model '%s'"), name);
     }
 
     if (xmlStrcmp(type, (const xmlChar*)"atomic") == 0) {
@@ -197,22 +199,22 @@ SaxStackVpz::pushModel(const xmlChar** att)
             gmdl = ptr;
         } catch (const utils::DevsGraphError& e) {
             throw utils::SaxParserError(
-              (fmt(_("Error build atomic model '%1%' with error: %2%")) %
-               name % e.what())
-                .str());
+              _("Error build atomic model '%s' with error: %s"),
+              name,
+              e.what());
         }
     } else if (xmlStrcmp(type, (const xmlChar*)"coupled") == 0) {
         try {
             gmdl = new vpz::CoupledModel((const char*)name, cplparent);
         } catch (const utils::DevsGraphError& e) {
             throw utils::SaxParserError(
-              (fmt(_("Error build coupled model '%1%' with error: %2%")) %
-               name % e.what())
-                .str());
+              _("Error build coupled model '%s' with error: %s"),
+              name,
+              e.what());
         }
     } else {
-        throw utils::SaxParserError(
-          (fmt(_("Unknow model type %1%")) % (const char*)type).str());
+        throw utils::SaxParserError(_("Unknow model type %s"),
+                                    (const char*)type);
     }
 
     buildModelGraphics(gmdl,
@@ -247,9 +249,8 @@ SaxStackVpz::buildModelGraphics(vpz::BaseModel* mdl,
             mdl->setY(std::stoi(y));
         } catch (const std::exception& /* e */) {
             throw utils::SaxParserError(
-              (fmt(_("Cannot convert x or y position for model %1%")) %
-               mdl->getName())
-                .str());
+              _("Cannot convert x or y position for model %s"),
+              mdl->getName().c_str());
         }
     }
 
@@ -259,9 +260,8 @@ SaxStackVpz::buildModelGraphics(vpz::BaseModel* mdl,
             mdl->setHeight(std::stoi(height));
         } catch (const std::exception& /* e */) {
             throw utils::SaxParserError(
-              (fmt(_("Cannot convert width or height for model %1%")) %
-               mdl->getName())
-                .str());
+              _("Cannot convert width or height for model %s"),
+              mdl->getName().c_str());
         }
     }
 }
@@ -335,8 +335,7 @@ SaxStackVpz::pushPortType(const char* att)
     } else if (std::strcmp(att, "init") == 0) {
         prt = new vpz::Init();
     } else {
-        throw utils::SaxParserError(
-          (fmt(_("Unknow port type %1%.")) % att).str());
+        throw utils::SaxParserError(_("Unknow port type %s."), att);
     }
     push(prt);
 }
@@ -391,8 +390,7 @@ SaxStackVpz::pushConnection(const xmlChar** att)
     } else if (xmlStrcmp(type, (const xmlChar*)"output") == 0) {
         cnt = new vpz::OutputConnection();
     } else {
-        throw utils::SaxParserError(
-          (fmt(_("Unknow connection type %1%")) % type).str());
+        throw utils::SaxParserError(_("Unknow connection type %s"), type);
     }
     push(cnt);
 }
@@ -798,8 +796,7 @@ SaxStackVpz::pushView(const xmlChar** att)
                 viewtype |= View::FINISH;
             else
                 throw utils::SaxParserError(
-                  (fmt(_("View tag does not accept type '%1%'")) % type)
-                    .str());
+                  _("View tag does not accept type '%s'"), tmp.c_str());
 
             if (it != std::string::npos)
                 begin = std::min(it + 1, typestr.size());

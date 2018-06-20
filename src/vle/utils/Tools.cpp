@@ -187,7 +187,7 @@ to(const std::string& str)
     if (s >> ret)
         return ret;
 
-    throw utils::ArgError((fmt(_("Can not convert `%1%'")) % str).str());
+    throw utils::ArgError(_("Can not convert `%s'"), str.c_str());
 }
 
 template VLE_API bool
@@ -228,7 +228,7 @@ convert(const std::string& value, bool locale, const std::string& loc)
     s << value;
 
     if (s.bad() or s.fail()) {
-        throw ArgError("failed to read the value");
+        throw ArgError(_("failed to read the value"));
     }
 
     output result;
@@ -245,7 +245,7 @@ convert(const std::string& value, bool locale, const std::string& loc)
             s >> result;
 
             if (s.bad()) {
-                throw ArgError("failed to write the value");
+                throw ArgError(_("failed to write the value"));
             } else {
                 return result;
             }

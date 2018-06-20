@@ -25,7 +25,6 @@
  */
 
 #include "oov.hpp"
-#include <boost/format.hpp>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -40,6 +39,7 @@
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/unit-test.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/CoupledModel.hpp>
@@ -595,16 +595,16 @@ public:
             set->toSet().add(value::Integer::create(1));
             if (get_nb_model() > 0 and ev.getTime() < 50.0) {
                 set->toSet().add(value::String::create("add"));
-                std::string name =
-                  (boost::format("MyBeep_%1%") % m_stacknames.size()).str();
+                auto name = vle::utils::format("MyBeep_%u",
+                    static_cast<unsigned>(m_stacknames.size()));
                 set->toSet().add(value::String::create(name));
                 set->toSet().add(value::String::create("2"));
                 std::string edge = name + std::string(" counter ");
                 set->toSet().add(value::String::create(edge));
             } else if (get_nb_model() > 0) {
                 set->toSet().add(value::String::create("delete"));
-                std::string name =
-                  (boost::format("MyBeep_%1%") % (get_nb_model())).str();
+                auto name = vle::utils::format("MyBeep_%u",
+                    static_cast<unsigned>(get_nb_model()));
                 set->toSet().add(value::String::create(name));
             }
 
@@ -620,8 +620,8 @@ public:
     void add_new_model()
     {
         printf("add_new_model starts\n");
-        std::string name(
-          (boost::format("MyBeep_%1%") % m_stacknames.size()).str());
+        auto name = vle::utils::format("MyBeep_%u",
+            static_cast<unsigned>(m_stacknames.size()));
 
         std::vector<std::string> outputs{ "out" }, inputs{};
 
@@ -635,12 +635,11 @@ public:
     void del_first_model()
     {
         printf("del_first_model starts\n");
-        if (m_stacknames.empty()) {
+
+        if (m_stacknames.empty())
             throw utils::InternalError(
-              boost::format("Cannot delete any model, the executive have no "
-                            "element.")
-                .str());
-        }
+                "Cannot delete any model, the executive have no "
+                "element.");
 
         delModel(m_stacknames.top());
         printf("del_first_model finished: %s\n", m_stacknames.top().c_str());

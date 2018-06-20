@@ -62,128 +62,117 @@
 #define N_(x) x
 #endif
 
+#define black "\033[30m"
+#define red "\033[31m"
+#define green "\033[31m"
+#define yellow "\033[32m"
+#define blue "\033[33m"
+#define magenta "\033[34m"
+#define cyan "\033[35m"
+#define def "\033[39m"
+
+static const char colors[][10] = { red,   red,   magenta, yellow,
+                                   green, black, black,   blue };
+
 struct vle_log_standard : vle::utils::Context::LogFunctor
 {
-    FILE* stream;
-    bool color;
+private:
+    FILE* stream = nullptr;
+    bool color = false;
+
+    void try_open(const vle::utils::Context& ctx)
+    {
+        auto* ret = fopen(ctx.getLogFile().string().c_str(), "w");
+
+        if (ret == nullptr) {
+            fprintf(stderr,
+                    "Fail to open log file `%s'. Fallback log to the standard "
+                    "output.\n",
+                    ctx.getLogFile().string().c_str());
+
+            if (stream and stream != stdout and stream != stderr)
+                fclose(stream);
+
+            stream = stdout;
+        }
+
+        color = use_color(stream);
+    }
+
+    bool use_color(FILE* f)
+    {
+#if defined(__unix__)
+        return isatty(fileno(f)) == 1;
+#else
+        return false;
+#endif
+    }
+
+public:
+    vle_log_standard() = default;
 
     vle_log_standard(FILE* f)
       : stream(f)
-#if defined(__unix__)
-      , color(isatty(fileno(f)) == 1)
-#else
-      , color(false)
-#endif
+      , color(use_color(f))
     {}
 
     void write(const vle::utils::Context& ctx,
                int priority,
                const std::string& str) noexcept override
     {
-        (void)ctx;
+        if (stream == nullptr)
+            try_open(ctx);
 
-        if (color) {
-            if (priority == 7)
-                fprintf(stream, "\e[90m[dbg] %s\e[39m", str.c_str());
-            else if (priority == 6)
-                fprintf(stream, "%s\e[39m", str.c_str());
-            else
-                fprintf(stream, "\e[91m[Error]\e[31m %s\e[39m ", str.c_str());
-        } else {
-            if (priority == 7)
-                fprintf(stream, "[dbg] %s", str.c_str());
-            else if (priority == 6)
-                fprintf(stream, "%s", str.c_str());
-            else
-                fprintf(stream, "[Error] %s", str.c_str());
-        }
+        if (color)
+            fputs(colors[priority], stream);
+
+        if (priority == 7)
+            fprintf(stream, "debug: %s", str.c_str());
+        else if (priority == 4)
+            fprintf(stream, "warning: %s", str.c_str());
+        else if (priority == 3)
+            fprintf(stream, "error: %s", str.c_str());
+        else if (priority == 2)
+            fprintf(stream, "critical: %s", str.c_str());
+        else if (priority == 1)
+            fprintf(stream, "alert: %s", str.c_str());
+        else if (priority == 0)
+            fprintf(stream, "emergency: %s", str.c_str());
+        else
+            fprintf(stream, "%s", str.c_str());
+
+        if (color)
+            fputs(def, stream);
     }
 
     void write(const vle::utils::Context& ctx,
                int priority,
-               const char* file,
-               int line,
-               const char* fn,
                const char* format,
                va_list args) noexcept override
     {
-        (void)ctx;
+        if (stream == nullptr)
+            try_open(ctx);
 
-        if (color) {
-            if (file and line >= 0 and fn) {
-                if (priority == 7)
-                    fprintf(
-                      stream, "\e[90m[dbg] %s:%d %s: \e[39m", file, line, fn);
-                else if (priority == 6)
-                    fprintf(stream, "%s: \e[39m", fn);
-                else
-                    fprintf(stream, "\e[91m[Error]\e[31m %s:\e[39m ", fn);
-            }
-            vfprintf(stream, format, args);
-        } else {
-            if (file and line >= 0 and fn) {
-                if (priority == 7)
-                    fprintf(stream, "[dbg] %s:%d %s: ", file, line, fn);
-                else if (priority == 6)
-                    fprintf(stream, "%s: ", fn);
-                else
-                    fprintf(stream, "[Error] %s: ", fn);
-            }
-            vfprintf(stream, format, args);
-        }
-    }
-};
+        if (color)
+            fputs(colors[priority], stream);
 
-struct vle_log_file : vle::utils::Context::LogFunctor
-{
-    FILE* fp{nullptr};
+        if (priority == 7)
+            fputs("debug: ", stream);
+        else if (priority == 4)
+            fputs("warning: ", stream);
+        else if (priority == 3)
+            fputs("error: ", stream);
+        else if (priority == 2)
+            fputs("critical: ", stream);
+        else if (priority == 1)
+            fputs("alert: ", stream);
+        else if (priority == 0)
+            fputs("emergency: ", stream);
 
-    vle_log_file() = default;
+        vfprintf(stream, format, args);
 
-    ~vle_log_file() override
-    {
-        if (fp)
-            fclose(fp);
-    }
-
-    void write(const vle::utils::Context& ctx,
-               int priority,
-               const std::string& str) noexcept override
-    {
-        if (not fp)
-            fp = fopen(ctx.getLogFile().string().c_str(), "w");
-
-        if (fp) {
-            if (priority == 7)
-                fprintf(fp, "[dbg] %s", str.c_str());
-            else if (priority == 6)
-                fprintf(fp, "%s", str.c_str());
-            else
-                fprintf(fp, "[Error] %s", str.c_str());
-        }
-    }
-
-    void write(const vle::utils::Context& ctx,
-               int priority,
-               const char* file,
-               int line,
-               const char* fn,
-               const char* format,
-               va_list args) noexcept override
-    {
-        if (not fp)
-            fp = fopen(ctx.getLogFile().string().c_str(), "w");
-
-        if (fp) {
-            if (priority == 7)
-                fprintf(fp, "[dbg] %s:%d %s: ", file, line, fn);
-            else if (priority == 6)
-                fprintf(fp, "%s: ", fn);
-            else
-                fprintf(fp, "[Error] %s: ", fn);
-
-            vfprintf(fp, format, args);
-        }
+        if (color)
+            fputs(def, stream);
     }
 };
 
@@ -985,7 +974,7 @@ main(int argc, char** argv)
     else if (log_stdout == 1)
         ctx->set_log_function(std::make_unique<vle_log_standard>(stderr));
     else
-        ctx->set_log_function(std::make_unique<vle_log_file>());
+        ctx->set_log_function(std::make_unique<vle_log_standard>());
 
     CmdArgs commands(argv + ::optind, argv + argc);
 

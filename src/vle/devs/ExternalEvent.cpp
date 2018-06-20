@@ -112,9 +112,8 @@ const value::Boolean&
 ExternalEvent::getBoolean() const
 {
     if (not m_attributes or not m_attributes->isBoolean())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Boolean."));
 
     return m_attributes->toBoolean();
 }
@@ -123,9 +122,8 @@ value::Boolean&
 ExternalEvent::getBoolean()
 {
     if (not m_attributes or not m_attributes->isBoolean())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Boolean."));
 
     return m_attributes->toBoolean();
 }
@@ -134,9 +132,8 @@ const value::Double&
 ExternalEvent::getDouble() const
 {
     if (not m_attributes or not m_attributes->isDouble())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Double."));
 
     return m_attributes->toDouble();
 }
@@ -145,9 +142,8 @@ value::Double&
 ExternalEvent::getDouble()
 {
     if (not m_attributes or not m_attributes->isDouble())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Double."));
 
     return m_attributes->toDouble();
 }
@@ -156,9 +152,8 @@ const value::Integer&
 ExternalEvent::getInteger() const
 {
     if (not m_attributes or not m_attributes->isInteger())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Integer."));
 
     return m_attributes->toInteger();
 }
@@ -167,9 +162,8 @@ value::Integer&
 ExternalEvent::getInteger()
 {
     if (not m_attributes or not m_attributes->isInteger())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Integer."));
 
     return m_attributes->toInteger();
 }
@@ -178,9 +172,8 @@ const value::String&
 ExternalEvent::getString() const
 {
     if (not m_attributes or not m_attributes->isString())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a String."));
 
     return m_attributes->toString();
 }
@@ -189,9 +182,8 @@ value::String&
 ExternalEvent::getString()
 {
     if (not m_attributes or not m_attributes->isString())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a String."));
 
     return m_attributes->toString();
 }
@@ -200,9 +192,8 @@ const value::Xml&
 ExternalEvent::getXml() const
 {
     if (not m_attributes or not m_attributes->isXml())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Xml."));
 
     return m_attributes->toXml();
 }
@@ -211,9 +202,8 @@ value::Xml&
 ExternalEvent::getXml()
 {
     if (not m_attributes or not m_attributes->isXml())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Xml."));
 
     return m_attributes->toXml();
 }
@@ -222,9 +212,8 @@ const value::Tuple&
 ExternalEvent::getTuple() const
 {
     if (not m_attributes or not m_attributes->isTuple())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Tuple."));
 
     return m_attributes->toTuple();
 }
@@ -233,9 +222,8 @@ value::Tuple&
 ExternalEvent::getTuple()
 {
     if (not m_attributes or not m_attributes->isTuple())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Tuple."));
 
     return m_attributes->toTuple();
 }
@@ -244,9 +232,8 @@ const value::Table&
 ExternalEvent::getTable() const
 {
     if (not m_attributes or not m_attributes->isTable())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Table."));
 
     return m_attributes->toTable();
 }
@@ -255,9 +242,8 @@ value::Table&
 ExternalEvent::getTable()
 {
     if (not m_attributes or not m_attributes->isTable())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Table."));
 
     return m_attributes->toTable();
 }
@@ -266,9 +252,8 @@ const value::Map&
 ExternalEvent::getMap() const
 {
     if (not m_attributes or not m_attributes->isMap())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Map."));
 
     return m_attributes->toMap();
 }
@@ -277,9 +262,8 @@ value::Map&
 ExternalEvent::getMap()
 {
     if (not m_attributes or not m_attributes->isMap())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Map."));
 
     return m_attributes->toMap();
 }
@@ -288,9 +272,8 @@ const value::Set&
 ExternalEvent::getSet() const
 {
     if (not m_attributes or not m_attributes->isSet())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Set."));
 
     return m_attributes->toSet();
 }
@@ -299,9 +282,8 @@ value::Set&
 ExternalEvent::getSet()
 {
     if (not m_attributes or not m_attributes->isSet())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Set."));
 
     return m_attributes->toSet();
 }
@@ -310,9 +292,8 @@ const value::Matrix&
 ExternalEvent::getMatrix() const
 {
     if (not m_attributes or not m_attributes->isMatrix())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Matrix."));
 
     return m_attributes->toMatrix();
 }
@@ -321,9 +302,8 @@ value::Matrix&
 ExternalEvent::getMatrix()
 {
     if (not m_attributes or not m_attributes->isMatrix())
-        throw utils::ArgError((fmt(_("ExternalEvent: getAttributes is empty or"
-                                     " is not a map.")))
-                                .str());
+        throw utils::ArgError(_("ExternalEvent: getAttributes is empty or"
+                                " is not a Matrix."));
 
     return m_attributes->toMatrix();
 }

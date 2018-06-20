@@ -47,9 +47,9 @@ pp_check_index(const vle::value::Set& s, std::size_t i)
 {
 #ifndef VLE_FULL_OPTIMIZATION
     if (i >= s.size())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Set: too big index '%1%' (max %2%)")) % i % s.size())
-            .str());
+        throw vle::utils::ArgError(_("Set: too big index '%lu' (max %lu)"),
+                                   static_cast<unsigned long>(i),
+                                   static_cast<unsigned long>(s.size()));
 #else
     (void)s;
     (void)i;
@@ -76,8 +76,8 @@ pp_get_value(vle::value::Set& s, std::size_t i)
     auto it = pp_get(s, i);
 
     if (not it->get())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Set: empty or null value at '%1%'")) % i).str());
+        throw vle::utils::ArgError(_("Set: empty or null value at '%lu'"),
+                                   static_cast<unsigned long>(i));
 
     return *it->get();
 }
@@ -88,8 +88,8 @@ pp_get_value(const vle::value::Set& s, std::size_t i)
     auto it = pp_get(s, i);
 
     if (not it->get())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Set: empty or null value at '%1%'")) % i).str());
+        throw vle::utils::ArgError(_("Set: empty or null value at '%lu'"),
+                                   static_cast<unsigned long>(i));
 
     return *it->get();
 }
@@ -113,8 +113,7 @@ namespace value {
 
 Set::Set(size_type size)
   : m_value(size)
-{
-}
+{}
 
 Set::Set(const Set& setfactory)
   : Value(setfactory)

@@ -132,9 +132,8 @@ public:
         /* If we reach here this means the close quote was never
          * encountered */
         throw vle::utils::CastError(
-          boost::str(vle::fmt("Unmatched quotation mark in command line "
-                              "or other shell-quoted text: %1%") %
-                     retval));
+            "Unmatched quotation mark in command line "
+            "or other shell-quoted text: %s", retval.c_str());
     }
 
     /**

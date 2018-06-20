@@ -24,11 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iterator>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/vpz/Output.hpp>
 #include <vle/vpz/Outputs.hpp>
+
+#include <algorithm>
+#include <iterator>
 
 namespace vle {
 namespace vpz {
@@ -92,11 +95,9 @@ Outputs::add(const Output& o)
 
     x = m_list.insert(value_type(o.name(), o));
 
-    if (not x.second) {
-        throw utils::ArgError(
-          (fmt(_("An output have already this name '%1%'\n")) % o.name())
-            .str());
-    }
+    if (not x.second)
+        throw utils::ArgError(_("An output have already this name '%s'\n"),
+                              o.name().c_str());
 
     return x.first->second;
 }
@@ -106,9 +107,8 @@ Outputs::get(const std::string& name)
 {
     auto it = m_list.find(name);
 
-    if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknow output '%1%'\n")) % name).str());
-    }
+    if (it == end())
+        throw utils::ArgError(_("Unknow output '%s'\n"), name.c_str());
 
     return it->second;
 }
@@ -118,9 +118,8 @@ Outputs::get(const std::string& name) const
 {
     auto it = m_list.find(name);
 
-    if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknow output '%1%'\n")) % name).str());
-    }
+    if (it == end())
+        throw utils::ArgError(_("Unknow output '%s'\n"), name.c_str());
 
     return it->second;
 }

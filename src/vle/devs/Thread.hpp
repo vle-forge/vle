@@ -116,10 +116,9 @@ public:
                 workers_count = 0l;
         }
 
-        vInfo(context,
-              _("Simulation kernel: thread:%ld block-size:%ld\n"),
-              workers_count,
-              m_block_size);
+        context->info(_("Simulation kernel: thread:%ld block-size:%ld\n"),
+                      workers_count,
+                      m_block_size);
 
         m_block_id.store(-1, std::memory_order_relaxed);
         m_block_count.store(-1, std::memory_order_relaxed);
@@ -154,8 +153,9 @@ public:
         m_jobs = &simulators;
         m_time = time;
 
-        auto sz = (simulators.size() / m_block_size) +
-                  ((simulators.size() % m_block_size) ? 1 : 0);
+        auto sz =
+          static_cast<long>((simulators.size() / m_block_size) +
+                            ((simulators.size() % m_block_size) ? 1 : 0));
 
         m_block_count.store(sz, std::memory_order_relaxed);
         m_block_id.store(sz, std::memory_order_relaxed);

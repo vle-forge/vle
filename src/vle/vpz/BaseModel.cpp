@@ -153,8 +153,8 @@ void
 BaseModel::rename(BaseModel* mdl, const std::string& newname)
 {
     if (not mdl) {
-        throw utils::DevsGraphError(
-          (fmt(_("Cannot rename empty model with '%1%'")) % newname).str());
+        throw utils::DevsGraphError(_("Cannot rename empty model with '%s'"),
+                                    newname.c_str());
     }
 
     CoupledModel* parent = mdl->getParent();
@@ -169,9 +169,9 @@ BaseModel::rename(BaseModel* mdl, const std::string& newname)
         auto itfind = parent->getModelList().find(newname);
         if (itfind != parent->getModelList().end()) {
             throw utils::DevsGraphError(
-              (fmt(_("Coupled model %1% already has submodel %2%")) %
-               parent->getName() % newname)
-                .str());
+              _("Coupled model %s already has submodel %s"),
+              parent->getName().c_str(),
+              newname.c_str());
         } else {
             mdl->m_name.assign(newname);
             parent->getModelList().erase(it);
@@ -255,9 +255,9 @@ BaseModel::getModel(const CoupledModelVector& lst, const std::string& name)
 
         if (other->getName() != top->getName()) {
             throw utils::DevsGraphError(
-              (fmt(_("Get model have not the same name '%1%' and '%2%'")) %
-               top->getName() % other->getName())
-                .str());
+              _("Get model have not the same name '%s' and '%s'"),
+              top->getName().c_str(),
+              other->getName().c_str());
         }
 
         it++;
@@ -267,22 +267,20 @@ BaseModel::getModel(const CoupledModelVector& lst, const std::string& name)
             BaseModel* tmp = top->findModel(other->getName());
 
             if (not tmp) {
-                throw utils::DevsGraphError(
-                  (fmt(_("Model '%1%' not found")) % other->getName()).str());
+                throw utils::DevsGraphError(_("Model '%s' not found"),
+                                            other->getName().c_str());
             }
 
             if (not tmp->isCoupled()) {
                 throw utils::DevsGraphError(
-                  (fmt(_("Model '%1%' is not a coupled model")) %
-                   other->getName())
-                    .str());
+                  _("Model '%s' is not a coupled model"),
+                  other->getName().c_str());
             }
 
             if (tmp->getName() != other->getName()) {
                 throw utils::DevsGraphError(
-                  (fmt(_("Model '%1%' have not the same parent")) %
-                   other->getName())
-                    .str());
+                  _("Model '%s' have not the same parent"),
+                  other->getName().c_str());
             }
 
             top = static_cast<CoupledModel*>(tmp);
@@ -539,9 +537,9 @@ BaseModel::getInPort(const std::string& name) const
     auto it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
         throw utils::DevsGraphError(
-          (fmt(_("Coupled model %1% have no input port %2%")) % getName() %
-           name)
-            .str());
+          _("Coupled model %s have no input port %s"),
+          getName().c_str(),
+          name.c_str());
     }
 
     return it->second;
@@ -553,9 +551,9 @@ BaseModel::getOutPort(const std::string& name) const
     auto it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
         throw utils::DevsGraphError(
-          (fmt(_("Coupled model %1% have no output port %2%")) % getName() %
-           name)
-            .str());
+          _("Coupled model %s have no output port %s"),
+          getName().c_str(),
+          name.c_str());
     }
 
     return it->second;
@@ -566,9 +564,9 @@ BaseModel::getInPort(const std::string& name)
 {
     auto it = m_inPortList.find(name);
     if (it == m_inPortList.end()) {
-        throw utils::DevsGraphError(
-          (fmt(_("Model %1% have no input port %2%")) % getName() % name)
-            .str());
+        throw utils::DevsGraphError(_("Model %s have no input port %s"),
+                                    getName().c_str(),
+                                    name.c_str());
     }
 
     return it->second;
@@ -579,9 +577,9 @@ BaseModel::getOutPort(const std::string& name)
 {
     auto it = m_outPortList.find(name);
     if (it == m_outPortList.end()) {
-        throw utils::DevsGraphError(
-          (fmt(_("Model %1% have no output port %2%")) % getName() % name)
-            .str());
+        throw utils::DevsGraphError(_("Model %s have no output port %s"),
+                                    getName().c_str(),
+                                    name.c_str());
     }
 
     return it->second;
@@ -605,9 +603,9 @@ BaseModel::getInputPortIndex(const std::string& name) const
     auto it = m_inPortList.find(name);
 
     if (it == m_inPortList.end()) {
-        throw utils::DevsGraphError(
-          (fmt(_("Input port %1% not exist in model %2%")) % name % getName())
-            .str());
+        throw utils::DevsGraphError(_("Input port %s not exist in model %s"),
+                                    name.c_str(),
+                                    getName().c_str());
     }
 
     return utils::numeric_cast<int>(std::distance(m_inPortList.begin(), it));
@@ -619,9 +617,9 @@ BaseModel::getOutputPortIndex(const std::string& name) const
     auto it = m_outPortList.find(name);
 
     if (it == m_outPortList.end()) {
-        throw utils::DevsGraphError(
-          (fmt(_("Output port %1% not exist in model %2%")) % name % getName())
-            .str());
+        throw utils::DevsGraphError(_("Output port %s not exist in model %s"),
+                                    name.c_str(),
+                                    getName().c_str());
     }
 
     return utils::numeric_cast<int>(std::distance(m_outPortList.begin(), it));

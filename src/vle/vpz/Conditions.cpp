@@ -166,8 +166,8 @@ Conditions::get(const std::string& condition) const
     auto it = m_list.find(condition);
 
     if (it == end()) {
-        throw utils::ArgError(
-          (fmt(_("The condition '%1%' does not exists")) % condition).str());
+        throw utils::ArgError(_("The condition '%s' does not exists"),
+                              condition.c_str());
     }
 
     return it->second;
@@ -179,8 +179,8 @@ Conditions::get(const std::string& condition)
     auto it = m_list.find(condition);
 
     if (it == end()) {
-        throw utils::ArgError(
-          (fmt(_("The condition '%1%' does not exists")) % condition).str());
+        throw utils::ArgError(_("The condition '%s' does not exists"),
+                              condition.c_str());
     }
 
     return it->second;
@@ -191,7 +191,8 @@ Conditions::cleanNoPermanent()
 {
     auto it = begin();
 
-    while ((it = utils::findIf(it, end(), Condition::IsPermanent())) != end()) {
+    while ((it = utils::findIf(it, end(), Condition::IsPermanent())) !=
+           end()) {
         auto del = it++;
         m_list.erase(del);
     }

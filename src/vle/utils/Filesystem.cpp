@@ -13,6 +13,11 @@
 */
 
 #ifdef _WIN32
+#include <tchar.h>
+
+#define NOMINMAX
+#include <Windows.h>
+
 #include <vle/utils/details/UtilsWin.hpp>
 #endif
 
@@ -453,7 +458,7 @@ Path::unique_path(const std::string& model)
 {
     std::mt19937 rng;
 #if defined _WIN32
-    rng.seed(std::time(0));
+    rng.seed(static_cast<unsigned int>(std::time(0)));
 #else
     rng.seed(std::random_device{}());
 #endif

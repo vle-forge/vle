@@ -80,11 +80,11 @@ class ExperimentGenerator::Pimpl
                         if (conditionsize != 0 and conditionsize != 1 and
                             result != conditionsize) {
                             throw utils::InternalError(
-                              (fmt(_("ExperimentGenerator: bad combination "
-                                     "size for the condition `%1%' port "
-                                     "`%2%': %3%")) %
-                               it->first % jt->first % conditionsize)
-                                .str());
+                              _("ExperimentGenerator: bad combination size "
+                                "for the condition `%s' port `%s': %d"),
+                              it->first.c_str(),
+                              jt->first.c_str(),
+                              conditionsize);
                         }
                     }
                 }
@@ -172,10 +172,11 @@ public:
                     cpy.emplace_back(elem.second[index]);
                 } else {
                     throw utils::InternalError(
-                      (fmt(_("ExperimentGenerator can not access to the index"
-                             " `%1%' of the condition `%2%' port `%3%' ")) %
-                       index % it->first % elem.first)
-                        .str());
+                      _("ExperimentGenerator can not access to the index `%d' "
+                        "of the condition `%s' port `%s' "),
+                      static_cast<int>(index),
+                      it->first.c_str(),
+                      elem.first.c_str());
                 }
 
                 cnvdst[elem.first] = std::move(cpy);

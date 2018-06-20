@@ -84,9 +84,6 @@ struct gvle_ctx_log : vle::utils::Context::LogFunctor
 
     void write(const vle::utils::Context& /*ctx*/,
                int priority,
-               const char* file,
-               int line,
-               const char* fn,
                const char* format,
                va_list args) noexcept override
     {
@@ -97,7 +94,7 @@ struct gvle_ctx_log : vle::utils::Context::LogFunctor
         else if (priority <= 5)
             msg = QString("Note: ");
         else if (priority > 6)
-            msg = QString("[debug] %1:%2 %3: ").arg(file).arg(line).arg(fn);
+            msg = QString("[debug]: ");
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
         msg += QString::vasprintf(format, args);

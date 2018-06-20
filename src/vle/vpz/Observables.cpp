@@ -78,8 +78,8 @@ Observables::add(const Observable& obs)
     x = m_list.insert(value_type(obs.name(), obs));
 
     if (not x.second) {
-        throw utils::ArgError(
-          (fmt(_("Observable %1% already exist")) % obs.name()).str());
+        throw utils::ArgError(_("Observable %s already exist"),
+                              obs.name().c_str());
     }
 
     return x.first->second;
@@ -91,8 +91,7 @@ Observables::get(const std::string& name)
     auto it = m_list.find(name);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(
-          (fmt(_("Observable %1% does not exist")) % name).str());
+        throw utils::ArgError(_("Observable %s does not exist"), name.c_str());
     }
 
     return it->second;
@@ -104,8 +103,8 @@ Observables::get(const std::string& name) const
     auto it = m_list.find(name);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(
-          (fmt(_("Observable %1% doest not exist")) % name).str());
+        throw utils::ArgError(_("Observable %s doest not exist"),
+                              name.c_str());
     }
 
     return it->second;

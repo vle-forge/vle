@@ -32,9 +32,9 @@
 namespace vle {
 namespace vpz {
 
-View::View(std::string  name,
+View::View(std::string name,
            View::Type type,
-           std::string  output,
+           std::string output,
            double timestep,
            bool enable)
   : m_timestep(timestep)
@@ -46,20 +46,20 @@ View::View(std::string  name,
     if (m_type == View::TIMED) {
         if (m_timestep <= 0.0) {
             throw utils::ArgError(
-              (fmt(_("Cannont define the View '%1%' with a timestep '%2%'")) %
-               m_name % m_timestep)
-                .str());
+              _("Cannont define the View '%s' with a timestep '%f'"),
+              m_name.c_str(),
+              m_timestep);
         }
     }
 }
 
-View::View(std::string  name)
+View::View(std::string name)
   : m_timestep(0.0)
   , m_name(std::move(name))
   , m_enabled(true)
-  , m_type(static_cast<Type>(View::INTERNAL | View::EXTERNAL | View::CONFLUENT))
-{
-}
+  , m_type(
+      static_cast<Type>(View::INTERNAL | View::EXTERNAL | View::CONFLUENT))
+{}
 
 void
 View::write(std::ostream& out) const
@@ -124,7 +124,7 @@ View::setTimestep(double time)
 {
     if ((m_type == View::TIMED) && (time <= 0.0)) {
         throw utils::ArgError(
-          (fmt(_("Bad time step %1% for view %2%")) % time % m_name).str());
+          _("Bad time step %f for view %s"), time, m_name.c_str());
     }
 
     m_timestep = time;

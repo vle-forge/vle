@@ -24,15 +24,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <mutex>
-#include <thread>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Spawn.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
+
+#include <mutex>
+#include <thread>
+
+#include <boost/format.hpp>
 
 namespace vle {
 namespace utils {
@@ -97,7 +101,7 @@ struct DownloadManager::Pimpl
     {
         std::string command;
         try {
-            command = (vle::fmt(mCommand) % mUrl % mFilename).str();
+            command = (boost::format(mCommand) % mUrl % mFilename).str();
 
             utils::Spawn spawn(mContext);
             std::vector<std::string> argv = spawn.splitCommandLine(command);
@@ -107,7 +111,7 @@ struct DownloadManager::Pimpl
             Path pwd = Path::current_path();
             if (not spawn.start(exe, pwd.string(), argv)) {
                 mErrorMessage = _("Download: fail to start download command");
-                vErr(mContext, "%s\n", mErrorMessage.c_str());
+                mContext->error("%s\n", mErrorMessage.c_str());
                 mHasError = true;
                 return;
             }
@@ -115,12 +119,13 @@ struct DownloadManager::Pimpl
             std::string output, error;
             while (not spawn.isfinish()) {
                 if (spawn.get(&output, &error)) {
-                    vDbg(mContext, "%s", output.c_str());
-                    vDbg(mContext, "%s", error.c_str());
+                    mContext->debug("%s", output.c_str());
+                    mContext->debug("%s", error.c_str());
                     output.clear();
                     error.clear();
 
-                    std::this_thread::sleep_for(std::chrono::microseconds(200));
+                    std::this_thread::sleep_for(
+                      std::chrono::microseconds(200));
                 } else
                     break;
             }
@@ -132,15 +137,17 @@ struct DownloadManager::Pimpl
             spawn.status(&message, &success);
 
             if (not success and not message.empty())
-                vErr(mContext,
-                     _("Download: fail to download resources: %s\n"),
-                     message.c_str());
+                mContext->error(
+                  _("Download: fail to download resources: %s\n"),
+                  message.c_str());
         } catch (const std::exception& e) {
-            mErrorMessage = (fmt(_("Download: unable to download '%s' "
-                                   "in '%s' with the '%s' command")) %
-                             mUrl % mFilename % command)
-                              .str();
-            vErr(mContext, "%s\n", mErrorMessage.c_str());
+            mErrorMessage =
+              utils::format(_("Download: unable to download '%s' in '%s' with "
+                              "the '%s' command"),
+                            mUrl.c_str(),
+                            mFilename.c_str(),
+                            command.c_str());
+            mContext->error("%s\n", mErrorMessage.c_str());
             mHasError = true;
         }
     }
@@ -148,8 +155,7 @@ struct DownloadManager::Pimpl
 
 DownloadManager::DownloadManager(ContextPtr context)
   : mPimpl(std::make_unique<DownloadManager::Pimpl>(context))
-{
-}
+{}
 
 DownloadManager::~DownloadManager() noexcept = default;
 

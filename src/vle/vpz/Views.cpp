@@ -93,8 +93,9 @@ Views::clear()
 void
 Views::add(const Views& views)
 {
-    std::for_each(
-      views.viewlist().begin(), views.viewlist().end(), Views::AddViews(*this));
+    std::for_each(views.viewlist().begin(),
+                  views.viewlist().end(),
+                  Views::AddViews(*this));
 
     m_outputs.add(views.outputs());
     m_observables.add(views.observables());
@@ -107,8 +108,8 @@ Views::add(const View& view)
     x = m_list.insert(value_type(view.name(), view));
 
     if (not x.second) {
-        throw utils::ArgError(
-          (fmt(_("View '%1%' already exist")) % view.name()).str());
+        throw utils::ArgError(_("View '%s' already exist"),
+                              view.name().c_str());
     }
 
     return x.first->second;
@@ -121,9 +122,9 @@ Views::addEventView(const std::string& name,
                     bool enable)
 {
     if (isUsedOutput(output)) {
-        throw utils::ArgError(
-          (fmt(_("Output '%1%' of view '%2%' is already used")) % output % name)
-            .str());
+        throw utils::ArgError(_("Output '%s' of view '%s' is already used"),
+                              output.c_str(),
+                              name.c_str());
     }
 
     return add(View(name, type, output, 0.0, enable));
@@ -136,9 +137,9 @@ Views::addTimedView(const std::string& name,
                     bool enable)
 {
     if (isUsedOutput(output)) {
-        throw utils::ArgError(
-          (fmt(_("Output '%1%' of view '%2%' is already used")) % output % name)
-            .str());
+        throw utils::ArgError(_("Output '%s' of view '%s' is already used"),
+                              output.c_str(),
+                              name.c_str());
     }
 
     return add(View(name, View::TIMED, output, timestep, enable));
@@ -156,7 +157,7 @@ Views::get(const std::string& name) const
     auto it = m_list.find(name);
 
     if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknow view '%1%'\n")) % name).str());
+        throw utils::ArgError(_("Unknow view '%s'\n"), name.c_str());
     }
 
     return it->second;
@@ -168,7 +169,7 @@ Views::get(const std::string& name)
     auto it = m_list.find(name);
 
     if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknow view '%1%'\n")) % name).str());
+        throw utils::ArgError(_("Unknow view '%s'\n"), name.c_str());
     }
 
     return it->second;

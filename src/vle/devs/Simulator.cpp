@@ -142,8 +142,7 @@ Simulator::timeAdvance()
 
     if (tn < 0.0)
         throw utils::ModellingError(
-          (fmt(_("Negative time advance in '%1%' (%2%)")) % getName() % tn)
-            .str());
+            "Negative time advance in '%s' (%f)", getName().c_str(), tn);
 
     return tn;
 }
@@ -155,8 +154,7 @@ Simulator::init(Time time)
 
     if (tn < 0.0)
         throw utils::ModellingError(
-          (fmt(_("Negative init function in '%1%' (%2%)")) % getName() % tn)
-            .str());
+            "Negative init function in '%s' (%f)", getName().c_str(), tn);
 
     m_tn = tn + time;
     return m_tn;

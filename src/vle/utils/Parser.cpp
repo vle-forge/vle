@@ -66,8 +66,8 @@ Block::getBlock(const std::string& name) const
 {
     auto it = blocks.find(name);
     if (it == blocks.end()) {
-        throw utils::ParseError(
-          (fmt(_("The block `%1%' does not exist")) % name).str());
+        throw utils::ParseError(_("The block `%s' does not exist"),
+                                name.c_str());
     }
     return it->second;
 }
@@ -85,9 +85,10 @@ Parser::Parser(std::istream& stream)
         readBlock(mRoot);
     } catch (const std::exception& e) {
         throw utils::ParseError(
-          (fmt(_("Parser error before line %1% column %2%:\t%3%")) % mLine %
-           mColumn % e.what())
-            .str());
+          _("Parser error before line %ld column %ld:\t%s"),
+          mLine,
+          mColumn,
+          e.what());
     }
 }
 

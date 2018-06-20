@@ -38,8 +38,8 @@ inline double
 pp_get(const vle::value::TupleValue& t, size_t i)
 {
     if (i > t.size())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Tuple: bad accessor %1%")) % i).str());
+        throw vle::utils::ArgError(_("Tuple: bad accessor %lu"),
+                                   static_cast<unsigned long>(i));
 
     return t[i];
 }
@@ -48,8 +48,8 @@ inline double&
 pp_get(vle::value::TupleValue& t, size_t i)
 {
     if (i > t.size())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Tuple: bad accessor %1%")) % i).str());
+        throw vle::utils::ArgError(_("Tuple: bad accessor %lu"),
+                                   static_cast<unsigned long>(i));
 
     return t[i];
 }
@@ -172,10 +172,8 @@ Tuple::fill(const std::string& str)
                       static_cast<double>(boost::lexical_cast<long>(elem)));
                 } catch (const boost::bad_lexical_cast& e) {
                     throw vle::utils::ArgError(
-                      (fmt("Can not convert string '%1%' into"
-                           " double or long") %
-                       (elem))
-                        .str());
+                      _("Can not convert string '%s' into double or long"),
+                      elem.c_str());
                 }
             }
         }

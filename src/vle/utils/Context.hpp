@@ -434,20 +434,11 @@ public:
          *
          * @param ctx Current context
          * @param priority An integer between 0 and 7.
-         * @param file In debug message, the filename of the source code that
-         *     uses the logging system.
-         * @param line In debug mode, the line of the source code that uses the
-         *     logging system.
-         * @param fn In debug mode, the function of the source code that uses
-         *     the logging system.
          * @param format A @c printf format.
          * @param args A @c printf format.
          */
         virtual void write(const Context& ctx,
                            int priority,
-                           const char* file,
-                           int line,
-                           const char* fn,
                            const char* format,
                            va_list args) noexcept = 0;
 
@@ -475,19 +466,32 @@ public:
 
     int get_log_priority() const noexcept;
 
-    void log(int priority, const std::string& str);
+    void log(int priority, const std::string& str) const;
+    void log(int priority, const char* format, ...) const;
 
-    void log(int priority,
-             const char* file,
-             int line,
-             const char* fn,
-             const char* format,
-             ...)
-#if defined(__GNUC__)
-      const noexcept __attribute__((format(printf, 6, 7)));
-#else
-      const noexcept;
-#endif
+    void emergency(const std::string& str) const;
+    void emergency(const char* format, ...) const;
+
+    void alert(const std::string& str) const;
+    void alert(const char* format, ...) const;
+
+    void critical(const std::string& str) const;
+    void critical(const char* format, ...) const;
+
+    void error(const std::string& str) const;
+    void error(const char* format, ...) const;
+
+    void warning(const std::string& str) const;
+    void warning(const char* format, ...) const;
+
+    void notice(const std::string& str) const;
+    void notice(const char* format, ...) const;
+
+    void info(const std::string& str) const;
+    void info(const char* format, ...) const;
+
+    void debug(const std::string& str) const;
+    void debug(const char* format, ...) const;
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *

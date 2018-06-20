@@ -74,15 +74,13 @@ remove_all(vle::utils::ContextPtr ctx, const vle::utils::Path& path)
         spawn.status(&message, &success);
 
         if (not success && not message.empty())
-            vErr(ctx,
-                 _("Error during remove directory operation: %s\n"),
-                 message.c_str());
+            ctx->error(_("Error during remove directory operation: %s\n"),
+                       message.c_str());
     } catch (const std::exception& e) {
-        vErr(ctx,
-             _("Package remove all: unable to remove `%s' with"
-               " the `%s' command\n"),
-             path.string().c_str(),
-             command.c_str());
+        ctx->error(_("Package remove all: unable to remove `%s' with"
+                     " the `%s' command\n"),
+                   path.string().c_str(),
+                   command.c_str());
     }
 }
 
@@ -96,8 +94,7 @@ struct Package::Pimpl
     Pimpl(ContextPtr context)
       : m_context(context)
       , m_spawn(context)
-    {
-    }
+    {}
 
     Pimpl(ContextPtr context, std::string pkgname)
       : m_context(context)
@@ -134,17 +131,15 @@ struct Package::Pimpl
                  const std::vector<std::string>& argv)
     {
         if (m_spawn.isstart() and not m_spawn.isfinish()) {
-            vDbg(m_context,
-                 _("-[%s] Need to wait old process before\n"),
-                 exe.c_str());
+            m_context->debug(_("-[%s] Need to wait old process before\n"),
+                             exe.c_str());
 
             m_spawn.wait();
             m_spawn.status(&m_message, &m_issuccess);
         }
 
         if (not m_spawn.start(exe, workingDir, argv))
-            throw utils::ArgError(
-              (fmt(_("Failed to start `%1%'")) % exe).str());
+            throw utils::ArgError(_("Failed to start `%s'"), exe.c_str());
     }
 
     void refreshPath()
@@ -174,13 +169,11 @@ struct Package::Pimpl
 
 Package::Package(ContextPtr context)
   : m_pimpl(std::make_unique<Package::Pimpl>(context))
-{
-}
+{}
 
 Package::Package(ContextPtr context, const std::string& pkgname)
   : m_pimpl(std::make_unique<Package::Pimpl>(context, pkgname))
-{
-}
+{}
 
 Package::~Package() = default;
 
@@ -197,13 +190,12 @@ Package::create()
     Path destination(getDir(PKG_SOURCE));
 
     if (destination.exists())
-        throw utils::FileError((fmt(_("Pkg create error: "
-                                      "the directory %1% already exists")) %
-                                destination.string())
-                                 .str());
+        throw utils::FileError(
+          _("Pkg create error: the directory %s already exists"),
+          destination.string().c_str());
 
     Path::create_directory(destination);
-    std::string command = (vle::fmt(m_pimpl->mCommandDirCopy) %
+    std::string command = (boost::format(m_pimpl->mCommandDirCopy) %
                            source.string() % destination.string())
                             .str();
 
@@ -215,8 +207,7 @@ Package::create()
     try {
         m_pimpl->process(exe, source.string(), argv);
     } catch (const std::exception& e) {
-        throw utils::InternalError(
-          (fmt(_("Pkg create error: %1%")) % e.what()).str());
+        throw utils::InternalError(_("Pkg create error: %s"), e.what());
     }
 }
 
@@ -246,7 +237,8 @@ Package::configure()
     }
 
     std::string pkg_binarydir = getDir(PKG_BINARY);
-    std::string cmd = (fmt(m_pimpl->mCommandConfigure) % pkg_binarydir).str();
+    std::string cmd =
+      (boost::format(m_pimpl->mCommandConfigure) % pkg_binarydir).str();
     Spawn spawn(m_pimpl->m_context);
     std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
@@ -254,8 +246,7 @@ Package::configure()
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch (const std::exception& e) {
-        throw utils::InternalError(
-          (fmt(_("Pkg configure error: %1%")) % e.what()).str());
+        throw utils::InternalError(_("Pkg configure error: %s"), e.what());
     }
 }
 
@@ -280,12 +271,11 @@ Package::test()
     Path path{ pkg_buildir };
     if (not path.exists())
         throw utils::FileError(
-          (fmt(_("Pkg test error: building directory '%1%' "
-                 "does not exist ")) %
-           pkg_buildir)
-            .str());
+          _("Pkg test error: building directory '%s' does not exist "),
+          pkg_buildir.c_str());
 
-    std::string cmd = (fmt(m_pimpl->mCommandTest) % pkg_buildir).str();
+    std::string cmd =
+      (boost::format(m_pimpl->mCommandTest) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
     std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
@@ -294,8 +284,8 @@ Package::test()
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch (const std::exception& e) {
-        throw utils::InternalError(
-          (fmt(_("Pkg error: test launch failed %1%")) % e.what()).str());
+        throw utils::InternalError(_("Pkg error: test launch failed %s"),
+                                   e.what());
     }
 }
 
@@ -322,7 +312,8 @@ Package::build()
     if (not path.exists())
         configure();
 
-    std::string cmd = (vle::fmt(m_pimpl->mCommandBuild) % pkg_buildir).str();
+    std::string cmd =
+      (boost::format(m_pimpl->mCommandBuild) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
     std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
@@ -331,8 +322,8 @@ Package::build()
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch (const std::exception& e) {
-        throw utils::InternalError(
-          (fmt(_("Pkg build error: build failed %1%")) % e.what()).str());
+        throw utils::InternalError(_("Pkg build error: build failed %s"),
+                                   e.what());
     }
 }
 
@@ -358,12 +349,11 @@ Package::install()
     Path path{ pkg_buildir };
     if (not path.exists())
         throw utils::FileError(
-          (fmt(_("Pkg install error: building directory '%1%' "
-                 "does not exist ")) %
-           pkg_buildir.c_str())
-            .str());
+          _("Pkg install error: building directory '%s' does not exist "),
+          pkg_buildir.c_str());
 
-    std::string cmd = (vle::fmt(m_pimpl->mCommandInstall) % pkg_buildir).str();
+    std::string cmd =
+      (boost::format(m_pimpl->mCommandInstall) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
     std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
@@ -373,23 +363,20 @@ Package::install()
 
     if (not builddir.exists()) {
         throw utils::ArgError(
-          (fmt(_("Pkg build error: directory '%1%' does not exist")) %
-           builddir.string())
-            .str());
+          _("Pkg build error: directory '%s' does not exist"),
+          builddir.string().c_str());
     }
 
     if (not builddir.is_directory()) {
-        throw utils::ArgError(
-          (fmt(_("Pkg build error: '%1%' is not a directory")) %
-           builddir.string())
-            .str());
+        throw utils::ArgError(_("Pkg build error: '%s' is not a directory"),
+                              builddir.string().c_str());
     }
 
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch (const std::exception& e) {
-        throw utils::InternalError(
-          (fmt(_("Pkg build error: install lib failed %1%")) % e.what()).str());
+        throw utils::InternalError(_("Pkg build error: install lib failed %s"),
+                                   e.what());
     }
 }
 
@@ -432,7 +419,8 @@ Package::pack()
 
     Path::create_directory(pkg_buildir);
 
-    std::string cmd = (fmt(m_pimpl->mCommandPack) % pkg_buildir).str();
+    std::string cmd =
+      (boost::format(m_pimpl->mCommandPack) % pkg_buildir).str();
     Spawn spawn(m_pimpl->m_context);
     std::vector<std::string> argv = spawn.splitCommandLine(cmd);
     std::string exe = std::move(argv.front());
@@ -441,8 +429,8 @@ Package::pack()
     try {
         m_pimpl->process(exe, pkg_buildir, argv);
     } catch (const std::exception& e) {
-        throw utils::InternalError(
-          (fmt(_("Pkg packaging error: package failed %1%")) % e.what()).str());
+        throw utils::InternalError(_("Pkg packaging error: package failed %s"),
+                                   e.what());
     }
 }
 
@@ -821,9 +809,8 @@ Package::getExperiments(VLE_PACKAGE_TYPE type) const
 
     if (not pkg.is_directory())
         throw utils::InternalError(
-          (fmt(_("Pkg list error: '%1%' is not an experiments directory")) %
-           pkg.string())
-            .str());
+          _("Pkg list error: '%s' is not an experiments directory"),
+          pkg.string().c_str());
 
     PathList result;
     std::stack<Path> stack;
@@ -931,9 +918,10 @@ Package::rename(const std::string& oldname,
 
     if (not oldfilepath.exists() or newfilepath.exists()) {
         throw utils::ArgError(
-          (fmt(_("In Package `%1%', can not rename `%2%' in `%3%'")) % name() %
-           oldfilepath.string() % newfilepath.string())
-            .str());
+          _("In Package `%s', can not rename `%s' in `%s'"),
+          name().c_str(),
+          oldfilepath.string().c_str(),
+          newfilepath.string().c_str());
     }
 
     Path::rename(oldfilepath, newfilepath);

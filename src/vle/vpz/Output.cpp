@@ -95,8 +95,8 @@ Output::setStream(const std::string& location,
                   const std::string& package)
 {
     if (plugin.empty()) {
-        throw utils::ArgError(
-          (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
+        throw utils::ArgError(_("Output '%s' have not plugin defined"),
+                              m_name.c_str());
     }
 
     m_location.assign(location);
@@ -116,8 +116,8 @@ void
 Output::setStream(const std::string& location, const std::string& plugin)
 {
     if (plugin.empty()) {
-        throw utils::ArgError(
-          (fmt(_("Output '%1%' have not plugin defined")) % m_name).str());
+        throw utils::ArgError(_("Output '%s' have not plugin defined"),
+                              m_name.c_str());
     }
 
     m_location.assign(location);
@@ -143,8 +143,8 @@ bool
 Output::operator==(const Output& output) const
 {
     return m_name == output.name() and m_plugin == output.plugin() and
-           m_location == output.location() and m_package == output.package() and
-           m_data == output.data();
+           m_location == output.location() and
+           m_package == output.package() and m_data == output.data();
 }
 }
 } // namespace vle vpz

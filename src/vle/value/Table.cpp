@@ -43,8 +43,9 @@ pp_get(vle::value::TableValue& t,
     auto i = y * width + x;
 
     if (i > t.size())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Table: bad accessor %1%x%2%")) % x % y).str());
+        throw vle::utils::ArgError(_("Table: bad accessor %lu x %lu"),
+                                   static_cast<unsigned long>(x),
+                                   static_cast<unsigned long>(y));
 
     return t[i];
 }
@@ -58,8 +59,9 @@ pp_get(const vle::value::TableValue& t,
     auto i = y * width + x;
 
     if (i > t.size())
-        throw vle::utils::ArgError(
-          (vle::fmt(_("Table: bad accessor %1%x%2%")) % x % y).str());
+        throw vle::utils::ArgError(_("Table: bad accessor %lu x %lu"),
+                                   static_cast<unsigned long>(x),
+                                   static_cast<unsigned long>(y));
 
     return t[i];
 }
@@ -79,9 +81,9 @@ Table::Table(std::size_t width, std::size_t height)
 {
     if (width * height <= 0)
         throw utils::ArgError(
-          (fmt(_("Table: bad constructor initialization %1%x%2%")) % width %
-           height)
-            .str());
+          _("Table: bad constructor initialization %lu x %lu"),
+          static_cast<unsigned long>(width),
+          static_cast<unsigned long>(height));
 }
 
 Value::type
@@ -141,9 +143,9 @@ Table::resize(std::size_t width, std::size_t height)
 {
     if (width * height <= 0)
         throw utils::ArgError(
-          (fmt(_("Table: bad constructor initialization %1%x%2%")) % width %
-           height)
-            .str());
+          _("Table: bad constructor initialization %lu x %lu"),
+          static_cast<unsigned long>(width),
+          static_cast<unsigned long>(height));
 
     if (width == m_width and height == m_height)
         return;
@@ -211,10 +213,9 @@ Table::fill(const std::string& str)
                       static_cast<double>(boost::lexical_cast<long>(elem));
                 } catch (const boost::bad_lexical_cast& e) {
                     throw vle::utils::ArgError(
-                      (fmt(_("Can not convert string \'%1%\' into"
-                             " double or long")) %
-                       (elem))
-                        .str());
+                      _("Can not convert string '%s' into double or long"),
+                      elem.c_str());
+                    ;
                 }
             }
 

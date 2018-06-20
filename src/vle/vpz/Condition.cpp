@@ -24,10 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
-#include <ostream>
-#include <string>
-#include <utility>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
@@ -45,14 +41,20 @@
 #include <vle/value/XML.hpp>
 #include <vle/vpz/Condition.hpp>
 
+#include <algorithm>
+#include <ostream>
+#include <string>
+#include <utility>
+
+#include <cassert>
+
 namespace vle {
 namespace vpz {
 
-Condition::Condition(std::string  name)
+Condition::Condition(std::string name)
   : Base()
   , m_name(std::move(name))
-{
-}
+{}
 
 Condition::Condition(const Condition& cnd)
   : Base(cnd)
@@ -161,7 +163,7 @@ Condition::clearValueOfPort(const std::string& portname)
 
     if (it == m_list.end())
         throw utils::ArgError(
-          (fmt(_("Condition %1% have no port %2%")) % m_name % portname).str());
+          _("Condition %s have no port %s"), m_name.c_str(), portname.c_str());
 
     it->second.clear();
 }
@@ -185,7 +187,7 @@ Condition::getSetValues(const std::string& portname) const
 
     if (it == m_list.end()) {
         throw utils::ArgError(
-          (fmt(_("Condition %1% have no port %2%")) % m_name % portname).str());
+          _("Condition %s have no port %s"), m_name.c_str(), portname.c_str());
     }
 
     return it->second;
@@ -198,7 +200,7 @@ Condition::getSetValues(const std::string& portname)
 
     if (it == m_list.end()) {
         throw utils::ArgError(
-          (fmt(_("Condition %1% have no port %2%")) % m_name % portname).str());
+          _("Condition %s have no port %s"), m_name.c_str(), portname.c_str());
     }
 
     return it->second;
@@ -239,9 +241,9 @@ Condition::lastAddedPort()
     auto it = m_list.find(m_last_port);
 
     if (it == m_list.end()) {
-        throw utils::ArgError(
-          (fmt(_("Condition %1% have no port %2%")) % m_name % m_last_port)
-            .str());
+        throw utils::ArgError(_("Condition %s have no port %s"),
+                              m_name.c_str(),
+                              m_last_port.c_str());
     }
 
     return it->second;

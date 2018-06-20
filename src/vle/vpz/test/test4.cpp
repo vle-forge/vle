@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/algorithm/string.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/unit-test.hpp>
 #include <vle/value/Double.hpp>
@@ -35,6 +34,8 @@
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/Vpz.hpp>
+
+#include <algorithm>
 
 using namespace vle;
 
@@ -48,7 +49,8 @@ check_remove_dyns_unittest_vpz(vpz::Project& project)
     Ensures(not project.dynamics().exist("new_unittest"));
 
     vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
-    vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
+    vpz::CoupledModel* top1 =
+      vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     std::set<std::string> dynamics = dyns.getKeys();
 
@@ -178,7 +180,8 @@ check_remove_obs_unittest_vpz(vpz::Project& project)
     Ensures(not obs_list.exist("obs1"));
 
     vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
-    vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
+    vpz::CoupledModel* top1 =
+      vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     std::set<std::string> obs = obs_list.getKeys();
 
@@ -209,7 +212,8 @@ check_rename_observables_unittest_vpz(vpz::Project& project)
     Ensures(not obs_list.exist("obs2"));
 
     vpz::CoupledModel* top = vpz::BaseModel::toCoupled(project.model().node());
-    vpz::CoupledModel* top1 = vpz::BaseModel::toCoupled(top->findModel("top1"));
+    vpz::CoupledModel* top1 =
+      vpz::BaseModel::toCoupled(top->findModel("top1"));
 
     EnsuresNotThrow(top->updateObservable("obs2", "new_obs2"), std::exception);
     EnsuresNotThrow(top->updateObservable("obs1", "new_obs1"), std::exception);

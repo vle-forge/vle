@@ -43,8 +43,7 @@ struct sim_log : utils::Context::LogFunctor
     std::vector<std::string>& log_messages;
     sim_log(std::vector<std::string>& logMessages)
       : log_messages(logMessages)
-    {
-    }
+    {}
 
     void write(const utils::Context& ctx,
                int priority,
@@ -58,17 +57,11 @@ struct sim_log : utils::Context::LogFunctor
 
     void write(const utils::Context& ctx,
                int priority,
-               const char* file,
-               int line,
-               const char* fn,
                const char* format,
                va_list args) noexcept override
     {
         (void)ctx;
         (void)priority;
-        (void)file;
-        (void)line;
-        (void)fn;
 
         log_messages.emplace_back(vle::utils::vformat(format, args));
     }
@@ -89,12 +82,10 @@ DefaultSimSubpanelThread::DefaultSimSubpanelThread(
   , mdebug(debug)
   , mnbthreads(nbthreads)
   , mblockSize(blockSize)
-{
-}
+{}
 
 DefaultSimSubpanelThread::~DefaultSimSubpanelThread()
-{
-}
+{}
 void
 DefaultSimSubpanelThread::init(vleVpz* vpz, vle::utils::Package* pkg)
 {
@@ -293,13 +284,11 @@ DefaultSimSubpanel::rightWidget()
 
 void
 DefaultSimSubpanel::undo()
-{
-}
+{}
 
 void
 DefaultSimSubpanel::redo()
-{
-}
+{}
 
 PluginSimPanel*
 DefaultSimSubpanel::newInstance()
@@ -452,7 +441,7 @@ DefaultSimSubpanel::updateCustomPlot()
         }
         if (index != -1) {
             QVector<double> x(utils::numeric_cast<int>(view.rows() - 1)),
-                y(utils::numeric_cast<int>(view.rows() - 1));
+              y(utils::numeric_cast<int>(view.rows() - 1));
 
             double localminyi = 99999999;
             double localmaxyi = -99999999;
@@ -489,8 +478,8 @@ DefaultSimSubpanel::updateCustomPlot()
         }
     }
     left->customPlot->axisRect(0)->setRangeZoomAxes(
-        (mHorizontalZoom)?left->customPlot->xAxis:0,
-        (mVerticalZoom)?left->customPlot->yAxis:0);
+      (mHorizontalZoom) ? left->customPlot->xAxis : 0,
+      (mVerticalZoom) ? left->customPlot->yAxis : 0);
 
     left->customPlot->replot();
     showCustomPlot((nbGraphs > 0));
@@ -693,8 +682,8 @@ DefaultSimSubpanel::onHorizontalZoom(int state)
 {
     mHorizontalZoom = (state == 2);
     left->customPlot->axisRect(0)->setRangeZoomAxes(
-        (mHorizontalZoom)?left->customPlot->xAxis:0,
-        (mVerticalZoom)?left->customPlot->yAxis:0);
+      (mHorizontalZoom) ? left->customPlot->xAxis : 0,
+      (mVerticalZoom) ? left->customPlot->yAxis : 0);
 }
 
 void
@@ -702,8 +691,8 @@ DefaultSimSubpanel::onVerticalZoom(int state)
 {
     mVerticalZoom = (state == 2);
     left->customPlot->axisRect(0)->setRangeZoomAxes(
-        (mHorizontalZoom)?left->customPlot->xAxis:0,
-        (mVerticalZoom)?left->customPlot->yAxis:0);
+      (mHorizontalZoom) ? left->customPlot->xAxis : 0,
+      (mVerticalZoom) ? left->customPlot->yAxis : 0);
 }
 
 void

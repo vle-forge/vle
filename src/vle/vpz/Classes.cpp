@@ -24,11 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iterator>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vpz/Classes.hpp>
+
+#include <algorithm>
+#include <iterator>
 
 namespace vle {
 namespace vpz {
@@ -52,10 +54,8 @@ Classes::add(const std::string& name)
     std::pair<iterator, bool> x;
     x = m_lst.insert(value_type(name, Class(name)));
 
-    if (not x.second) {
-        throw utils::ArgError(
-          (fmt(_("Class '%1%' already exists")) % name).str());
-    }
+    if (not x.second)
+        throw utils::ArgError(_("Class '%s' already exists"), name.c_str());
 
     return x.first->second;
 }
@@ -71,9 +71,8 @@ Classes::get(const std::string& name) const
 {
     auto it = m_lst.find(name);
 
-    if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknow class '%1%'")) % name).str());
-    }
+    if (it == end())
+        throw utils::ArgError(_("Unknow class '%s'"), name.c_str());
 
     return it->second;
 }
@@ -84,7 +83,8 @@ Classes::get(const std::string& name)
     auto it = m_lst.find(name);
 
     if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknow class '%1%'")) % name).str());
+        throw utils::ArgError(
+            _("Unknow class '%s'"), name.c_str());
     }
 
     return it->second;
@@ -95,12 +95,12 @@ Classes::rename(const std::string& oldname, const std::string& newname)
 {
     if (exist(newname)) {
         throw utils::ArgError(
-          (fmt(_("Class '%1%' already exists")) % newname).str());
+          _("Class '%s' already exists"), newname.c_str());
     }
 
     auto it = m_lst.find(oldname);
     if (it == end()) {
-        throw utils::ArgError((fmt(_("Unknow class '%1%'")) % oldname).str());
+        throw utils::ArgError(_("Unknow class '%s'"), oldname.c_str());
     }
 
     std::pair<iterator, bool> x;

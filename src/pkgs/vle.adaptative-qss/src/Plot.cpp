@@ -46,7 +46,14 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
         std::string filename("gnuplot-");
         filename += std::to_string(adr);
 
-        fp = fopen(home.string().c_str(), "w");
+#ifdef _WIN32
+        if (fopen_s(&fp, home.string().c_str(), "w"))
+#else
+        if ((fp = fopen(home.string().c_str(), "w")) == nullptr)
+#endif
+            fprintf(stderr,
+                    "Gnuplot plug-in fails to open %s",
+                    home.string().c_str());
     }
 
     void write(const vle::utils::Context& ctx,
@@ -58,11 +65,17 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
 
         if (fp) {
             if (priority == 7)
-                fprintf(fp, "Gnuplot log: [Debug]: ");
-            else if (priority == 6)
-                fprintf(fp, "Gnuplot log:");
-            else
-                fprintf(fp, "Gnuplot log: [Error]");
+                fprintf(fp, "debug: %s", str.c_str());
+            else if (priority == 4)
+                fprintf(fp, "warning: %s", str.c_str());
+            else if (priority == 3)
+                fprintf(fp, "error: %s", str.c_str());
+            else if (priority == 2)
+                fprintf(fp, "critical: %s", str.c_str());
+            else if (priority == 1)
+                fprintf(fp, "alert: %s", str.c_str());
+            else if (priority == 0)
+                fprintf(fp, "emergency: %s", str.c_str());
 
             fprintf(fp, "%s", str.c_str());
         }
@@ -70,9 +83,6 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
 
     void write(const vle::utils::Context& ctx,
                int priority,
-               const char* file,
-               int line,
-               const char* fn,
                const char* format,
                va_list args) noexcept override
     {
@@ -81,11 +91,17 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
 
         if (fp) {
             if (priority == 7)
-                fprintf(fp, "Gnuplot log: [Debug] %s:%d %s: ", file, line, fn);
-            else if (priority == 6)
-                fprintf(fp, "Gnuplot log: %s: ", fn);
-            else
-                fprintf(fp, "Gnuplot log: [Error] %s: ", fn);
+                fprintf(fp, "debug: ");
+            else if (priority == 4)
+                fprintf(fp, "warning: ");
+            else if (priority == 3)
+                fprintf(fp, "error: ");
+            else if (priority == 2)
+                fprintf(fp, "critical: ");
+            else if (priority == 1)
+                fprintf(fp, "alert: ");
+            else if (priority == 0)
+                fprintf(fp, "emergency: ");
 
             vfprintf(fp, format, args);
         }
@@ -142,7 +158,7 @@ start_plot(vle::utils::Path command, vle::utils::Path gnuplot_script)
 
         spawn.start(
           command.string(), vle::utils::Path::current_path().string(), args);
-    } catch (const std::exception& e) {
+    } catch (const std::exception& /*e*/) {
         vle::devs::Trace(
           ctx,
           3,

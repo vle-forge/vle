@@ -24,10 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/cast.hpp>
-#include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <iostream>
 #include <ostream>
@@ -43,10 +39,17 @@
 #include <vle/utils/Package.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Spawn.hpp>
+#include <vle/utils/Tools.hpp>
 #include <vle/utils/details/Package.hpp>
 #include <vle/utils/details/PackageManager.hpp>
 #include <vle/utils/details/PackageParser.hpp>
 #include <vle/utils/i18n.hpp>
+
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/cast.hpp>
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 
 #define PACKAGESID_VECTOR_RESERVED_SIZE 100u
 
@@ -200,9 +203,8 @@ public:
                 mThread.join();
             }
         } catch (const std::exception& e) {
-            vErr(mContext,
-                 _("Remote: internal error joining thread:`%s'\n"),
-                 e.what());
+            mContext->error(_("Remote: internal error joining thread:`%s'\n"),
+                            e.what());
         }
     }
 
@@ -234,8 +236,7 @@ public:
 
         NotHaveExpression(const std::regex& expression)
           : expression(expression)
-        {
-        }
+        {}
 
         bool operator()(const PackageId& pkg) const
         {
@@ -269,10 +270,10 @@ public:
             file.open(mContext->getLocalPackageFilename().string());
             file << local << std::endl;
         } catch (const std::exception& e) {
-            vErr(mContext,
-                 _("Remote: failed to write local package `%s': %s\n"),
-                 mContext->getLocalPackageFilename().string().c_str(),
-                 e.what());
+            mContext->error(
+              _("Remote: failed to write local package `%s': %s\n"),
+              mContext->getLocalPackageFilename().string().c_str(),
+              e.what());
         }
 
         try {
@@ -283,11 +284,11 @@ public:
             file.open(mContext->getRemotePackageFilename().string());
             file << remote << std::endl;
         } catch (const std::exception& e) {
-            vErr(mContext,
-                 _("Remote: failed to write remote package `%s': "
-                   "%s\n"),
-                 mContext->getRemotePackageFilename().string().c_str(),
-                 e.what());
+            mContext->error(
+              _("Remote: failed to write remote package `%s': "
+                "%s\n"),
+              mContext->getRemotePackageFilename().string().c_str(),
+              e.what());
         }
     }
 
@@ -333,17 +334,15 @@ public:
                     parser->extract(filename.string(), url);
                 } catch (const utils::FileError& err) {
                     *remoteHasError = true;
-                    remoteMessageError->assign(
-                      (vle::fmt(
-                         "failed while parsing packages.pkg file: %1%\n") %
-                       err.what())
-                        .str());
+                    remoteMessageError->assign(utils::format(
+                      _("failed while parsing packages.pkg file: %s\n"),
+                      err.what()));
                 }
             } else {
                 if (!(*remoteHasError)) {
                     *remoteHasError = true;
-                    remoteMessageError->assign(
-                      (vle::fmt("failed: %1%\n") % dl.getErrorMessage()).str());
+                    remoteMessageError->assign(utils::format(
+                      _("failed: %s\n"), dl.getErrorMessage().c_str()));
                 }
             }
         }
@@ -435,7 +434,7 @@ public:
         pkgs_range = remote.equal_range(pkgid);
         if (pkgs_range.first == remote.end()) {
             std::ostringstream errorStream;
-            errorStream << fmt(_("Unknown package `%1%'\n")) % mArgs;
+            errorStream << _("Unknown package `") << mArgs << "'\n";
             mErrorMessage.assign(errorStream.str());
             mHasError = true;
             return;
@@ -452,20 +451,23 @@ public:
 
         PackagesIdSet::const_iterator locPkg = local.find(*it);
         if ((locPkg != local.end()) && (!pkgUpdateOp(*locPkg, *it))) {
-            out(fmt(_("Package `%1%` is already uptodate\n")) % pkgid.name);
+            out(utils::format(_("Package `%s` is already uptodate\n"),
+                              pkgid.name.c_str()));
             return;
         }
 
         DownloadManager dl(mContext);
         std::string url = it->url + "/";
-        out(fmt(_("Download archive  '%1%' from '%2%': ")) % archname % url);
+        out(utils::format(_("Download archive  '%s' from '%s': "),
+                          archname.c_str(),
+                          url.c_str()));
 
         Path archfile(Path::temp_directory_path());
         archfile /= archname;
         dl.start(url + archname, archfile.string());
         dl.join();
         if (not dl.hasError()) {
-            out(fmt(_("ok\n")));
+            out(_("ok\n"));
 
             Path tempDir(Path::temp_directory_path());
             Path archpath(archfile);
@@ -475,23 +477,23 @@ public:
                 FScurrent_path_restore restore(tempDir);
                 decompress(archpath.string(), dearchpath.string());
                 vle::utils::Package pkg(mContext, pkgid.name);
-                out(fmt(_("Building package '%1%' into '%2%': ")) % pkgid.name %
-                    dearchpath.string());
+                out(utils::format(_("Building package '%s' into '%s': "),
+                                  pkgid.name.c_str(),
+                                  dearchpath.string().c_str()));
                 pkg.configure();
                 pkg.wait(std::cerr, std::cerr);
                 pkg.build();
                 pkg.wait(std::cerr, std::cerr);
                 pkg.install();
                 pkg.wait(std::cerr, std::cerr);
-                out(fmt(_("ok\n")));
+                out(_("ok\n"));
             }
             mResults.push_back(*it);
         } else {
-            out(fmt(_("failed\n")));
+            out(_("failed\n"));
             std::ostringstream errorStream;
-            errorStream << fmt(_("Error while downloading package "
-                                 "`%1%'\n")) %
-                             mArgs;
+            errorStream << utils::format(
+              _("Error while downloading package `%s'\n"), mArgs.c_str());
             mErrorMessage.assign(errorStream.str());
             mHasError = true;
         }
@@ -523,15 +525,16 @@ public:
                 Path::rename(filename, archname);
             } else {
                 std::ostringstream errorStream;
-                errorStream << fmt(_("Error while downloading "
-                                     "source package `%1%'\n")) %
-                                 mArgs;
+                errorStream << utils::format(
+                  _("Error while downloading source package `%s'\n"),
+                  mArgs.c_str());
                 mErrorMessage.assign(errorStream.str());
                 mHasError = true;
             }
         } else {
             std::ostringstream errorStream;
-            errorStream << fmt(_("Unknown package `%1%'\n")) % mArgs;
+            errorStream << utils::format(_("Unknown package `%s'\n"),
+                                         mArgs.c_str());
             mErrorMessage.assign(errorStream.str());
             mHasError = true;
         }
@@ -599,7 +602,8 @@ public:
 
         if (found.first == remote.end()) {
             std::ostringstream errorStream;
-            errorStream << fmt(_("Unknown remote package `%1%'\n")) % mArgs;
+            errorStream << utils::format(_("Unknown remote package `%s'\n"),
+                                         mArgs.c_str());
             mErrorMessage.assign(errorStream.str());
             mHasError = true;
             return;
@@ -631,7 +635,8 @@ public:
 
         if (found.first == remote.end()) {
             std::ostringstream errorStream;
-            errorStream << fmt(_("Unknown local package `%1%'\n")) % mArgs;
+            errorStream << utils::format(_("Unknown local package `%s'\n"),
+                                         mArgs.c_str());
             mErrorMessage.assign(errorStream.str());
             mHasError = true;
             return;
@@ -649,17 +654,15 @@ public:
     {
         if (not filepath.exists())
             throw utils::InternalError(
-              (fmt(_("fail to compress '%1%': file or directory does not "
-                     "exist")) %
-               filepath.string())
-                .str());
+              _("fail to compress '%s': file or directory does not exist"),
+              filepath.string().c_str());
 
         Path pwd = Path::current_path();
         std::string command;
 
         try {
             mContext->get_setting("vle.command.tar", &command);
-            command = (vle::fmt(command) % compressedfilepath.string() %
+            command = (boost::format(command) % compressedfilepath.string() %
                        filepath.string())
                         .str();
 
@@ -680,7 +683,8 @@ public:
                     output.clear();
                     error.clear();
 
-                    std::this_thread::sleep_for(std::chrono::microseconds(200));
+                    std::this_thread::sleep_for(
+                      std::chrono::microseconds(200));
                 } else
                     break;
             }
@@ -692,39 +696,37 @@ public:
             spawn.status(&message, &success);
 
             if (not message.empty())
-                vErr(mContext, "Compress: %s\n", message.c_str());
+                mContext->error("Compress: %s\n", message.c_str());
         } catch (const std::exception& e) {
-            vErr(mContext,
-                 _("Compress: unable to compress '%s' in '%s' with "
-                   "the '%s' command\n"),
-                 compressedfilepath.string().c_str(),
-                 pwd.string().c_str(),
-                 command.c_str());
+            mContext->error(_("Compress: unable to compress '%s' in '%s' with "
+                              "the '%s' command\n"),
+                            compressedfilepath.string().c_str(),
+                            pwd.string().c_str(),
+                            command.c_str());
         }
     }
 
     void decompress(const Path& compressedfilepath, const Path& directorypath)
     {
         if (not directorypath.is_directory())
-            throw utils::InternalError(
-              (fmt(_("fail to extract '%1%' in directory '%2%': "
-                     " directory does not exist")) %
-               compressedfilepath.string() % directorypath.string())
-                .str());
+            throw utils::InternalError(_("fail to extract '%s' in directory "
+                                         "'%s':  directory does not exist"),
+                                       compressedfilepath.string().c_str(),
+                                       directorypath.string().c_str());
 
         if (not compressedfilepath.is_file())
             throw utils::InternalError(
-              (fmt(_("fail to extract '%1%' in directory '%2%': "
-                     "file does not exist")) %
-               compressedfilepath.string() % directorypath.string())
-                .str());
+              _("fail to extract '%s' in directory '%s': file does not exist"),
+              compressedfilepath.string().c_str(),
+              directorypath.string().c_str());
 
         Path pwd = Path::current_path();
 
         std::string command;
         try {
             mContext->get_setting("vle.command.untar", &command);
-            command = (vle::fmt(command) % compressedfilepath.string()).str();
+            command =
+              (boost::format(command) % compressedfilepath.string()).str();
 
             utils::Spawn spawn(mContext);
             std::vector<std::string> argv = spawn.splitCommandLine(command);
@@ -743,7 +745,8 @@ public:
                     output.clear();
                     error.clear();
 
-                    std::this_thread::sleep_for(std::chrono::microseconds(200));
+                    std::this_thread::sleep_for(
+                      std::chrono::microseconds(200));
                 } else
                     break;
             }
@@ -755,14 +758,13 @@ public:
             spawn.status(&message, &success);
 
             if (not message.empty())
-                vErr(mContext, "Decompress: %s\n", message.c_str());
+                mContext->error("Decompress: %s\n", message.c_str());
         } catch (const std::exception& e) {
-            vErr(mContext,
-                 _("Decompress: unable to decompress '%s' "
-                   "in '%s' with the '%s' command\n"),
-                 compressedfilepath.string().c_str(),
-                 pwd.string().c_str(),
-                 command.c_str());
+            mContext->error(_("Decompress: unable to decompress '%s' "
+                              "in '%s' with the '%s' command\n"),
+                            compressedfilepath.string().c_str(),
+                            pwd.string().c_str(),
+                            command.c_str());
         }
     }
 
@@ -783,11 +785,9 @@ public:
 
 RemoteManager::RemoteManager(ContextPtr context)
   : mPimpl(std::make_unique<RemoteManager::Pimpl>(context))
-{
-}
+{}
 
-RemoteManager::~RemoteManager() noexcept
-= default;
+RemoteManager::~RemoteManager() noexcept = default;
 
 void
 RemoteManager::start(RemoteManagerActions action,

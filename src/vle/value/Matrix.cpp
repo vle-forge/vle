@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/value/Boolean.hpp>
@@ -39,6 +38,10 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
 
+#include <algorithm>
+
+#include <cassert>
+
 namespace {
 
 inline void
@@ -49,9 +52,11 @@ pp_check_index(const vle::value::Matrix& m,
 #ifndef VLE_FULL_OPTIMIZATION
     if (not(column < m.columns() and row <= m.rows()))
         throw vle::utils::ArgError(
-          (vle::fmt(_("Matrix: bad access %1% %2% for %3%x%4% matrix")) %
-           column % row % m.columns() % m.rows())
-            .str());
+          _("Matrix: bad access %u %u for %u x %u matrix"),
+          static_cast<unsigned>(column),
+          static_cast<unsigned>(row),
+          static_cast<unsigned>(m.columns()),
+          static_cast<unsigned>(m.rows()));
 #else
     (void)m;
     (void)column;
@@ -69,10 +74,11 @@ pp_get_value(vle::value::Matrix& m,
     auto pointer = m.value()[row * m.columns_max() + column].get();
     if (not pointer)
         throw vle::utils::ArgError(
-          (vle::fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
-                      "matrix")) %
-           column % row % m.columns() % m.rows())
-            .str());
+          _("Matrix: empty or null value at %u %u for %u x %u "),
+          static_cast<unsigned>(column),
+          static_cast<unsigned>(row),
+          static_cast<unsigned>(m.columns()),
+          static_cast<unsigned>(m.rows()));
 
     return *pointer;
 }
@@ -87,10 +93,11 @@ pp_get_value(const vle::value::Matrix& m,
     auto pointer = m.value()[row * m.columns_max() + column].get();
     if (not pointer)
         throw vle::utils::ArgError(
-          (vle::fmt(_("Matrix: empty or null value at %1% %2% for %3%x%4% "
-                      "matrix")) %
-           column % row % m.columns() % m.rows())
-            .str());
+          _("Matrix: empty or null value at %u %u for %u x %u "),
+          static_cast<unsigned>(column),
+          static_cast<unsigned>(row),
+          static_cast<unsigned>(m.columns()),
+          static_cast<unsigned>(m.rows()));
 
     return *pointer;
 }
@@ -153,20 +160,19 @@ Matrix::Matrix(index columns,
 {
     if (columnmax * rowmax <= 0)
         throw utils::ArgError(
-          (fmt(_("Matrix: bad constructor initialization %1%x%2%")) % columns %
-           rows)
-            .str());
+          _("Matrix: bad constructor initialization %u x %u"),
+          static_cast<unsigned>(columns),
+          static_cast<unsigned>(rows));
 
     if (columns > columnmax)
-        throw utils::ArgError(
-          (fmt(_("Matrix: Number of columns error: %1% on %2%")) % columns %
-           columnmax)
-            .str());
+        throw utils::ArgError(_("Matrix: Number of columns error: %u on %u"),
+                              static_cast<unsigned>(columns),
+                              static_cast<unsigned>(columnmax));
 
     if (rows > rowmax)
-        throw utils::ArgError(
-          (fmt(_("Matrix: Number of row error: %1% on %2%")) % rows % rowmax)
-            .str());
+        throw utils::ArgError(_("Matrix: Number of row error: %u on %u"),
+                              static_cast<unsigned>(rows),
+                              static_cast<unsigned>(rowmax));
 }
 
 Value::type
@@ -458,10 +464,9 @@ void
 Matrix::reserve(size_type columnmax, size_type rowmax)
 {
     if (columnmax * rowmax <= 0)
-        throw utils::ArgError(
-          (fmt(_("Matrix: bad reserve operation %1%x%2%")) % columnmax %
-           rowmax)
-            .str());
+        throw utils::ArgError(_("Matrix: bad reserve operation %u x %u"),
+                              static_cast<unsigned>(columnmax),
+                              static_cast<unsigned>(rowmax));
 
     if (columnmax <= m_nbcolmax and rowmax <= m_nbrowmax)
         return;
@@ -490,8 +495,8 @@ Matrix::resize(size_type columns, size_type rows)
     if (columns >= m_nbcolmax or rows >= m_nbrowmax)
         reserve(columns + m_stepcol, rows + m_steprow);
 
-    // No reallocation necessary, just move the m_nbcol and m_nbrow values
-    // with columns and rows parameters.
+    // No reallocation necessary, just move the m_nbcol and m_nbrow values with
+    // columns and rows parameters.
 
     auto range_r = std::minmax(m_nbrow, rows);
     auto range_c = std::minmax(m_nbcol, columns);

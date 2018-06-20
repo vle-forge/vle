@@ -41,49 +41,6 @@
 #define VLE_LOG_INFO 6    // informational
 #define VLE_LOG_DEBUG 7   // debug-level messages
 
-static inline void
-#if defined(__GNUC__)
-  __attribute__((always_inline, format(printf, 2, 3)))
-#endif
-  vle_log_null(const vle::utils::ContextPtr&, const char*, ...)
-{
-}
-
-static inline void
-#if defined(__GNUC__)
-  __attribute__((always_inline, format(printf, 2, 3)))
-#endif
-  vle_log_null(const vle::utils::Context*, const char*, ...)
-{
-}
-
-#define vle_log_cond(ctx, prio, arg...)                                        \
-    do {                                                                       \
-        if (ctx->get_log_priority() >= prio) {                                 \
-            ctx->log(prio, __FILE__, __LINE__, __FUNCTION__, ##arg);           \
-        }                                                                      \
-    } while (0)
-
-    /* Default, logging system is active and the \e dbg() macro checks log
-     * priority argument.
-     * Define VLE_FULL_OPTIMIZATION to hide all logging message (and more).
-     * Define VLE_DISABLE_DEBUG to remove vDbg() macro.
-     */
-
-#ifndef VLE_FULL_OPTIMIZATION
-#ifndef VLE_DISABLE_DEBUG
-#define vDbg(ctx, arg...) vle_log_cond(ctx, VLE_LOG_DEBUG, ##arg)
-#else
-#define vDbg(ctx, arg...) vle_log_null(ctx, ##arg)
-#endif
-#define vInfo(ctx, arg...) vle_log_cond(ctx, VLE_LOG_INFO, ##arg)
-#define vErr(ctx, arg...) vle_log_cond(ctx, VLE_LOG_ERR, ##arg)
-#else
-#define vDbg(ctx, arg...) vle_log_null(ctx, ##arg)
-#define vInfo(ctx, arg...) vle_log_null(ctx, ##arg)
-#define vErr(ctx, arg...) vle_log_null(ctx, ##arg)
-#endif
-
 namespace vle {
 namespace utils {
 

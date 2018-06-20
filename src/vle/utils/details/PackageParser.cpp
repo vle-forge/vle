@@ -467,8 +467,7 @@ public:
       , oldcolumn(0)
     {}
 
-    ~DescriptionParser()
-    = default;
+    ~DescriptionParser() = default;
 
     void read_packages(const std::string& distribution, Packages* pkgs)
     {
@@ -486,11 +485,12 @@ public:
             case 1:
                 return;
             default:
-                throw FileError(
-                  (boost::format(_("Remote: syntax error in file `%1%'"
-                                   " l. %2% c. %3%: %4%")) %
-                   filepath % line % column % result)
-                    .str());
+                throw FileError(_("Remote: syntax error in file `%s'"
+                                  " l. %d c. %d: %d"),
+                                filepath.c_str(),
+                                line,
+                                column,
+                                result);
             }
         } while (in);
     }
@@ -503,10 +503,8 @@ PackageParser::extract(const std::string& filepath,
     std::ifstream ifs(filepath.c_str());
 
     if (not ifs)
-        throw FileError(
-          (boost::format(_("Remote: fail to parse package file '%1%'")) %
-           filepath)
-            .str());
+        throw FileError(_("Remote: fail to parse package file '%s'"),
+                        filepath.c_str());
 
     DescriptionParser parser(ifs, filepath);
     parser.read_packages(distribution, &m_packages);
