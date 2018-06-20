@@ -148,13 +148,6 @@ test_algo()
 
     append_string x = utils::forEach(n.begin(), n.end(), append_string());
     EnsuresEqual(x.str, "xurentou");
-
-    std::map<std::string, std::string>::iterator it;
-    it = utils::findIf(
-      n.begin(),
-      n.end(),
-      std::bind1st(std::equal_to<std::string>(), std::string("ou")));
-    Ensures(it != n.end());
 }
 
 void
