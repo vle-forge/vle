@@ -211,7 +211,7 @@ public:
     }
 
 private:
-    long m_counter;
+    std::size_t m_counter;
     bool m_active;
 };
 
