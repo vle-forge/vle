@@ -19,6 +19,7 @@
 #include <Windows.h>
 
 #include <vle/utils/details/UtilsWin.hpp>
+#include <ctime>
 #endif
 
 #include <array>
@@ -28,6 +29,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <numeric>
 #include <random>
 #include <stdexcept>
 #include <string>
@@ -38,19 +40,18 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 
-#if !defined(_WIN32)
+#ifndef _WIN32
 #include <unistd.h>
-#endif
-
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#endif
 
-#if defined(__unix__)
+#ifdef __unix__
 #include <fts.h>
 #endif
 
-#if defined(__linux)
+#ifdef __linux
 #include <linux/limits.h>
 #endif
 
