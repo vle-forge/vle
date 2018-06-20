@@ -131,7 +131,7 @@ get_index(const std::vector<std::string>& labels,
 
     assert(it != labels.end() && "FIXIT for executive's job");
 
-    return std::distance(labels.begin(), it);
+    return static_cast<long int>(std::distance(labels.begin(), it));
 }
 
 void
