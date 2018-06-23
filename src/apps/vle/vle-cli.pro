@@ -48,3 +48,6 @@ vleman.path = $$MANPATH
 vleman.files += vle.1
 
 INSTALLS += target vleman
+
+HEADERS += \
+    conditionupdater.hpp

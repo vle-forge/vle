@@ -48,6 +48,8 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/vle.hpp>
 
+#include "conditionupdater.hpp"
+
 #ifdef VLE_HAVE_NLS
 #ifndef ENABLE_NLS
 #define ENABLE_NLS
@@ -232,7 +234,11 @@ show_help() noexcept
         "Need a file name parameter.\n"
         "timeout       limit the simulation duration with a timeout in "
         "miliseconds.\n"
-        "\n"
+        "condition,c   change a single type condition value with:\n"
+        "              -c condition.port.map.1=1234\n"
+        "                map is the key of a map\n"
+        "                integer is the vector index of a set\n"
+        "                value can be boolean, integer, real or string\n"
         "processor,j Select number of processor in manager mode [>= 1]\n"
         "manager,m  Use the manager mode to run experimental frames\n"
         "verbose,V   Verbose mode 0 - 7. [default 3]\n"
@@ -375,6 +381,7 @@ convert_log_mode(vle::utils::ContextPtr ctx)
 static int
 run_manager(vle::utils::ContextPtr ctx,
             std::chrono::milliseconds timeout,
+            const vle::ConditionUpdater& conds,
             CmdArgs::const_iterator it,
             CmdArgs::const_iterator end,
             int processor,
@@ -394,12 +401,13 @@ run_manager(vle::utils::ContextPtr ctx,
             success = EXIT_FAILURE;
         } else {
             vle::manager::Error error;
+
+            auto file = std::make_unique<vle::vpz::Vpz>(vpzAbsolutePath);
+            if (file and not conds.empty())
+                conds.update(*file);
+
             std::unique_ptr<vle::value::Matrix> res =
-              man.run(std::make_unique<vle::vpz::Vpz>(vpzAbsolutePath),
-                      processor,
-                      0,
-                      1,
-                      &error);
+              man.run(std::move(file), processor, 0, 1, &error);
 
             if (error.code) {
                 fprintf(stderr,
@@ -418,6 +426,7 @@ static int
 run_simulation(vle::utils::ContextPtr ctx,
                std::chrono::milliseconds timeout,
                const std::string& output_file,
+               const vle::ConditionUpdater& conds,
                CmdArgs::const_iterator it,
                CmdArgs::const_iterator end,
                std::shared_ptr<vle::utils::Package> pkg)
@@ -435,8 +444,11 @@ run_simulation(vle::utils::ContextPtr ctx,
             success = EXIT_FAILURE;
         } else {
             vle::manager::Error error;
-            auto res = sim.run(
-              std::make_unique<vle::vpz::Vpz>(vpzAbsolutePath), &error);
+            auto vpz = std::make_unique<vle::vpz::Vpz>(vpzAbsolutePath);
+            if (vpz and not conds.empty())
+                conds.update(*vpz);
+
+            auto res = sim.run(std::move(vpz), &error);
 
             if (error.code) {
                 fprintf(stderr,
@@ -489,6 +501,7 @@ init_package(vle::utils::Package& pkg, const CmdArgs& args)
 static int
 manage_package_mode(vle::utils::ContextPtr ctx,
                     const std::string& output_file,
+                    const vle::ConditionUpdater& conds,
                     std::chrono::milliseconds timeout,
                     bool manager_mode,
                     int processor,
@@ -566,9 +579,10 @@ manage_package_mode(vle::utils::ContextPtr ctx,
         ret = EXIT_FAILURE;
     else if (it != end) {
         if (manager_mode)
-            ret = run_manager(ctx, timeout, it, end, processor, pkg);
+            ret = run_manager(ctx, timeout, conds, it, end, processor, pkg);
         else
-            ret = run_simulation(ctx, timeout, output_file, it, end, pkg);
+            ret =
+              run_simulation(ctx, timeout, output_file, conds, it, end, pkg);
     }
 
     return ret;
@@ -735,6 +749,7 @@ manage_remote_mode(vle::utils::ContextPtr ctx, CmdArgs args)
 static int
 manage_nothing_mode(vle::utils::ContextPtr ctx,
                     const std::string& output_file,
+                    const vle::ConditionUpdater& conds,
                     std::chrono::milliseconds timeout,
                     bool manager_mode,
                     int processor,
@@ -752,9 +767,9 @@ manage_nothing_mode(vle::utils::ContextPtr ctx,
     int ret = EXIT_SUCCESS;
 
     if (manager_mode)
-        ret = run_manager(ctx, timeout, it, end, processor, pkg);
+        ret = run_manager(ctx, timeout, conds, it, end, processor, pkg);
     else
-        ret = run_simulation(ctx, timeout, output_file, it, end, pkg);
+        ret = run_simulation(ctx, timeout, output_file, conds, it, end, pkg);
 
     return ret;
 }
@@ -833,6 +848,7 @@ manage_config_mode(vle::utils::ContextPtr ctx, CmdArgs args)
 int
 main(int argc, char** argv)
 {
+    vle::ConditionUpdater conds;
     std::string output_file;
     std::chrono::milliseconds timeout{ std::chrono::milliseconds::zero() };
     unsigned int mode = CLI_MODE_NOTHING;
@@ -844,10 +860,11 @@ main(int argc, char** argv)
     int opt_index;
     int ret = EXIT_SUCCESS;
 
-    const char* const short_opts = "hviV:j:mPRC";
+    const char* const short_opts = "hvic:V:j:mPRC";
     const struct option long_opts[] = { { "help", 0, nullptr, 'h' },
                                         { "version", 0, nullptr, 'v' },
                                         { "infos", 0, nullptr, 'i' },
+                                        { "condition", 0, nullptr, 'c' },
                                         { "restart", 0, &restart_conf, 1 },
                                         { "log-file", 0, &log_stdout, 0 },
                                         { "log-stdout", 0, &log_stdout, 1 },
@@ -896,6 +913,15 @@ main(int argc, char** argv)
         case 'i':
             mode |= CLI_MODE_END;
             show_infos();
+            break;
+        case 'c':
+            if (not conds.emplace(::optarg))
+                fprintf(stderr,
+                        _("Bad condition format: cond.port[[.map][.set]]=value"
+                          " with map is the key of a vle::value::Map and"
+                          " with set the index of the vle::value::Set."
+                          " value must be single type (bool, real, integer or"
+                          "string.\n"));
             break;
         case 'V':
             try {
@@ -982,6 +1008,7 @@ main(int argc, char** argv)
     case CLI_MODE_PACKAGE:
         ret = manage_package_mode(ctx,
                                   output_file,
+                                  conds,
                                   timeout,
                                   manager,
                                   processor_number,
@@ -996,6 +1023,7 @@ main(int argc, char** argv)
     case CLI_MODE_NOTHING:
         ret = manage_nothing_mode(ctx,
                                   output_file,
+                                  conds,
                                   timeout,
                                   manager,
                                   processor_number,
