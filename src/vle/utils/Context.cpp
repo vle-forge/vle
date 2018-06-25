@@ -24,10 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef _WIN32
-#include <vle/utils/details/UtilsWin.hpp>
-#endif
-
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <vle/utils/Context.hpp>
@@ -37,6 +33,12 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
+
+#ifdef _WIN32
+#include <vle/utils/details/UtilsWin.hpp>
+
+#include <Windows.h>
+#endif
 
 namespace vle {
 namespace utils {
@@ -234,6 +236,80 @@ Context::Context(std::string locale, const Path& /* prefix */)
         setlocale(LC_ALL, "C");
     else if (not setlocale(LC_ALL, locale.c_str()))
         setlocale(LC_ALL, "C");
+
+#ifdef _WIN32
+    /* Starting from VLE 2.0, Windows port changes is own environment
+     * variables PATH, CMAKE_MODULE_PATH and PKG_CONFIG_PATH simplify source
+     * code of VLE.
+     *
+     * https://msdn.microsoft.com/en-us/library/windows/desktop/ms682009(v=vs.85).aspx
+     */
+
+    {
+        auto path = getPrefixDir();
+        path /= L"bin";
+
+        auto str = path.wstring();
+        auto var = get_environment_variable_wide(L"PATH");
+
+        if (var.find(str) == var.npos) {
+            if (not var.empty()) {
+                str += L';';
+                str += var;
+            }
+
+            set_environment_variable_wide(L"PATH", str);
+        }
+    }
+
+    {
+        auto path = getPrefixDir();
+        path /= L"bin";
+
+        auto str = path.wstring();
+        auto var = get_environment_variable_wide(L"CMAKE_MODULE_PATH");
+
+        if (var.find(str) == var.npos) {
+            if (not var.empty()) {
+                str += L';';
+                str += var;
+            }
+
+            set_environment_variable_wide(L"CMAKE_MODULE_PATH", str);
+        }
+    }
+
+    {
+        auto path = getPrefixDir();
+        path /= L"lib";
+        path /= L"pkgconfig";
+
+        set_environment_variable_wide(L"PKG_CONFIG_PATH", path.wstring());
+    }
+
+    {
+        auto path = getPrefixDir();
+        set_environment_variable_wide(L"VLE_BASEPATH", path.wstring());
+    }
+
+    {
+        this->debug(_("Environment\n"));
+        LPWCH env = ::GetEnvironmentStringsW();
+        for (LPWSTR vars = static_cast<PWSTR>(env); *vars;
+             vars += wcslen(vars) + 1) {
+            try {
+                std::wstring str(vars);
+
+                if (not str.empty() or str[0] != L'=' or
+                    str.find(L'=') != str.npos)
+                    this->debug(_("%s\n"), from_wide_to_utf8(str).c_str());
+            } catch (const std::exception& /*e*/) {
+            }
+        }
+
+        FreeEnvironmentStringsW(env);
+    }
+#endif
 
     this->info("Context initialized [prefix=%s] [home=%s] [locale=%s]\n",
                m_pimpl->m_prefix.string().c_str(),
