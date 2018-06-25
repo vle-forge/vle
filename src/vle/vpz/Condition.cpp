@@ -51,7 +51,7 @@
 namespace vle {
 namespace vpz {
 
-Condition::Condition(std::string name)
+Condition::Condition(const std::string& name)
   : Base()
   , m_name(std::move(name))
 {}

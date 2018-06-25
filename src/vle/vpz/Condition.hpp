@@ -59,7 +59,7 @@ public:
      * @brief Build a new Condition with only a name.
      * @param name The name of the condition.
      */
-    Condition(std::string  name);
+    Condition(const std::string& name);
 
     /**
      * @brief Copy constructor. All values are cloned.

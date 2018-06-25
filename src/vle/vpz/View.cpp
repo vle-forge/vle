@@ -53,7 +53,7 @@ View::View(std::string name,
     }
 }
 
-View::View(std::string name)
+View::View(const std::string& name)
   : m_timestep(0.0)
   , m_name(std::move(name))
   , m_enabled(true)

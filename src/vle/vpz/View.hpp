@@ -60,7 +60,7 @@ public:
      * @brief Build a new event view with a specific name.
      * @param name The name of the View.
      */
-    View(std::string  name);
+    View(const std::string& name);
 
     /**
      * @brief Build a new View with a specific name, type and reference.
@@ -71,7 +71,7 @@ public:
      * @throw utils::ArgError it the time step is not greater than 0 and the
      * Type is TIMED.
      */
-    View(std::string  name,
+    View(std::string name,
          View::Type type,
          std::string  output,
          double timestep = 0.0,
