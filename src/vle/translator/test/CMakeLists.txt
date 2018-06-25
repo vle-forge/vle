@@ -1,9 +1,19 @@
-add_executable(test_graph graph.cpp ../../utils/Filesystem.cpp
+if (WIN32)
+	add_executable(test_graph graph.cpp ../../utils/Filesystem.cpp
+  ../../utils/ContextModule.cpp ../../devs/ModelFactory.cpp
+  ../../devs/Simulator.cpp ../../devs/Coordinator.cpp
+  ../../devs/RootCoordinator.cpp ../../devs/Scheduler.cpp
+  ../../devs/View.cpp ../../devs/DynamicsDbg.cpp ../../devs/Dynamics.cpp
+  ../MatrixTranslator.cpp ../GraphTranslator.cpp
+  ../../utils/details/UtilsWin.cpp)
+else ()
+	add_executable(test_graph graph.cpp ../../utils/Filesystem.cpp
   ../../utils/ContextModule.cpp ../../devs/ModelFactory.cpp
   ../../devs/Simulator.cpp ../../devs/Coordinator.cpp
   ../../devs/RootCoordinator.cpp ../../devs/Scheduler.cpp
   ../../devs/View.cpp ../../devs/DynamicsDbg.cpp ../../devs/Dynamics.cpp
   ../MatrixTranslator.cpp ../GraphTranslator.cpp)
+endif ()
 
 set_target_properties(test_graph PROPERTIES
   COMPILE_DEFINITIONS
