@@ -35,7 +35,6 @@
 #endif
 
 #include <boost/version.hpp>
-#include <unordered_map>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
@@ -43,7 +42,8 @@
 #include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
 
-
+#include <algorithm>
+#include <unordered_map>
 
 namespace vle {
 namespace utils {
