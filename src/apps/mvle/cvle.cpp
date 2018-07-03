@@ -781,6 +781,7 @@ private:
     std::unique_ptr<Columns> m_columns;             // used for simple values
     std::unique_ptr<ConditionsBackup> m_conditions; // used for complex values
     bool m_warnings;
+    bool m_more_output_details;
 
     void simulate(std::ostream& os, int row_id)
     {
@@ -818,6 +819,9 @@ private:
         } else {
             for (auto & it : *result) {
                 if (it.second && it.second->isMatrix()) {
+                    if(m_more_output_details) {
+                        os << "view:" << it.first << "\n";
+                    }
                     it.second->writeFile(os);
                 }
             }
@@ -829,12 +833,14 @@ public:
            std::chrono::milliseconds timeout,
            const std::string& vpz,
            bool withoutspawn,
-           bool warnings)
+           bool warnings,
+           bool more_output_details)
       : m_context(vle::utils::make_context())
       , m_timeout(timeout)
       , m_packagename(std::move(package))
       , m_simulator(nullptr)
       , m_warnings(warnings)
+      , m_more_output_details(more_output_details)
     {
         if (not withoutspawn) {
             m_simulator = std::make_unique<vle::manager::Simulation>(
@@ -1090,10 +1096,12 @@ run_as_worker(const std::string& package,
               const std::string& vpz,
               std::chrono::milliseconds timeout,
               bool withoutspawn,
-              bool warnings)
+              bool warnings,
+              bool more_output_details)
 {
     try {
-        Worker w(package, timeout, vpz, withoutspawn, warnings);
+        Worker w(package, timeout, vpz, withoutspawn, warnings,
+                 more_output_details);
         std::string block;
         int from;
         int first, last;
@@ -1174,6 +1182,7 @@ main(int argc, char* argv[])
     std::chrono::milliseconds timeout{ std::chrono::milliseconds::zero() };
     int withoutspawn = 0;
     int warnings = 0;
+    int more_output_details = 0;
     int block_size = 5000;
     int ret = EXIT_SUCCESS;
 
@@ -1188,6 +1197,7 @@ main(int argc, char* argv[])
         { "withoutspawn", 0, &withoutspawn, 1 },
         { "warnings", 0, &warnings, 1 },
         { "block-size", 1, nullptr, 'b' },
+        { "more-output-details", 0, &more_output_details, 1 },
         { nullptr, 0, nullptr, 0 }
     };
     int opt_index;
@@ -1292,7 +1302,8 @@ main(int argc, char* argv[])
         status = run_as_master(input_file, output_file, block_size);
     } else {
         status = run_as_worker(
-          package_name, vpz.front(), timeout, withoutspawn, warnings);
+          package_name, vpz.front(), timeout, withoutspawn, warnings,
+          more_output_details);
     }
 
     MPI_Finalize();
