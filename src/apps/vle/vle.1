@@ -31,7 +31,7 @@ software. \fBVLE\fR is composed of 3 applications: \fIVLE\fR the simulator,
 .PP
 \fBVLE\fR is a program that simulate the VPZ files. \fBVLE\fR use two modes:
 \fBmanager\fP or just to run simulation. \fBManager\fP run
-experimentals frames to build VPZ instances files. \fBJustRun\fP is the mode to run a VPZ directly.
+experimental frames to build VPZ instances files. \fBJustRun\fP is the mode to run a VPZ directly.
 
 .SH "OPTIONS"
 .PP
@@ -48,9 +48,44 @@ Show version of program.
 Show somes informations for vle framework.
 
 .IP "\fB-P\fP, \fB\-\-timeout\fI duration\fR\fP"
-Limit the simulation duration with a timeout in miliseconds (integer).
+Limit the simulation duration with a timeout in milliseconds (integer).
 
-.IP "\fB-V\fI int\fR\fP, \fB\-\-verbose\fI int \fR\fP"
+.IP "\fB\-\-name \fI name\fP"
+
+Change the identifier of the experiment. To use in combination with the
+condition parameter to generate simulation's output into different file.
+
+.IP "\fB-c\fP, \fB\-\-condition\fI string\fR\fP"
+
+Change a single type condition value with the following system:
+
+        vle ... condition.port.map.1=1234
+
+Where:
+        map is the key of a map
+        integer is the vector index of a set
+        value can be boolean, integer, real or string
+
+For example:
+
+        vle-2.0  ... -c condition.port.x=hello
+
+                The key 'x' of the map in condition.port must be a string and
+                it will be assigned to 'hello'.
+
+        vle-2.0  ... -c condition.port.y.1=world
+
+                The key 'y' of the map in condition.port must be a set and the
+                index 1 of the vector must be a string and it will be
+                assigned to 'world'.
+
+        vle-2.0  ... -c condition.port.y.2=!
+
+                The key 'y' of the map in condition.port must be a set and the
+                index 2 of the vector must be a string and it will be assigned
+                to '!'.
+
+.IP "\fB-V\fI int\fP, \fB\-\-verbose\fI int \fR\fP"
 Set the verbosity of this application. Default is \fI0\fR, only problem in VLE,
 \fI1\fR trace users' models problem, \fI2\fR trace extension process and
 \fI3\fR trace all DEVS API. Logs are stored in $VLE_HOME/vle.log.
