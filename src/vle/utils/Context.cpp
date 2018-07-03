@@ -106,7 +106,6 @@ make_context(std::string locale, const Path& prefix)
 Context::Context(const Path& /* prefix */)
   : m_pimpl(std::make_unique<PrivateContextImpl>())
 {
-
     m_pimpl->log_fn = std::make_unique<vle_log_stderr>();
 #ifndef VLE_DISABLE_DEBUG
     m_pimpl->log_priority = VLE_LOG_DEBUG;
@@ -200,9 +199,9 @@ Context::Context(const Path& /* prefix */)
     }
 #endif
 
-    this->info("Context initialized [prefix=%s] [home=%s]\n",
-               m_pimpl->m_prefix.string().c_str(),
-               m_pimpl->m_home.string().c_str());
+    this->debug("Context initialized [prefix=%s] [home=%s]\n",
+                m_pimpl->m_prefix.string().c_str(),
+                m_pimpl->m_home.string().c_str());
 
 #if defined(VLE_HAVE_NLS)
     bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
@@ -311,10 +310,10 @@ Context::Context(std::string locale, const Path& /* prefix */)
     }
 #endif
 
-    this->info("Context initialized [prefix=%s] [home=%s] [locale=%s]\n",
-               m_pimpl->m_prefix.string().c_str(),
-               m_pimpl->m_home.string().c_str(),
-               locale.c_str());
+    this->debug("Context initialized [prefix=%s] [home=%s] [locale=%s]\n",
+                m_pimpl->m_prefix.string().c_str(),
+                m_pimpl->m_home.string().c_str(),
+                locale.c_str());
 
 #if defined(VLE_HAVE_NLS)
     bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
