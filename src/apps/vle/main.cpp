@@ -234,6 +234,9 @@ show_help() noexcept
         "Need a file name parameter.\n"
         "timeout       limit the simulation duration with a timeout in "
         "miliseconds.\n"
+        "name          change the identifier of the experiment. To use in\n"
+        "                combination with the condition parameter to\n"
+        "                generate simulation's output into different file\n"
         "condition,c   change a single type condition value with:\n"
         "              -c condition.port.map.1=1234\n"
         "                map is the key of a map\n"
@@ -381,6 +384,7 @@ convert_log_mode(vle::utils::ContextPtr ctx)
 static int
 run_manager(vle::utils::ContextPtr ctx,
             std::chrono::milliseconds timeout,
+            const std::string& name,
             const vle::ConditionUpdater& conds,
             CmdArgs::const_iterator it,
             CmdArgs::const_iterator end,
@@ -406,6 +410,9 @@ run_manager(vle::utils::ContextPtr ctx,
             if (file and not conds.empty())
                 conds.update(*file);
 
+            if (not name.empty())
+                file->project().experiment().setName(name);
+
             std::unique_ptr<vle::value::Matrix> res =
               man.run(std::move(file), processor, 0, 1, &error);
 
@@ -425,6 +432,7 @@ run_manager(vle::utils::ContextPtr ctx,
 static int
 run_simulation(vle::utils::ContextPtr ctx,
                std::chrono::milliseconds timeout,
+               const std::string& name,
                const std::string& output_file,
                const vle::ConditionUpdater& conds,
                CmdArgs::const_iterator it,
@@ -445,8 +453,12 @@ run_simulation(vle::utils::ContextPtr ctx,
         } else {
             vle::manager::Error error;
             auto vpz = std::make_unique<vle::vpz::Vpz>(vpzAbsolutePath);
+
             if (vpz and not conds.empty())
                 conds.update(*vpz);
+
+            if (not name.empty())
+                vpz->project().experiment().setName(name);
 
             auto res = sim.run(std::move(vpz), &error);
 
@@ -503,6 +515,7 @@ manage_package_mode(vle::utils::ContextPtr ctx,
                     const std::string& output_file,
                     const vle::ConditionUpdater& conds,
                     std::chrono::milliseconds timeout,
+                    const std::string& name,
                     bool manager_mode,
                     int processor,
                     CmdArgs args)
@@ -579,10 +592,11 @@ manage_package_mode(vle::utils::ContextPtr ctx,
         ret = EXIT_FAILURE;
     else if (it != end) {
         if (manager_mode)
-            ret = run_manager(ctx, timeout, conds, it, end, processor, pkg);
-        else
             ret =
-              run_simulation(ctx, timeout, output_file, conds, it, end, pkg);
+              run_manager(ctx, timeout, name, conds, it, end, processor, pkg);
+        else
+            ret = run_simulation(
+              ctx, timeout, name, output_file, conds, it, end, pkg);
     }
 
     return ret;
@@ -751,6 +765,7 @@ manage_nothing_mode(vle::utils::ContextPtr ctx,
                     const std::string& output_file,
                     const vle::ConditionUpdater& conds,
                     std::chrono::milliseconds timeout,
+                    const std::string& name,
                     bool manager_mode,
                     int processor,
                     CmdArgs args)
@@ -767,9 +782,10 @@ manage_nothing_mode(vle::utils::ContextPtr ctx,
     int ret = EXIT_SUCCESS;
 
     if (manager_mode)
-        ret = run_manager(ctx, timeout, conds, it, end, processor, pkg);
+        ret = run_manager(ctx, timeout, name, conds, it, end, processor, pkg);
     else
-        ret = run_simulation(ctx, timeout, output_file, conds, it, end, pkg);
+        ret =
+          run_simulation(ctx, timeout, name, output_file, conds, it, end, pkg);
 
     return ret;
 }
@@ -850,6 +866,7 @@ main(int argc, char** argv)
 {
     vle::ConditionUpdater conds;
     std::string output_file;
+    std::string name;
     std::chrono::milliseconds timeout{ std::chrono::milliseconds::zero() };
     unsigned int mode = CLI_MODE_NOTHING;
     int verbose_level = 0;
@@ -864,6 +881,7 @@ main(int argc, char** argv)
     const struct option long_opts[] = { { "help", 0, nullptr, 'h' },
                                         { "version", 0, nullptr, 'v' },
                                         { "infos", 0, nullptr, 'i' },
+                                        { "name", 1, nullptr, 0 },
                                         { "condition", 0, nullptr, 'c' },
                                         { "restart", 0, &restart_conf, 1 },
                                         { "log-file", 0, &log_stdout, 0 },
@@ -900,7 +918,8 @@ main(int argc, char** argv)
                             _("Bad timeout: %s. Assume no timeout\n"),
                             ::optarg);
                 }
-            }
+            } else if (not strcmp(long_opts[opt_index].name, "name"))
+                name = ::optarg;
             break;
         case 'h':
             mode |= CLI_MODE_END;
@@ -1010,6 +1029,7 @@ main(int argc, char** argv)
                                   output_file,
                                   conds,
                                   timeout,
+                                  name,
                                   manager,
                                   processor_number,
                                   std::move(commands));
@@ -1025,6 +1045,7 @@ main(int argc, char** argv)
                                   output_file,
                                   conds,
                                   timeout,
+                                  name,
                                   manager,
                                   processor_number,
                                   std::move(commands));
