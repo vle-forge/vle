@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-2.0.dtd">
+<vle_project version="0.5" date="Thu, 9 Jul 2018" author="Gauthier Quesnel">
+  <structures>
+    <model name="top" type="coupled" width="459"  >
+      <submodels>
+        <model name="Agent" type="atomic" dynamics="agent" conditions="lifegame">
+          <out>
+            <port name="out" />
+          </out>
+        </model>
+        <model name="LifeGame" type="atomic" dynamics="multicomp" conditions="lifegame" observables="obs" debug="true">
+          <in>
+           <port name="live" />
+         </in>
+       </model>
+     </submodels>
+     <connections>
+      <connection type="internal">
+        <origin model="Agent" port="out" />
+        <destination model="LifeGame" port="live" />
+      </connection>
+    </connections>
+  </model>
+</structures>
+<dynamics>
+  <dynamic name="agent" package="" library="dynamics_agent"  />
+  <dynamic name="multicomp" package="" library="dynamics_component_a"  />
+</dynamics>
+<experiment name="expe" >
+  <conditions>
+    <condition name="simulation_engine" >
+      <port name="begin" >
+        <double>0</double>
+      </port>
+      <port name="duration" >
+        <double>4</double>
+      </port>
+    </condition>
+    <condition name="lifegame">
+      <port name="oscillator">
+        <string>toad</string>
+      </port>
+      <port name="width">
+        <integer>7</integer>
+      </port>
+      <port name="height">
+        <integer>7</integer>
+      </port>
+    </condition>
+  </conditions>
+  <views>
+    <outputs>
+      <output name="o" format="local" plugin="oov_plugin" />
+    </outputs>
+    <observables>
+      <observable name="obs" >
+        <port name="c" >
+          <attachedview name="view1" />
+        </port>
+      </observable>
+    </observables>
+    <view name="view1" output="o" type="timed" timestep="1.0" />
+  </views>
+</experiment>
+</vle_project>

@@ -1,33 +1,7 @@
 vle_declare_test(test_time time.cpp)
+# vle_declare_test(test_coordinator coordinator.cpp)
+# vle_declare_test(test_mdl mdl.cpp)
+vle_declare_test(test_multicomponant component.cpp)
 
-# if (WIN32)
-# 	add_executable(test_coordinator coordinator.cpp ../DynamicsDbg.cpp
-# 	  ../../utils/Filesystem.cpp ../../utils/ContextModule.cpp
-# 	  ../ModelFactory.cpp ../Simulator.cpp ../Coordinator.cpp
-# 	  ../RootCoordinator.cpp ../Scheduler.cpp ../View.cpp
-# 	  ../../utils/details/UtilsWin.cpp)
-
-# 	add_executable(test_mdl mdl.cpp ../../utils/Filesystem.cpp
-# 	  ../../utils/ContextModule.cpp ../DynamicsDbg.cpp ../ModelFactory.cpp
-# 	  ../Simulator.cpp ../Coordinator.cpp ../RootCoordinator.cpp
-# 	  ../Scheduler.cpp ../View.cpp ../../utils/details/UtilsWin.cpp)
-# else ()
-# 	add_executable(test_coordinator coordinator.cpp ../DynamicsDbg.cpp
-# 	  ../../utils/Filesystem.cpp ../../utils/ContextModule.cpp
-# 	  ../ModelFactory.cpp ../Simulator.cpp ../Coordinator.cpp
-# 	  ../RootCoordinator.cpp ../Scheduler.cpp ../View.cpp)
-
-# 	add_executable(test_mdl mdl.cpp ../../utils/Filesystem.cpp
-# 	  ../../utils/ContextModule.cpp ../DynamicsDbg.cpp ../ModelFactory.cpp
-# 	  ../Simulator.cpp ../Coordinator.cpp ../RootCoordinator.cpp
-# 	  ../Scheduler.cpp ../View.cpp)
-# endif ()
-
-# target_link_libraries(test_coordinator vlelib ${CMAKE_THREAD_LIBS_INIT})
-# add_test(devscoordinator test_coordinator)
-
-# set_target_properties(test_mdl PROPERTIES
-#   COMPILE_DEFINITIONS DEVS_TEST_DIR=\"${CMAKE_SOURCE_DIR}/src/vle/devs/test\")
-
-# target_link_libraries(test_mdl vlelib ${CMAKE_THREAD_LIBS_INIT})
-# add_test(devsmdl test_mdl)
+set_target_properties(test_multicomponant PROPERTIES
+  COMPILE_DEFINITIONS DEVS_TEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\")

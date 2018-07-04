@@ -1,92 +1,92 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "https://www.vle-project.org/vle-1.1.0.dtd">
 <vle_project version="0.5" date="Mon, 27 Dec 2010" author="Gauthier Quesnel">
-<structures>
-<model name="top" type="coupled" width="459"  >
-<submodels>
-<model name="counter" type="atomic" dynamics="counter" x="292" y="37" width="100" height="45" >
-<in>
- <port name="in" />
-</in>
-<out>
- <port name="out" />
-</out>
-</model>
-<model name="coupled" type="coupled" x="118" y="74" width="100" height="45"  >
-<out>
- <port name="out" />
-</out>
-<submodels>
-<model name="coupled" type="coupled" x="111" y="79" width="459" height="45"  >
-<out>
- <port name="out" />
-</out>
-<submodels>
-<model name="beep-0" type="atomic" dynamics="beep" x="32" y="46" width="100" height="45" >
-<out>
- <port name="out" />
-</out>
-</model>
-<model name="beep-1" type="atomic" dynamics="beep" x="35" y="115" width="100" height="45" >
-<out>
- <port name="out" />
-</out>
-</model>
-<model name="executive" type="atomic" conditions="DeleteConnection" dynamics="executive" x="234" y="158" width="100" height="30" >
-</model>
+    <structures>
+        <model name="top" type="coupled" width="459"  >
+            <submodels>
+                <model name="counter" type="atomic" dynamics="counter" x="292" y="37" width="100" height="45" >
+                    <in>
+                       <port name="in" />
+                   </in>
+                   <out>
+                       <port name="out" />
+                   </out>
+               </model>
+               <model name="coupled" type="coupled" x="118" y="74" width="100" height="45"  >
+                <out>
+                   <port name="out" />
+               </out>
+               <submodels>
+                <model name="coupled" type="coupled" x="111" y="79" width="459" height="45"  >
+                    <out>
+                       <port name="out" />
+                   </out>
+                   <submodels>
+                    <model name="beep-0" type="atomic" dynamics="beep" x="32" y="46" width="100" height="45" >
+                        <out>
+                           <port name="out" />
+                       </out>
+                   </model>
+                   <model name="beep-1" type="atomic" dynamics="beep" x="35" y="115" width="100" height="45" >
+                    <out>
+                       <port name="out" />
+                   </out>
+               </model>
+               <model name="executive" type="atomic" conditions="DeleteConnection" dynamics="executive" x="234" y="158" width="100" height="30" >
+               </model>
+           </submodels>
+           <connections>
+            <connection type="output">
+               <origin model="beep-0" port="out" />
+               <destination model="coupled" port="out" />
+           </connection>
+           <connection type="output">
+               <origin model="beep-1" port="out" />
+               <destination model="coupled" port="out" />
+           </connection>
+       </connections>
+   </model>
 </submodels>
 <connections>
-<connection type="output">
- <origin model="beep-0" port="out" />
- <destination model="coupled" port="out" />
-</connection>
-<connection type="output">
- <origin model="beep-1" port="out" />
- <destination model="coupled" port="out" />
-</connection>
+    <connection type="output">
+       <origin model="coupled" port="out" />
+       <destination model="coupled" port="out" />
+   </connection>
 </connections>
 </model>
 </submodels>
 <connections>
-<connection type="output">
- <origin model="coupled" port="out" />
- <destination model="coupled" port="out" />
-</connection>
-</connections>
-</model>
-</submodels>
-<connections>
-<connection type="internal">
- <origin model="coupled" port="out" />
- <destination model="counter" port="in" />
-</connection>
+    <connection type="internal">
+       <origin model="coupled" port="out" />
+       <destination model="counter" port="in" />
+   </connection>
 </connections>
 </model>
 </structures>
 <dynamics>
-<dynamic name="beep" package="" library="dynamics_MyBeep" type="local"  />
-<dynamic name="counter" package="" library="dynamics_counter" type="local"  />
-<dynamic name="executive" package="" library="exe_deleteconnection" type="local"  />
+    <dynamic name="beep" package="" library="dynamics_MyBeep" type="local"  />
+    <dynamic name="counter" package="" library="dynamics_counter" type="local"  />
+    <dynamic name="executive" package="" library="exe_deleteconnection" type="local"  />
 </dynamics>
 <experiment name="generatorexecutive" duration="100.000000000000000" begin="0.000000000000000" seed="123" >
-<conditions>
-<condition name="DeleteConnection" >
- <port name="alarm" >
-<double>4.000000000000000</double>
-</port>
- <port name="model dest" >
-<string>coupled</string>
-</port>
- <port name="model source" >
-<string>beep-0</string>
-</port>
- <port name="port dest" >
-<string>out</string>
-</port>
- <port name="port source" >
-<string>out</string>
-</port>
-</condition>
+    <conditions>
+        <condition name="DeleteConnection" >
+           <port name="alarm" >
+            <double>4.000000000000000</double>
+        </port>
+        <port name="model dest" >
+            <string>coupled</string>
+        </port>
+        <port name="model source" >
+            <string>beep-0</string>
+        </port>
+        <port name="port dest" >
+            <string>out</string>
+        </port>
+        <port name="port source" >
+            <string>out</string>
+        </port>
+    </condition>
 </conditions>
 </experiment>
 </vle_project>
