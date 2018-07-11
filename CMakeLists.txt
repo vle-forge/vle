@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
-project(VLE CXX C)
+project(VLE CXX)
 enable_testing()
+include(GNUInstallDirs)
 
 #
 # Options
