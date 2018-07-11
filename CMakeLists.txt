@@ -56,6 +56,14 @@ include(CheckLibraryExists)
 include(CMakeDetermineCCompiler)
 include(CheckCXXCompilerFlag)
 
+# Tries to found asciidoctor to generate manpages of the share/doc directory.
+find_program(ASCIIDOCTOR_EXECUTABLE NAMES asciidoctor)
+if (NOT ${ASCIIDOCTOR_EXECUTABLE})
+  message(STATUS "asciidoctor not found.")
+else ()
+  message(STATUS "asciidoctor -> ${ASCIIDOCTOR_EXECUTABLE}")
+endif ()
+
 CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 CHECK_CXX_COMPILER_FLAG("-std=c++1y" COMPILER_SUPPORTS_CXX1Y)
 
