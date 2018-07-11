@@ -12,8 +12,6 @@ if (VLE_HAVE_MVLE)
     ${MPI_EXTRA_LIBRARY} vlelib)
 
   install(TARGETS mvle DESTINATION bin)
-  install(FILES mvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
-    "mvle-${VLE_VERSION_SHORT}.1")
 endif()
 
 if (VLE_HAVE_CVLE)
@@ -28,6 +26,4 @@ if (VLE_HAVE_CVLE)
     ${MPI_EXTRA_LIBRARY} vlelib)
 
   install(TARGETS cvle DESTINATION bin)
-  install(FILES cvle.1 DESTINATION ${VLE_MANPAGE_PATH} RENAME
-    "cvle-${VLE_VERSION_SHORT}.1")
 endif()

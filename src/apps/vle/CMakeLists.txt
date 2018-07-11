@@ -27,6 +27,3 @@ target_link_libraries(vle vlelib ${CMAKE_THREAD_LIBS_INIT}
   ${VLEDEPS_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vle DESTINATION bin)
-
-install(FILES vle.1 DESTINATION ${VLE_MANPAGE_PATH}
-  RENAME "vle-${VLE_VERSION_SHORT}.1")
