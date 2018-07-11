@@ -19,9 +19,9 @@ option(WITH_WIN32_INSTALLER "prepare win32 installer [default: off]" OFF)
 #
 
 set(VLE_MAJOR 2)
-set(VLE_MINOR 0)
+set(VLE_MINOR 1)
 set(VLE_PATCH 0)
-set(VLE_EXTRA "")
+set(VLE_EXTRA "devel")
 set(VLE_VERSION "${VLE_MAJOR}.${VLE_MINOR}.${VLE_PATCH}")
 set(VLE_VERSION_SHORT "${VLE_MAJOR}.${VLE_MINOR}")
 set(VLE_NAME "vle")
