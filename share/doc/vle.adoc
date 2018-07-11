@@ -1,0 +1,190 @@
+= vle(1)
+
+== NAME
+
+vle - virtual laboratory environment
+
+== SYNOPSIS
+
+*vle* [*--version*] [*-h* | *--help*] [*-i* | *--infos*] [*--restart*] [*--log-file*] [*--log-stdout*] [*--log-stderr*] [*--write-output* 'FILE'] [*--timeout* 'milliseconds'] [*--name* 'new_name'] [*-c* | *--condition* 'condition.port[key_of_map|index_in_set]=[string|integer|real]] [*-j* | *--processor* 'integer'] [*-v* | *--verbose* 'integer'] [*-P* | *--package* 'package' 'command'] [*-R* | *--remote* 'command' 'package'] [*-C* | *--config* 'variable' 'value'] [*-m* | *--manager*] [files...]
+
+== DESCRIPTION
+
+VLE is a part of a multi-modeling and simulation framework call VLE. It
+addresses the reliability issue using recent developments in the theory of
+Modeling and Simulation proposed by Bernard Zeigler and open sources software.
+VLE is composed of 3 applications: *vle* the command line interface, *gvle*
+the modeling tool with graphical support, *mvle* and *cvle* the MPI simulation
+managers.
+
+*vle* is a command line interface to start simulation, adjust configuration
+file, download package.
+
+== OPTIONS
+
+*--version*::
+    Print version information to standard output, then exit.
+*-h*, *--help*::
+    Print help information, then exit.
+*-i*, *--infos*::
+    Shows information about installed packages in system or user package directory.
+*--restart*::
+    Rewrite a new configuration file of VLE (in $VLE_HOME/vle.conf).
+*--log-file*::
+    Log of simulation are reported to the standard file (in $VLE_HOME/vle.log).
+*--log-stdout*::
+    Log of simulation are reported to the standard output (default).
+*--log-stderr*::
+    Log of simulation are reported to the standard error output.
+*--write-output* 'FILE'::
+    Output simulation results used are stored into XML output file. Only available with the storage output plug-in.
+*--timeout* 'milliseconds'::
+    Limit the simulation duration with a timeout in milliseconds.\n"
+*--name* 'new_name'::
+    Change the identifier of the experiment. To use in combination with the condition parameter to generate simulation's output into different files
+*-c*, *--condition* 'condition.port[key_of_map|index_in_set]=[string|integer|real]::
+    Change a single type condition value where key_of_map is the key in a vle::value::Map, index_in_set is the index in a vle::value::Set. Value to be change can be boolean, integer, real or string
+*-j*, *--processor* 'integer'::
+    Select number of processor in manager mode
+*-v*, *--verbose* 'integer'::
+    Select the level of verbosity. The parameter must be greater or equal to 0 and less than 8.
+*-P*, *--package 'package' 'command'::
+    Select package mode, see option below.
+*-R*, *--remote* 'command' 'package'::
+    Select remote mode, see options below.
+*-C*, *--config* 'variable' 'value::
+    Select configuration mode and update the configuration file $VLE_HOME/vle.conf
+*-m*, *--manager*::
+    Use the manager mode to run experimental frames
+
+=== VERBOSITY
+
+The *-v*, *--verbose* option allows control of verbosity of 'vle'. Level are::
+    - 0 system is unusable
+    - 1 action must be taken immediately
+    - 2 critical conditions
+    - 3 error conditions
+    - 4 warning conditions
+    - 5 normal, but significant, condition
+    - 6 informational message
+    - 7 debug-level message
+
+....
+# This command hides all message of vle from level 4 to 7.
+$ vle --verbose=3 ...
+....
+
+=== PACKAGE MODE
+
+*-P*, *--package* 'name' '[commands ...]'
+
+'Commands' availabled allow to create a new package, configure (run cmake),
+build (run make), etc. Commands can be combined.
+
+....
+# build new foo package
+$ vle -P foo create
+
+# configure the foo package
+$ vle -P foo configure
+
+# build the foo package
+$ vle -P foo build
+
+# start a unit test campaign
+$ vle -P foo test
+
+# install libs
+$ vle -P foo install
+
+# clean up the build directory
+$ vle -P foo clean
+
+# delete binary directories
+$ vle -P foo rclean
+
+# build packages
+$ vle -P foo package
+
+# build all depends of foo package
+$ vle -P foo all
+
+# list depends of foo package
+$ vle -P foo depends
+
+# list vpz and library package
+$ vle -P foo list
+....
+
+=== REMOTE MODE
+
+The remote mode permits to search, download and install packages from distant repository.
+
+....
+#  update the database
+$ vle -R update
+
+# search in database
+$ vle -R search expression
+
+# search in local
+$ vle -R local_search expression
+
+# install package
+$ vle -R install package
+
+# download source package
+$ vle -R source package
+
+# show package in database
+$ vle -R show package
+
+# show package in local
+$ vle -R localshow package
+....
+
+=== CONFIG MODE
+
+The config mode changes the configuration file directly from the command line.
+
+....
+$ vle -C vle.author me
+
+$ vle -C gvle.editor.font Monospace 10
+....
+
+=== MANAGER MODE
+
+The manager mode is an obsolete mode to perform experimental frames using a
+*vpz* with multiple values. Make a try with *cvle* and *mvle*. They are
+better.
+
+== ENVIRONMENTS
+
+VLE_HOME::
+    A path where you push models packages (ie. simulators, streams and modeling plug-ins, vpz files, data, and the outputs of simulation)
+
+== SEE ALSO
+
+*cvle*(1) *mvle*(1) *libvle*(1)
+
+== BUGS
+
+Of course there's no bug in *vle*. But there may be unexpected behaviors.
+
+== AUTHORS
+
+Gauthier Quesnel <gauthier.quesnel@inra.fr> and others.
+
+== COPYRIGHT
+
+Copyright © 2015-2018 INRA http://www.inra.fr
+
+Copyright © 2003-2018 ULCO http://www.univ-littoral.fr
+
+Copyright © 2003-2018 Gauthier Quesnel
+
+
+== WWW
+
+http://vle-project.org

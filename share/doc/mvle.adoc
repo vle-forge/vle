@@ -1,0 +1,73 @@
+= mvle(1)
+
+== NAME
+
+mvle - experimental frames executor for *vle*
+
+== DESCRIPTION
+
+VLE is a part of a multi-modeling and simulation framework call VLE. It
+addresses the reliability issue using recent developments in the theory of
+Modeling and Simulation proposed by Bernard Zeigler and open sources software.
+VLE is composed of 3 applications: *vle* the command line interface, *gvle*
+the modeling tool with graphical support, *mvle* and *cvle* the MPI simulation
+managers.
+
+*mvle* is a program to execute experimental frames on classical cluster
+system using the MPI2 interface.
+
+== OPTIONS
+
+*-h*, *--help*::
+    Show summary of options.
+*-v*, *--version*::
+    Show version of program.
+*-P*, *--package* 'package'::
+    Select the package where run the *vpz* file.
+*--timeout*::
+    Limit the simulation duration with a timeout in milliseconds.
+
+== EXAMPLES
+
+Run mvle on 32 process, for the experimental frame `firemanqss-exp.vpz` of the
+package `firemanqss`:
+
+....
+$ mpirun -np 32 mvle -P firemanqss firemanqss-exp.vpz
+....
+
+Run mvle on 2048 processor from a specified machine file, for the experimental
+frame `firemanqss-exp.vpz` of the package `firemanqss`:
+
+....
+$ mpirun -np 2048 --machinefile file.txt mvle -P vle.examples unittest.vpz
+....
+
+== ENVIRONMENTS
+
+VLE_HOME::
+    A path where you push models packages (ie. simulators, streams and modeling plug-ins, vpz files, data, and the outputs of simulation)
+
+== SEE ALSO
+
+*vle*(1) *mvle*(1) *libvle*(1)
+
+== BUGS
+
+Of course there's no bug in *cvle*. But there may be unexpected behaviors.
+
+== AUTHORS
+
+Gauthier Quesnel <gauthier.quesnel@inra.fr> and others.
+
+== COPYRIGHT
+
+Copyright © 2015-2018 INRA http://www.inra.fr
+
+Copyright © 2003-2018 ULCO http://www.univ-littoral.fr
+
+Copyright © 2003-2018 Gauthier Quesnel
+
+== WWW
+
+http://vle-project.org

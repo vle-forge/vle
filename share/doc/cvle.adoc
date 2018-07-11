@@ -1,0 +1,95 @@
+= cvle(1)
+
+== NAME
+
+cvle - cluster access for *vle*
+
+== SYNOPSIS
+
+cvle [ *h* | *help* ] [ *P* | *package* 'package' ] [ *i* | *input* ] [ *o* | *output* ] [ *t* | *template* 'file' ] [ *timeout* ] [ *withoutspawn* ] [ *warnings* ] [ *b* | *block* 'integer'] [ more-output-*details* ]
+
+== DESCRIPTION
+
+VLE is a part of a multi-modeling and simulation framework call VLE. It
+addresses the reliability issue using recent developments in the theory of
+Modeling and Simulation proposed by Bernard Zeigler and open sources software.
+VLE is composed of 3 applications: *vle* the command line interface, *gvle*
+the modeling tool with graphical support, *mvle* and *cvle* the MPI simulation
+managers.
+
+*cvle* is a program to execute a set of simulation on classical cluster system
+using the MPI2 (Message Parsing Interface) interface.
+
+*cvle* treats huge simulation plan. *cvle* does not use the classical *vle*'s
+manager to build the experimental frames. It reads a Comma-Separated Value
+(csv) files where columns are conditions, lines are instances of the
+experimental frame. The first line, the header, of the input file defines the
+conditions. If a column does not exist in the *vpz* file, it is simply added
+to he output file (e.g. to store simulation id).
+
+The column header is a list of string of the following format:
+
+....
+condition_name.port_name([.set_index]|[.map_key])
+....
+
+Represents an access to a value of the specified condition, port. Values are
+single type and can be : boolean, integer, double or string.
+
+If the string is unknown, the string is reported into the output file. This
+feature is useful to assign index or a list of identifier for each simulation.
+
+For example, the column name "cond.x.2.default" tries to access the map's key
+'default' in the 3rd element (start from 0) of the set of the condition
+
+== OPTIONS
+
+*-h*, *--help*::
+    Print help information, then exit.
+*-P*, *--package* 'package'::
+    Select the package where run the *vpz* file.
+*-i*, *--input*::
+    *csv* input file (standard input if empty).
+*-o*, *--output*::
+    *csv* output file (standard output if empty).
+*-t*, *--template* 'file'::
+    Generates a *csv* file with header initialized by each condition from the *vpz* file.
+*--timeout*::
+    Limit the simulation duration with a timeout in milliseconds.
+*--withoutspawn*::
+    Perform simulation in the current thread instead of a sub child process.
+*--warnings*::
+    Show warnings  in output.
+*-b*, *--block* 'integer'::
+    Set number of lines to be send between MPI2 process. Default 5000 lines.
+*--more-output-details*::
+    Show more details in output. Be careful, *csv* output format may be broken.
+
+== ENVIRONMENTS
+
+VLE_HOME::
+    A path where you push models packages (ie. simulators, streams and modeling plug-ins, vpz files, data, and the outputs of simulation)
+
+== SEE ALSO
+
+*vle*(1) *mvle*(1) *libvle*(1)
+
+== BUGS
+
+Of course there's no bug in *cvle*. But there may be unexpected behaviors.
+
+== AUTHORS
+
+Gauthier Quesnel <gauthier.quesnel@inra.fr> and others.
+
+== COPYRIGHT
+
+Copyright © 2015-2018 INRA http://www.inra.fr
+
+Copyright © 2003-2018 ULCO http://www.univ-littoral.fr
+
+Copyright © 2003-2018 Gauthier Quesnel
+
+== WWW
+
+http://vle-project.org
