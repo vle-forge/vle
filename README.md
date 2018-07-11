@@ -51,7 +51,7 @@ Install dependencies (recent ubuntu/debian). Copy/paste the following lines:
 ```bash
 apt-get install curl libxml2-dev libboost-dev cmake pkg-config g++ \
         qttools5-dev qttools5-dev-tools qtbase5-dev qtbase5-dev-tools \
-        qtchooser qt5-default
+        qtchooser qt5-default asciidoctor ruby-asciidoctor
 ```
 
 Once you have met requirements, compiling and installing is simple. Copy/paste
