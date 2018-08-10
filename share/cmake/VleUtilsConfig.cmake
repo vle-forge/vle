@@ -25,10 +25,10 @@
 #
 # Following CMake variables have to be defined :
 #
-#  VLE_DEBUG       - if true, prints debug traces (default OFF)
-#  VLE_ABI_VERSION - it gives the ABI version of installed vle. For example,
-#                    if VLE_ABI_VERSION = "1.2", then packages are expected to
-#                    be installed into VLE_HOME/pkgs-1.2.
+#  VLE_DEBUG    - if true, prints debug traces (default OFF)
+#  VLE_VERSION  - it gives the ABI version of installed vle. For example, if 
+#                  VLE_VERSION = "2.0", then packages are expected to
+#                  be installed into VLE_HOME/pkgs-2.0.
 #
 # This script provides utils macros for vle cmake files :
 #
@@ -37,7 +37,7 @@
 # VleCheckPackage: it checks if a package is installed into the binary
 #     packages. And sets the variables used to link to the designated package.
 #
-#> set(VLE_ABI_VERSION 1.2)
+#> find_package(VLE 2.0 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleCheckPackage(MYPKG mypackage)
 #> VleCheckPackage(MYPKG2 mypackage2(>=1.0))
@@ -52,11 +52,11 @@
 #####
 #
 # VleCheckDependencies: it checks if vle dependencies are installed into the
-#     binary packages (VLE_HOME/pkgs-${VLE_ABI_VERSION}). Dependencies are
+#     binary packages (VLE_HOME/pkgs-${VLE_VERSION}). Dependencies are
 #     declared into the flag "Build-Depends" of the file Description.txt
 #     (${CMAKE_SRC_DIR}/Description.txt).
 #
-#> set(VLE_ABI_VERSION 1.2)
+#> find_package(VLE 2.0 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleCheckDependencies()
 #
@@ -65,7 +65,7 @@
 # VleBuildDynamic: it builds a vle dynamic from a cpp file taking into account
 #     packages dependencies declared into tag "@@tagdepends" into the cpp file
 #
-#> set(VLE_ABI_VERSION 1.2)
+#> find_package(VLE 2.0 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildDynamic(Simple "Simple.cpp;otherSouce.cpp")
 #
@@ -77,7 +77,7 @@
 #
 # VleBuildTest: it builds test for the current project, from a cpp file
 #
-#> set(VLE_ABI_VERSION 1.2)
+#> find_package(VLE 2.0 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildTest(test_pkg "test.cpp")
 #
@@ -89,7 +89,7 @@
 #
 # VleBuildOovPlugin: it builds a oov plugin from a cpp file
 #
-#> set(VLE_ABI_VERSION 1.2)
+#> find_package(VLE 2.0 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildOovPlugin(oovplug_name "source1.cpp;source2.cpp")
 #
@@ -99,7 +99,7 @@
 #     if the tag "@@tagdynamic@@" is present then it builds a vle dynamic
 #     using VleBuildDynamic.
 #
-#> set(VLE_ABI_VERSION 1.2)
+#> find_package(VLE 2.0 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildAllDyn()
 #
@@ -109,18 +109,19 @@
 #     if the tag "@@tagtest@@" is present then it builds a vle test
 #     using VleBuildTest.
 #
-#> set(VLE_ABI_VERSION 1.2)
+#> find_package(VLE 2.0 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildAllTest()
 #
 # ===========================================================================
 
-set(VleUtils_VERSION 1.0)
+set(VleUtils_VERSION 2.0)
+
 if (NOT DEFINED VLE_DEBUG)
     message(FATAL_ERROR "VLE_DEBUG is not set ")
 endif ()
-if (NOT DEFINED VLE_ABI_VERSION)
-    message(FATAL_ERROR "VLE_ABI_VERSION is not set ")
+if (NOT DEFINED VLE_VERSION)
+    message(FATAL_ERROR "VLE_VERSION is not set ")
 endif ()
 
 ##
@@ -273,18 +274,10 @@ function(IntVleHomePkgs out)
       message(STATUS "The VLE_HOME defined: ${_vle_home}")
     endif ()
   endif ()
-  if (NOT VLE_ABI_VERSION)
-    set(_vle_package_dir "${_vle_home}/pkgs")
-    if (VLE_DEBUG)
-      message(STATUS "VLE_ABI_VERSION undefined for package directory, "
-                     "try default ${_vle_package_dir}")
-    endif()
-  else ()
-    set(_vle_package_dir "${_vle_home}/pkgs-${VLE_ABI_VERSION}")
-    if (VLE_DEBUG)
-      message(STATUS "VLE_ABI_VERSION defined for package directory: "
-                     "${_vle_package_dir}")
-    endif ()
+  set(_vle_package_dir "${_vle_home}/pkgs-${VLE_VERSION}")
+  if (VLE_DEBUG)
+    message(STATUS "VLE_VERSION defined for package directory: "
+                   "${_vle_package_dir}")
   endif ()
   if (NOT IS_DIRECTORY ${_vle_package_dir})
     message(FATAL_ERROR "Package directory does not exist: ${_vle_package_dir}")
@@ -299,7 +292,7 @@ endfunction()
 
 function(IntVleSystemPkgs out)
   find_path(_vle_install_dir vle PATHS ${VLE_INCLUDE_DIRS} NO_DEFAULT_PATH)
-  set(_vle_sys_pkgs "${_vle_install_dir}/../../lib/vle-${VLE_ABI_VERSION}/pkgs")
+  set(_vle_sys_pkgs "${_vle_install_dir}/../../lib/vle-${VLE_VERSION}/pkgs")
   if (NOT EXISTS ${_vle_package_dir})
     message(FATAL_ERROR "System packages directory does not exist: ${_vle_sys_pkgs}")
   endif ()

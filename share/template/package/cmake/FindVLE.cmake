@@ -19,10 +19,10 @@
 #  VLE_LIBRARY_DIRS      - Directories containing libraries to link
 #  VLE_LIBRARIES         - Link these to use shared libraries of VLE
 #  VLE_SHARE_DIR         - Base directory for VLE shared files
+#  VLE_VERSION           - gives the VLE version found (e.g 2.1)
 #
 # CMake variables used by this module:
-#  VLE_ABI_VERSION       - gives the VLE version to search for (e.g 1.1, 1.2)
-#                          (REQUIRED)
+#
 #  VLE_DEBUG             - If true, prints debug traces
 #                          (default OFF)
 #  VLE_USING_CMAKE       - If true, on windows, use cmake for finding VLE,
@@ -35,28 +35,28 @@
 #
 #  VLE_BASEPATH          - environment variable for base path of vle
 #
-#=============================================================================
 #
-# Usage
-# -----
+# Example of use, find VLE with the minimal version of 2.0 :
 #
-# set(VLE_ABI_VERSION 2.0)
-# find_package(VLE REQUIRED)
-#
+# find_package(VLE 2.0 REQUIRED) 
+#  
 #=============================================================================
 
 #
-# Check VLE_ABI_VERSION
+# Check VLE_VERSION
 #
 
-if (NOT DEFINED VLE_ABI_VERSION)
-  message (FATAL_ERROR "Cmake variable VLE_ABI_VERSION is not set")
-endif ()
-
+set (_find_vle_all_versions 2.2 2.1 2.0)
 
 #
 # Set default behavior of find vle
 #
+
+if (DEFINED VLE_DEBUG)
+  set (_vle_debug  ${VLE_DEBUG})
+else ()
+  set (_vle_debug 0)
+endif ()
 
 if (WIN32)
   if (DEFINED VLE_USING_CMAKE)
@@ -65,93 +65,111 @@ if (WIN32)
      set (_find_vle_using_cmake 1)
   endif (DEFINED VLE_USING_CMAKE)
 else (WIN32)
+  find_package(PkgConfig REQUIRED)
   set (_find_vle_using_cmake 0)
 endif (WIN32)
 
-if (DEFINED VLE_DEBUG)
-  set (_vle_debug ${VLE_DEBUG})
-else ()
-  set (_vle_debug 0)
+if (${_vle_debug})
+  message ("[FindVLE] search VLE :")
+  message ("[FindVLE]  - with minimal version "
+           "${VLE_FIND_VERSION_MAJOR}.${VLE_FIND_VERSION_MINOR}")
+  message ("[FindVLE]  - using internal cmake tools : ${_find_vle_using_cmake}")
 endif ()
+
 
 
 #
 # Find VLE
 #
 
-if (${_find_vle_using_cmake})
-
-  find_path(_vle_base_include vle-${VLE_ABI_VERSION}/vle/vle.hpp PATHS
-    $ENV{VLE_BASEPATH}/include
-    ${VLE_BASEPATH_LOCAL}/include
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/include"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/include"
-	NO_DEFAULT_PATH)
-
-  find_path(_vle_base_bin vle.exe PATHS
-    $ENV{VLE_BASEPATH}/bin
-    ${VLE_BASEPATH_LOCAL}/bin
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/bin"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/bin"
-	NO_DEFAULT_PATH)
-
-  find_path(_vle_base_lib libvle-${VLE_ABI_VERSION}.a PATHS
-    $ENV{VLE_BASEPATH}/lib
-    ${VLE_BASEPATH_LOCAL}/lib
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;Path]/lib"
-    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\VLE Development Team\\VLE ${VLE_ABI_VERSION}.0;]/lib"
-	NO_DEFAULT_PATH)
-
+foreach (_find_vle_test_version ${_find_vle_all_versions})
   if (${_vle_debug})
-    message (" vle_debug _vle_base_include ${_vle_base_include}")
-    message (" vle_debug _vle_base_bin ${_vle_base_bin}")
-    message (" vle_debug _vle_base_lib ${_vle_base_lib}")
+    message ("[FindVLE] search VLE ${_find_vle_test_version}")
   endif ()
+  if (${_find_vle_using_cmake})
+    find_path(_vle_base_include vle-${_find_vle_test_version}/vle/vle.hpp PATHS
+      $ENV{VLE_BASEPATH}/include
+      ${VLE_BASEPATH_LOCAL}/include
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;Path]/include"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;]/include"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version}.0;]/include"
+      NO_DEFAULT_PATH)
 
-  if(NOT _vle_base_include OR NOT _vle_base_bin OR NOT _vle_base_lib)
-     message (FATAL_ERROR "Missing vle dependencies")
-  endif ()
+    find_path(_vle_base_bin vle.exe PATHS
+      $ENV{VLE_BASEPATH}/bin
+      ${VLE_BASEPATH_LOCAL}/bin
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;Path]/bin"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;]/bin"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version}.0;]/bin"
+      NO_DEFAULT_PATH)
 
-  set(VLE_INCLUDE_DIRS
-    ${_vle_base_include}/vle-${VLE_ABI_VERSION}; ${_vle_base_include};
-    ${_vle_base_include}/libxml2)
+    find_path(_vle_base_lib libvle-${_find_vle_test_version}.a PATHS
+      $ENV{VLE_BASEPATH}/lib
+      ${VLE_BASEPATH_LOCAL}/lib
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;Path]/lib"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;]/lib"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version}.0;]/lib"
+      NO_DEFAULT_PATH)
+ 
+    if (${_vle_debug})
+      message ("[FindVLE] cmake _vle_base_include ${_vle_base_include}")
+      message ("[FindVLE] cmake _vle_base_bin ${_vle_base_bin}")
+      message ("[FindVLE] cmake _vle_base_lib ${_vle_base_lib}")
+    endif ()
 
-  set(VLE_LIBRARY_DIRS
-    ${_vle_base_bin};${_vle_base_lib})
+    if(NOT _vle_base_include OR NOT _vle_base_bin OR NOT _vle_base_lib)
+       message (FATAL_ERROR "Missing vle dependencies")
+    endif ()
 
-  set (VLE_LIBRARIES
-    vle-${VLE_ABI_VERSION} xml2 intl)
+    set(VLE_INCLUDE_DIRS
+      ${_vle_base_include}/vle-${_find_vle_test_version}; ${_vle_base_include};
+      ${_vle_base_include}/libxml2)
 
-  set (VLE_SHARE_DIR "${_vle_base_include}/../share/vle-${VLE_ABI_VERSION}")
+    set(VLE_LIBRARY_DIRS
+      ${_vle_base_bin};${_vle_base_lib})
 
-else (${_find_vle_using_cmake})
-  find_package(PkgConfig REQUIRED)
-  PKG_CHECK_MODULES(VLE vle-${VLE_ABI_VERSION})
-  # select only the directory of vle, containing the pkgs directory
-  # to build VLE_SHARE_DIR
-  find_path(vle_lib_dir vle PATHS
-            ${VLE_INCLUDE_DIRS} NO_DEFAULT_PATH)
-  set (VLE_SHARE_DIR "${vle_lib_dir}/../../share/vle-${VLE_ABI_VERSION}")
-endif (${_find_vle_using_cmake})
+    set(VLE_LIBRARIES
+      vle-${_find_vle_test_version} xml2 intl)
 
+    set (VLE_SHARE_DIR "${_vle_base_include}/../share/vle-${_find_vle_test_version}")
+  else (${_find_vle_using_cmake})
+    pkg_check_modules(_VLE-${_find_vle_test_version}
+		vle-${_find_vle_test_version} QUIET)
+    # select only the directory of vle, containing the pkgs directory
+    # to build VLE_SHARE_DIR
+    if (_VLE-${_find_vle_test_version}_FOUND)
+      set(VLE_VERSION ${_find_vle_test_version})
+      set(VLE_INCLUDE_DIRS ${_VLE-${_find_vle_test_version}_INCLUDE_DIRS})
+      set(VLE_LIBRARY_DIRS ${_VLE-${_find_vle_test_version}_LIBRARY_DIRS})
+      set(VLE_LIBRARIES ${_VLE-${_find_vle_test_version}_LIBRARIES})
+      find_path(vle_lib_dir vle PATHS ${VLE_INCLUDE_DIRS} NO_DEFAULT_PATH)
+      set(VLE_SHARE_DIR "${vle_lib_dir}/../../share/vle-${VLE_VERSION}")
+      break ()
+    endif ()
+  endif (${_find_vle_using_cmake})
+endforeach (_find_vle_test_version)
+
+#error when VLE not found
+if (NOT DEFINED VLE_VERSION)
+  message (FATAL_ERROR "Missing VLE (set VLE_DEBUG to 1 for information)")
+endif ()
+#error when VLE too old
+if (${VLE_VERSION} LESS "${VLE_FIND_VERSION_MAJOR}.${VLE_FIND_VERSION_MINOR}")
+  message (FATAL_ERROR "VLE too old, version detected : ${VLE_VERSION}")
+endif ()
 
 # handle the QUIETLY and REQUIRED arguments and set VLE_FOUND to TRUE if all
 # listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(VLE REQUIRED_VARS VLE_INCLUDE_DIRS
-                        VLE_LIBRARIES VLE_SHARE_DIR)
+                        VLE_LIBRARIES VLE_SHARE_DIR VLE_VERSION)
 
 if (${_vle_debug})
-  message (" vle_debug VLE_INCLUDE_DIRS ${VLE_INCLUDE_DIRS}")
-  message (" vle_debug VLE_LIBRARY_DIRS ${VLE_LIBRARY_DIRS}")
-  message (" vle_debug VLE_LIBRARIES ${VLE_LIBRARIES}")
-  message (" vle_debug VLE_SHARE_DIR ${VLE_SHARE_DIR}")
+  message ("[FindVLE] VLE_INCLUDE_DIRS ${VLE_INCLUDE_DIRS}")
+  message ("[FindVLE] VLE_LIBRARY_DIRS ${VLE_LIBRARY_DIRS}")
+  message ("[FindVLE] VLE_LIBRARIES ${VLE_LIBRARIES}")
+  message ("[FindVLE] VLE_SHARE_DIR ${VLE_SHARE_DIR}")
+  message ("[FindVLE] VLE_VERSION ${VLE_VERSION}")
 endif ()
 
 #mark_as_advanced(VLE_INCLUDE_DIRS VLE_LIBRARIES VLE_LIBRARY_DIRS)

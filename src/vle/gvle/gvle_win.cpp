@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <vle/vle.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Tools.hpp>
@@ -110,7 +111,9 @@ std::map<std::string, std::string>
 gvle_win::defaultDistrib()
 {
     std::map<std::string, std::string> ret;
-    ret["http://www.vle-project.org/pub/2.0"] = "vle";
+    std::string remote_vle = "http://www.vle-project.org/pub/"+
+            vle::string_version_abi();
+    ret[remote_vle] = "vle";
     ret["http://recordb.toulouse.inra.fr/distributions/2.0"] = "record";
     return ret;
 }
