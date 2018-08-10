@@ -31,6 +31,7 @@
 #include <ostream>
 #include <stack>
 #include <thread>
+#include <vle/vle.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
@@ -603,7 +604,7 @@ std::string
 Package::getBuildDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
-    p /= "buildvle";
+    p /= "buildvle"+vle::string_version_abi();
 
     return p.string();
 }
