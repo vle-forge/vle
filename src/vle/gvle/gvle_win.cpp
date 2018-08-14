@@ -55,57 +55,6 @@ namespace vu = vle::utils;
 namespace vle {
 namespace gvle {
 
-struct gvle_ctx_log : vle::utils::Context::LogFunctor
-{
-    Logger* m_logger;
-
-    gvle_ctx_log(Logger* logger)
-      : m_logger(logger)
-    {
-        assert(logger);
-    }
-
-    ~gvle_ctx_log() override = default;
-
-    void write(const vle::utils::Context& /*ctx*/,
-               int priority,
-               const std::string& str) noexcept override
-    {
-        QString msg = QString::fromStdString(str);
-
-        if (priority <= 3)
-            msg = QString("Error (level %1) :").arg(priority);
-        else if (priority <= 5)
-            msg = QString("Note: ");
-        else if (priority > 6)
-            msg = QString("[debug]: ");
-
-        m_logger->log(msg);
-    }
-
-    void write(const vle::utils::Context& /*ctx*/,
-               int priority,
-               const char* format,
-               va_list args) noexcept override
-    {
-        QString msg;
-
-        if (priority <= 3)
-            msg = QString("Error (level %1) :").arg(priority);
-        else if (priority <= 5)
-            msg = QString("Note: ");
-        else if (priority > 6)
-            msg = QString("[debug]: ");
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-        msg += QString::vasprintf(format, args);
-#else
-        msg += QString::fromStdString(vu::vformat(format, args));
-#endif
-
-        m_logger->log(msg);
-    }
-};
 
 std::map<std::string, std::string>
 gvle_win::defaultDistrib()
@@ -147,7 +96,11 @@ gvle_win::gvle_win(QWidget* parent)
     mLogger = new Logger();
     mLogger->setWidget(ui->statusLog);
     mCtx->set_log_function(
-      std::unique_ptr<utils::Context::LogFunctor>(new gvle_ctx_log(mLogger)));
+      std::unique_ptr<utils::Context::LogFunctor>(new Logger_ctx(mLogger)));
+    QObject::connect(
+      mLogger, SIGNAL(logFromCtx(QString)),
+      this, SLOT(onLogFromCtx(QString)));
+
     // VLE init
     mCurrPackage.refreshPath();
 
@@ -1818,6 +1771,12 @@ gvle_win::onPackageUninstall()
     }
 
     menuLocalPackagesRefresh();
+}
+
+void
+gvle_win::onLogFromCtx(QString msg)
+{
+  mLogger->log(msg);
 }
 
 void

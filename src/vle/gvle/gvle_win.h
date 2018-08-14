@@ -25,7 +25,7 @@
 #ifndef gvle_gvle_win_H
 #define gvle_gvle_win_H
 
-#include "vle/gvle/logger.h"
+
 #include <QActionGroup>
 #include <QFileInfo>
 #include <QFileSystemModel>
@@ -47,6 +47,7 @@
 
 #include "gvle_file.h"
 #include "plugin_mainpanel.h"
+#include "logger.h"
 
 namespace Ui {
 class gvleWin;
@@ -129,6 +130,7 @@ private slots:
     void onCheckDependency();
     void onPackageInstall();
     void onPackageUninstall();
+    void onLogFromCtx(QString msg);
 
 private:
     void projectInstall();

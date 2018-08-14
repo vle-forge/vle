@@ -24,6 +24,9 @@
 
 #include "logger.h"
 
+#include <iostream>
+#include <vle/utils/Tools.hpp>
+
 namespace vle {
 namespace gvle {
 
@@ -66,5 +69,58 @@ Logger::logExt(QString message, bool isError)
     mWidget->appendHtml(logLine);
     mWidget->moveCursor(QTextCursor::End);
 }
+
+void
+Logger::forwardFromCtx(QString msg)
+{
+    emit (logFromCtx(msg));
+}
+
+
+/*******************************************/
+
+
+Logger_ctx::Logger_ctx(Logger* logger) :
+    logger_fwd(logger)
+{}
+
+void
+Logger_ctx::write(const vle::utils::Context& /*ctx*/,
+               int priority,
+               const std::string& str) noexcept
+{
+    QString msg = QString::fromStdString(str);
+    if (priority <= 3)
+        msg = QString("Error (level %1) :").arg(priority);
+    else if (priority <= 5)
+        msg = QString("Note: ");
+    else if (priority > 6)
+        msg = QString("[debug]: ");
+    logger_fwd->forwardFromCtx(msg);
+}
+
+void
+Logger_ctx::write(const vle::utils::Context& /*ctx*/,
+               int priority,
+               const char* format,
+               va_list args) noexcept
+{
+    QString msg;
+
+    if (priority <= 3)
+        msg = QString("Error (level %1) :").arg(priority);
+    else if (priority <= 5)
+        msg = QString("Note: ");
+    else if (priority > 6)
+        msg = QString("[debug]: ");
+
+    #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+        msg += QString::vasprintf(format, args);
+    #else
+        msg += QString::fromStdString(vu::vformat(format, args));
+    #endif
+    logger_fwd->forwardFromCtx(msg);
+}
+
 }
 } // namepsaces
