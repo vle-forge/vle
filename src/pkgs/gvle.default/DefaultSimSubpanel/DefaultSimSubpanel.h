@@ -49,13 +49,13 @@ public:
     vleVpz* mvpz;
     vle::utils::Package* mpkg;
     QString error_simu;
-    std::vector<std::string>& log_messages;
+    Logger* mLog;
     // parameters
     bool mdebug;
     int mnbthreads;
     int mblockSize;
 
-    DefaultSimSubpanelThread(std::vector<std::string>& logMessages,
+    DefaultSimSubpanelThread(Logger* log,
                              bool debug,
                              int nbthreads,
                              int blockSize);
@@ -163,11 +163,8 @@ public:
     vleVpz* mvpz;
     vle::utils::Package* mpkg;
     Logger* mLog;
-    QTimer timer;
 
     std::vector<portToPlot> portsToPlot;
-    std::vector<std::string> log_messages;
-    unsigned int index_message;
 
     bool mNormalized;
     bool mHorizontalZoom;
@@ -181,7 +178,6 @@ public slots:
     void onBlockSizeChanged(int);
     void onTreeItemChanged(QTreeWidgetItem* item, int col);
     void onTreeItemSelected();
-    void onTimeout();
     void onToolColor();
     void onNormalized(int state);
     void onHorizontalZoom(int state);

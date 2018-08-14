@@ -38,39 +38,8 @@
 namespace vle {
 namespace gvle {
 
-struct sim_log : utils::Context::LogFunctor
-{
-    std::vector<std::string>& log_messages;
-    sim_log(std::vector<std::string>& logMessages)
-      : log_messages(logMessages)
-    {}
-
-    void write(const utils::Context& ctx,
-               int priority,
-               const std::string& msg) noexcept override
-    {
-        (void)ctx;
-        (void)priority;
-
-        log_messages.emplace_back(msg);
-    }
-
-    void write(const utils::Context& ctx,
-               int priority,
-               const char* format,
-               va_list args) noexcept override
-    {
-        (void)ctx;
-        (void)priority;
-
-        log_messages.emplace_back(vle::utils::vformat(format, args));
-    }
-
-    ~sim_log() override = default;
-};
-
 DefaultSimSubpanelThread::DefaultSimSubpanelThread(
-  std::vector<std::string>& logMessages,
+  Logger* log,
   bool debug,
   int nbthreads,
   int blockSize)
@@ -78,7 +47,7 @@ DefaultSimSubpanelThread::DefaultSimSubpanelThread(
   , mvpz(0)
   , mpkg(0)
   , error_simu("")
-  , log_messages(logMessages)
+  , mLog(log)
   , mdebug(debug)
   , mnbthreads(nbthreads)
   , mblockSize(blockSize)
@@ -99,11 +68,11 @@ DefaultSimSubpanelThread::onStarted()
     auto ctx = utils::make_context();
     if (mdebug) {
         ctx->set_log_priority(7); // VLE_LOG_DEBUG
-        ctx->set_log_function(
-          std::unique_ptr<sim_log>(new sim_log(log_messages)));
     } else {
-        ctx->set_log_priority(3); // VLE_LOG_ERROR
+       ctx->set_log_priority(3); // VLE_LOG_ERROR
     }
+    ctx->set_log_function(
+        std::unique_ptr<utils::Context::LogFunctor>(new Logger_ctx(mLog)));
     if (mnbthreads > 0) {
         ctx->set_setting("vle.simulation.thread", (long)mnbthreads);
     }
@@ -111,16 +80,9 @@ DefaultSimSubpanelThread::onStarted()
         ctx->set_setting("vle.simulation.block-size", (long)mblockSize);
     }
 
-    vle::manager::SimulationOptions doSpawn;
-    if (mdebug) {
-        doSpawn = vle::manager::SIMULATION_NONE;
-    } else {
-        doSpawn = vle::manager::SIMULATION_SPAWN_PROCESS;
-    }
-
     vle::manager::Simulation sim(ctx,
                                  vle::manager::LOG_RUN,
-                                 doSpawn,
+                                 vle::manager::SIMULATION_SPAWN_PROCESS,
                                  std::chrono::milliseconds::zero(),
                                  &std::cout);
     vle::manager::Error manerror;
@@ -197,10 +159,7 @@ DefaultSimSubpanel::DefaultSimSubpanel()
   , mvpz(0)
   , mpkg(0)
   , mLog(0)
-  , timer(this)
   , portsToPlot()
-  , log_messages()
-  , index_message(0)
   , mNormalized(false)
   , mHorizontalZoom(true)
   , mVerticalZoom(true)
@@ -241,7 +200,6 @@ DefaultSimSubpanel::DefaultSimSubpanel()
                      SIGNAL(itemSelectionChanged()),
                      this,
                      SLOT(onTreeItemSelected()));
-    QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 
 DefaultSimSubpanel::~DefaultSimSubpanel()
@@ -517,8 +475,6 @@ DefaultSimSubpanel::onSimulationFinished()
 {
     bool oldBlockTree = right->ui->treeSimViews->blockSignals(true);
     right->ui->treeSimViews->clear();
-    onTimeout();
-    timer.stop();
     if (sim_process and not sim_process->error_simu.isEmpty()) {
         mLog->logExt(sim_process->error_simu, true);
     } else if (sim_process and sim_process->output_map) {
@@ -594,19 +550,16 @@ DefaultSimSubpanel::onRunPressed()
     portsToPlot.erase(portsToPlot.begin(), portsToPlot.end());
 
     // prepare new thread for simulation
-    log_messages.clear();
-    index_message = 0;
     delete sim_process;
     sim_process =
-      new DefaultSimSubpanelThread(log_messages, debug, nbthreads, blockSize);
+      new DefaultSimSubpanelThread(mLog, debug, nbthreads, blockSize);
     sim_process->init(mvpz, mpkg);
 
-    // delete set
+    // delete thread
     delete thread;
     thread = new QThread();
 
     // move to thread
-    timer.start(1000);
     sim_process->moveToThread(thread);
     connect(thread, SIGNAL(started()), sim_process, SLOT(onStarted()));
     connect(sim_process,
@@ -723,16 +676,6 @@ DefaultSimSubpanel::onTreeItemSelected()
         }
     }
     right->ui->widSimStyle->setVisible(itemVisility);
-}
-
-void
-DefaultSimSubpanel::onTimeout()
-{
-    for (unsigned int i = index_message; i < log_messages.size(); i++) {
-        mLog->logExt(QString(log_messages[i].c_str()), false);
-    }
-
-    index_message = utils::numeric_cast<int>(log_messages.size());
 }
 
 void
