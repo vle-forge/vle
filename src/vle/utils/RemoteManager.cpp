@@ -222,8 +222,7 @@ public:
     template<typename T>
     void out(const T& t)
     {
-        if (mStream)
-            *mStream << t;
+       mContext->debug(_(t));
     }
 
     /**
@@ -775,7 +774,7 @@ public:
     Packages mResults;
     std::thread mThread;
     std::string mArgs;
-    std::ostream* mStream;
+    std::ostream* mStream;//@deprecated{useless}
     bool mIsStarted;
     bool mIsFinish;
     bool mStop;

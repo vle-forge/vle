@@ -165,6 +165,8 @@ public:
      * @param[in] action The type of the action to start.
      * @param[in] arg The argument of the action.
      * @param[out] os The output stream of the action.
+     * @deprecated{the os argument is no more used, the context log functor
+     *             is used instead}
      */
     void start(RemoteManagerActions action,
                const std::string& arg,
