@@ -119,11 +119,14 @@ struct DownloadManager::Pimpl
             std::string output, error;
             while (not spawn.isfinish()) {
                 if (spawn.get(&output, &error)) {
-                    mContext->debug("%s", output.c_str());
-                    mContext->debug("%s", error.c_str());
-                    output.clear();
-                    error.clear();
-
+                    if (not output.empty()) {
+                        mContext->debug("%s", output.c_str());
+                        output.clear();
+                    }
+                    if (not error.empty()) {
+                        mContext->debug("%s", error.c_str());
+                        error.clear();
+                    }
                     std::this_thread::sleep_for(
                       std::chrono::microseconds(200));
                 } else
