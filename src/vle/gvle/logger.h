@@ -25,23 +25,55 @@
 #ifndef gvle_LOGGER_H
 #define gvle_LOGGER_H
 
+#include <QObject>
 #include <QPlainTextEdit>
 #include <QTime>
+
+#include <vle/utils/Context.hpp>
 
 namespace vle {
 namespace gvle {
 
-class Logger
+class Logger  : public QObject
 {
+	Q_OBJECT
 public:
     Logger();
     void setWidget(QPlainTextEdit* widget);
     void log(QString message);
     void logExt(QString message, bool isError = false);
+    /**
+     * forward a log from Context, typically coming from another
+     * thread than the GUI, by using QT signal/slots system
+     **/
+	void forwardFromCtx(QString msg);
 
+signals:
+	void logFromCtx(QString msg);
 private:
     QPlainTextEdit* mWidget;
 };
+
+/*******************************************/
+struct Logger_ctx : public vle::utils::Context::LogFunctor
+{
+public:
+    Logger_ctx(Logger* mainWin);
+
+    ~Logger_ctx() override = default;
+
+    void write(const vle::utils::Context& /*ctx*/,
+               int priority,
+               const std::string& str) noexcept override;
+
+    void write(const vle::utils::Context& /*ctx*/,
+               int priority,
+               const char* format,
+               va_list args) noexcept override;
+
+    Logger* logger_fwd;
+};
+
 }
 } // namespaces
 
