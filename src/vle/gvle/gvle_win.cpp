@@ -63,7 +63,9 @@ gvle_win::defaultDistrib()
     std::string remote_vle = "http://www.vle-project.org/pub/"+
             vle::string_version_abi();
     ret[remote_vle] = "vle";
-    ret["http://recordb.toulouse.inra.fr/distributions/2.0"] = "record";
+    std::string remote_rec = "http://recordb.toulouse.inra.fr/distributions/"+
+            vle::string_version_abi();
+    ret[remote_rec] = "record";
     return ret;
 }
 
