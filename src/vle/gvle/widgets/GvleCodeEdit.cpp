@@ -205,7 +205,7 @@ GvleCodeEdit::GvleCodeEdit(QWidget* parent)
   updateVleCodeLineNumberAreaWidth(0);
   highlightCurrentLine();
 
-  setUndoRedoEnabled(false);
+  //setUndoRedoEnabled(false);
   installEventFilter(this);
   mtimer.setInterval(500);
   connect(&mtimer, SIGNAL(timeout()),
@@ -215,7 +215,8 @@ GvleCodeEdit::GvleCodeEdit(QWidget* parent)
 
 GvleCodeEdit::GvleCodeEdit(QWidget* parent,
                          const QString& text,
-                         const QString& idstr)
+                         const QString& idstr,
+                         bool allowExternalUndo)
   : QPlainTextEdit(parent)
   , stacked_value("")
   , id(idstr)
@@ -252,8 +253,10 @@ GvleCodeEdit::GvleCodeEdit(QWidget* parent,
 
   setText(text);
   this->resize(document()->size().toSize());
-
-  setUndoRedoEnabled(false);
+  
+  if (not allowExternalUndo){
+    setUndoRedoEnabled(false);
+  }
   installEventFilter(this);
   mtimer.setInterval(500);
   connect(&mtimer, SIGNAL(timeout()),

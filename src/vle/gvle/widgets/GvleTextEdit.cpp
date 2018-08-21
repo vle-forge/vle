@@ -31,7 +31,8 @@ namespace gvle {
 /************************** GvleTextEdit ******************************/
 GvleTextEdit::GvleTextEdit(QWidget* parent,
                          const QString& text,
-                         const QString& idstr)
+                         const QString& idstr, 
+                         bool allowExternalUndo)
   : QPlainTextEdit(parent), stacked_value(""), id(idstr), mtimer()
 {
   this->setLineWrapMode(QPlainTextEdit::NoWrap);
@@ -40,7 +41,9 @@ GvleTextEdit::GvleTextEdit(QWidget* parent,
   // this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   // this->setContextMenuPolicy(Qt::NoContextMenu);
 
-  setUndoRedoEnabled(false);
+  if (not allowExternalUndo){
+    setUndoRedoEnabled(false);
+  }
   setText(text);
   installEventFilter(this);
   // this->resize(document()->size().toSize());

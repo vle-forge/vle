@@ -95,7 +95,8 @@ public:
     GvleCodeEdit(QWidget* parent = 0);
     GvleCodeEdit(QWidget* parent,
                 const QString& text,
-                const QString& id = "");
+                const QString& id = "",
+                bool allowExternalUndo = false);
     ~GvleCodeEdit() override;
 
     void setText(const QString& text);

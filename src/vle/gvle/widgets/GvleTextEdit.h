@@ -41,7 +41,8 @@ class GvleTextEdit : public QPlainTextEdit
 public:
     GvleTextEdit(QWidget* parent,
                 const QString& text,
-                const QString& id = "");
+                const QString& id = "",
+                bool  allowExternalUndo=false);
     ~GvleTextEdit() override;
 
     void setText(const QString& text);
