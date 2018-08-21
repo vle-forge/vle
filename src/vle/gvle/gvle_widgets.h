@@ -288,6 +288,8 @@ signals:
  * reimplement focusOutEvent
  * TODO should contain text rules no comma, no '<', etc..
  * send textUpdated on lost focus
+ *
+ * @deprecated : use instead widgets/GvleTextEdit
  */
 class VleTextEdit : public QPlainTextEdit
 {
@@ -493,6 +495,7 @@ protected:
 
 /**
  * C++ code Editor
+ * @deprecated : use instead widgets/GvleCodeEdit 
  */
 
 class VleCodeEdit;

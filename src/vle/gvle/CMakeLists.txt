@@ -24,9 +24,15 @@ SET(gvle_SOURCES_HPP ${ui_gvle_win_h} ${aboutbox_h} ${help_h} gvle_widgets.h
    dom_tools.hpp vle_dom.hpp vlevpz.hpp gvle_plugins.h gvle_file.h
    notification.h)
 
+SET(gvle_widgets_SOURCES_HPP widgets/GvleCodeEdit.h
+  widgets/GvleTextEdit.h)
+
 SET(gvle_SOURCES_CPP gvle_widgets.cpp gvle_win.cpp aboutbox.cpp help.cpp
   helpbrowser.cpp logger.cpp dom_tools.cpp vle_dom.cpp vlevpz.cpp
   gvle_plugins.cpp gvle_file.cpp notification.cpp)
+
+SET(gvle_widgets_SOURCES_CPP widgets/GvleCodeEdit.cpp
+  widgets/GvleTextEdit.cpp)
 
 if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vfl.o
@@ -43,7 +49,8 @@ endif (WIN32)
 
 QT5_ADD_RESOURCES(GVLE_QRC gvle.qrc)
 
-add_library(gvlelib SHARED ${gvle_SOURCES_CPP} ${gvle_SOURCES_HPP}
+add_library(gvlelib SHARED ${gvle_SOURCES_CPP} ${gvle_widgets_SOURCES_CPP}
+  ${gvle_SOURCES_HPP} ${gvle_widgets_SOURCES_HPP}
   ${GVLE_QRC})
 
 set_target_properties(gvlelib PROPERTIES
@@ -68,6 +75,9 @@ target_link_libraries(gvlelib vlelib ${INTL_LIB}
 
 install(FILES ${gvle_SOURCES_HPP}
   DESTINATION ${VLE_INCLUDE_DIRS}/gvle)
+
+install(FILES ${gvle_widgets_SOURCES_HPP}
+  DESTINATION ${VLE_INCLUDE_DIRS}/gvle/widgets)
 
 install(TARGETS gvlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
   lib ARCHIVE DESTINATION lib)
