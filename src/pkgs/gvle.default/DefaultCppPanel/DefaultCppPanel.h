@@ -28,7 +28,7 @@
 #include <QObject>
 #include <QWidget>
 #include <vle/gvle/gvle_file.h>
-#include <vle/gvle/gvle_widgets.h>
+#include <vle/gvle/widgets/GvleCodeEdit.h>
 #include <vle/gvle/plugin_mainpanel.h>
 
 namespace vle {
@@ -64,17 +64,18 @@ public:
         return new DefaultCppPanel();
     }
 
-public slots:
-    void onUndoAvailable(bool);
-
-public:
-    VleCodeEdit* m_edit;
-    QString m_file;
-
+private slots:
+    void onTextChanged(const QString& /* id */,
+                                    const QString& old,
+                                    const QString& newVal);
 private:
     void initCpp(QString pkg, QString classname, QString filePath);
+
+    GvleCodeEdit* m_edit;
+    QString m_file;
+    QString saved_text;
 };
-}
-} // namespaces
+
+}} // namespaces
 
 #endif

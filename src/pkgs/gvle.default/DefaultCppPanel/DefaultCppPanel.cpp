@@ -31,14 +31,109 @@ namespace vle {
 namespace gvle {
 
 DefaultCppPanel::DefaultCppPanel()
-  : PluginMainPanel()
+  : PluginMainPanel(), m_edit(0), m_file(""), saved_text("") 
 {
-    m_edit = new VleCodeEdit;
+  m_edit = new GvleCodeEdit;
+  QObject::connect(m_edit,
+          SIGNAL(textUpdated(const QString&, const QString&, const QString&)),
+          this,
+          SLOT(onTextChanged(const QString&, const QString&,const QString&)));
 }
 
 DefaultCppPanel::~DefaultCppPanel()
 {
     delete m_edit;
+}
+
+
+
+void
+DefaultCppPanel::init(const gvle_file& gf,
+                      utils::Package* pkg,
+                      Logger* /*log*/,
+                      gvle_plugins* /*plugs*/,
+                      const utils::ContextPtr& /*ctx*/)
+{
+    QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
+    m_file = gf.source_file;
+
+    if (not QFile(m_file).exists()) {
+        initCpp(
+          QString(pkg->name().c_str()), QFileInfo(m_file).baseName(), m_file);
+    }
+
+    QFile cppFile(m_file);
+
+    if (!cppFile.open(QFile::ReadOnly | QFile::Text)) {
+        qDebug() << " Error DefaultCppPanel::init ";
+    }
+
+    QTextStream in(&cppFile);
+    m_edit->setPlainText(in.readAll());
+    saved_text = m_edit->toPlainText();
+}
+
+QString
+DefaultCppPanel::canBeClosed()
+{
+    return "";
+}
+
+void
+DefaultCppPanel::save()
+{
+    if (m_file != "") {
+        QFile file(m_file);
+        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+            file.write(m_edit->toPlainText().toStdString().c_str());
+            file.flush();
+            file.close();
+        }
+    }
+    saved_text = m_edit->toPlainText();
+    emit undoAvailable(false);
+}
+
+QString
+DefaultCppPanel::getname()
+{
+    return "Default";
+}
+
+QWidget*
+DefaultCppPanel::leftWidget()
+{
+    return m_edit;
+}
+
+QWidget*
+DefaultCppPanel::rightWidget()
+{
+    return 0;
+}
+
+void
+DefaultCppPanel::undo()
+{
+  m_edit->undo();
+  emit undoAvailable(m_edit->toPlainText() != saved_text);
+}
+
+void
+DefaultCppPanel::redo()
+{
+  m_edit->redo();
+  emit undoAvailable(m_edit->toPlainText() != saved_text);
+}
+
+void
+DefaultCppPanel::onTextChanged(const QString& /* id */,
+                               const QString& /*old*/,
+                               const QString& newVal)
+{
+    if (newVal != saved_text) {
+        emit undoAvailable(true);
+    }
 }
 
 void
@@ -125,83 +220,4 @@ DefaultCppPanel::initCpp(QString pkg, QString classname, QString filePath)
     cppfile.close();
 }
 
-void
-DefaultCppPanel::init(const gvle_file& gf,
-                      utils::Package* pkg,
-                      Logger* /*log*/,
-                      gvle_plugins* /*plugs*/,
-                      const utils::ContextPtr& /*ctx*/)
-{
-    QString basepath = pkg->getDir(vle::utils::PKG_SOURCE).c_str();
-    m_file = gf.source_file;
-
-    if (not QFile(m_file).exists()) {
-        initCpp(
-          QString(pkg->name().c_str()), QFileInfo(m_file).baseName(), m_file);
-    }
-
-    QFile cppFile(m_file);
-
-    if (!cppFile.open(QFile::ReadOnly | QFile::Text)) {
-        qDebug() << " Error DefaultCppPanel::init ";
-    }
-
-    QTextStream in(&cppFile);
-    m_edit->setPlainText(in.readAll());
-}
-
-QString
-DefaultCppPanel::canBeClosed()
-{
-    return "";
-}
-
-void
-DefaultCppPanel::save()
-{
-    if (m_file != "") {
-        QFile file(m_file);
-        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-            file.write(m_edit->toPlainText().toStdString().c_str());
-            file.flush();
-            file.close();
-        }
-    }
-    emit undoAvailable(false);
-}
-
-QString
-DefaultCppPanel::getname()
-{
-    return "Default";
-}
-
-QWidget*
-DefaultCppPanel::leftWidget()
-{
-    return m_edit;
-}
-
-QWidget*
-DefaultCppPanel::rightWidget()
-{
-    return 0;
-}
-
-void
-DefaultCppPanel::undo()
-{
-}
-
-void
-DefaultCppPanel::redo()
-{
-}
-
-void
-DefaultCppPanel::onUndoAvailable(bool b)
-{
-    emit undoAvailable(b);
-}
-}
-} // namespaces
+}} // namespaces
