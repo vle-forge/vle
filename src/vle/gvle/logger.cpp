@@ -117,7 +117,7 @@ Logger_ctx::write(const vle::utils::Context& /*ctx*/,
     #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
         msg += QString::vasprintf(format, args);
     #else
-        msg += QString::fromStdString(vu::vformat(format, args));
+        msg += QString::fromStdString(vle::utils::vformat(format, args));
     #endif
     logger_fwd->forwardFromCtx(msg);
 }
