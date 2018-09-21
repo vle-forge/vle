@@ -509,6 +509,7 @@ private:
         value_column
     };
 
+    bool m_more_output_details;
     std::vector<KeepColumnDefinition> keep_vector;
     std::vector<ValueColumnDefinition> value_vector;
     std::vector<std::pair<column_type, int>> indices;
@@ -526,6 +527,17 @@ private:
     }
 
 public:
+    Columns(bool more_output_details) :
+        m_more_output_details(more_output_details),
+        keep_vector(), value_vector(), indices()
+    {
+    }
+
+    bool more_output_details() const
+    {
+        return m_more_output_details;
+    }
+
     void add(std::string str)
     {
         indices.emplace_back(column_type::keep_column,
@@ -609,8 +621,14 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Columns& columns)
     {
         for (const auto& elem : columns.indices)
-            if (elem.first == column_type::keep_column)
-                os << columns.keep_vector[elem.second].str.c_str() << ',';
+            if (elem.first == column_type::keep_column) {
+                if (columns.more_output_details()) {
+                    os << columns.keep_vector[elem.second].str.c_str() << ' ';
+                } else {
+                    os << columns.keep_vector[elem.second].str.c_str() << ',';
+                }
+
+            }
 
         return os;
     }
@@ -820,9 +838,12 @@ private:
             for (auto & it : *result) {
                 if (it.second && it.second->isMatrix()) {
                     if(m_more_output_details) {
-                        os << "view:" << it.first << "\n";
+                        os << "view:" << it.first << "\n" <<
+                                vle::value::toMatrixValue(it.second);
+                    } else {
+                        it.second->writeFile(os);
                     }
-                    it.second->writeFile(os);
+
                 }
             }
         }
@@ -872,7 +893,7 @@ public:
         } else {
             namespace ba = boost::algorithm;
 
-            m_columns = std::make_unique<Columns>();
+            m_columns = std::make_unique<Columns>(m_more_output_details);
             std::vector<std::string> tokens;
             ba::split(tokens, header, ba::is_any_of(","));
 
