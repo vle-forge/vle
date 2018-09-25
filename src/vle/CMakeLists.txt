@@ -116,8 +116,13 @@ endif()
 
 configure_file(vle.pc.in
   ${VLE_BINARY_DIR}/src/vle/vle-${VLE_VERSION_SHORT}.pc @ONLY)
-
 install(FILES ${VLE_BINARY_DIR}/src/vle/vle-${VLE_VERSION_SHORT}.pc
   DESTINATION lib/pkgconfig)
 
-install(FILES DllDefines.hpp DESTINATION ${VLE_INCLUDE_DIRS})
+# Configure the version.hpp.in to produce the VLE_VERSION macro.
+
+math(EXPR VLE_MACRO_VERSION "${VLE_MAJOR} * 100000 + ${VLE_MINOR} * 100 + ${VLE_PATCH}")
+configure_file(version.hpp.in
+  ${VLE_BINARY_DIR}/src/vle/version.hpp @ONLY)
+install(FILES ${VLE_BINARY_DIR}/src/vle/version.hpp DESTINATION
+  ${VLE_INCLUDE_DIRS})
