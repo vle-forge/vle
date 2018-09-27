@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -100,21 +100,18 @@ struct portToPlot
       : view()
       , port()
       , color()
-    {
-    }
+    {}
     portToPlot(QString viewN, QString portN)
       : view(viewN)
       , port(portN)
       , color(70, 130, 180)
-    {
-    }
+    {}
 
     portToPlot(const portToPlot& p)
       : view(p.view)
       , port(p.port)
       , color(p.color)
-    {
-    }
+    {}
 
     QString view;
     QString port;

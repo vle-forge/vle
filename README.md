@@ -76,7 +76,7 @@ under a different license. Check the headers for the copyright info.
 
 VLE is a multi-modeling environment to build model, to simulate and
 analys them.  To more information, see the VLE website
-(http://www.vle-projet.org).
+(https://www.vle-projet.org).
 
 To build a new package::
 

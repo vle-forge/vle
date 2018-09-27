@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -222,7 +222,7 @@ public:
     template<typename T>
     void out(const T& t)
     {
-       mContext->debug(_(t));
+        mContext->debug(_(t));
     }
 
     /**
@@ -774,7 +774,7 @@ public:
     Packages mResults;
     std::thread mThread;
     std::string mArgs;
-    std::ostream* mStream;//@deprecated{useless}
+    std::ostream* mStream; //@deprecated{useless}
     bool mIsStarted;
     bool mIsFinish;
     bool mStop;

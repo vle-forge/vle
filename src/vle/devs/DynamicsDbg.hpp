@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -127,7 +127,8 @@ public:
      * @param event the external event with of the port.
      * @param time the date of occurrence of this event.
      */
-    void externalTransition(const ExternalEventList& event, Time time) override;
+    void externalTransition(const ExternalEventList& event,
+                            Time time) override;
 
     /**
      * @brief Process the confluent transition: select the transition to

@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -83,8 +83,7 @@ Classes::get(const std::string& name)
     auto it = m_lst.find(name);
 
     if (it == end()) {
-        throw utils::ArgError(
-            _("Unknow class '%s'"), name.c_str());
+        throw utils::ArgError(_("Unknow class '%s'"), name.c_str());
     }
 
     return it->second;
@@ -94,8 +93,7 @@ void
 Classes::rename(const std::string& oldname, const std::string& newname)
 {
     if (exist(newname)) {
-        throw utils::ArgError(
-          _("Class '%s' already exists"), newname.c_str());
+        throw utils::ArgError(_("Class '%s' already exists"), newname.c_str());
     }
 
     auto it = m_lst.find(oldname);

@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -80,7 +80,9 @@ struct F
             throw std::runtime_error("Fails to found temporary directory");
 
 #ifdef _WIN32
-        ::_putenv(vle::utils::format("VLE_HOME=%s", current_path.string().c_str()).c_str());
+        ::_putenv(
+          vle::utils::format("VLE_HOME=%s", current_path.string().c_str())
+            .c_str());
 #else
         ::setenv("VLE_HOME", current_path.string().c_str(), 1);
 #endif
@@ -207,7 +209,7 @@ remote_package_local_remote(vle::utils::ContextPtr ctx)
     pkg.distribution = "distribution";
     pkg.maintainer = "me";
     pkg.description = "too good";
-    pkg.url = "http://www.vle-project.org";
+    pkg.url = "https://www.vle-project.org";
     pkg.md5sum = "1234567890987654321";
     pkg.tags = { "a", "b", "c" };
 
@@ -290,7 +292,7 @@ remote_package_read_write(vle::utils::ContextPtr ctx)
             pkg.distribution = "distribution";
             pkg.maintainer = "me";
             pkg.description = "too good";
-            pkg.url = "http://www.vle-project.org";
+            pkg.url = "https://www.vle-project.org";
             pkg.md5sum = "1234567890987654321";
             pkg.tags = { "a", "b", "c" };
 
@@ -378,7 +380,7 @@ remote_package_read_write(vle::utils::ContextPtr ctx)
         EnsuresEqual(pkgs[0].name, "name-8");
         EnsuresEqual(pkgs[0].size, 8u);
         EnsuresEqual(pkgs[0].md5sum, "1234567890987654321");
-        EnsuresEqual(pkgs[0].url, "http://www.vle-project.org");
+        EnsuresEqual(pkgs[0].url, "https://www.vle-project.org");
         EnsuresEqual(pkgs[0].maintainer, "me");
         EnsuresEqual(pkgs[0].major, 1);
         EnsuresEqual(pkgs[0].minor, 2);

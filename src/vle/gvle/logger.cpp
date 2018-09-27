@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -73,21 +73,19 @@ Logger::logExt(QString message, bool isError)
 void
 Logger::forwardFromCtx(QString msg)
 {
-    emit (logFromCtx(msg));
+    emit(logFromCtx(msg));
 }
-
 
 /*******************************************/
 
-
-Logger_ctx::Logger_ctx(Logger* logger) :
-    logger_fwd(logger)
+Logger_ctx::Logger_ctx(Logger* logger)
+  : logger_fwd(logger)
 {}
 
 void
 Logger_ctx::write(const vle::utils::Context& /*ctx*/,
-               int priority,
-               const std::string& str) noexcept
+                  int priority,
+                  const std::string& str) noexcept
 {
     QString msg = QString::fromStdString(str);
     if (priority <= 3)
@@ -101,9 +99,9 @@ Logger_ctx::write(const vle::utils::Context& /*ctx*/,
 
 void
 Logger_ctx::write(const vle::utils::Context& /*ctx*/,
-               int priority,
-               const char* format,
-               va_list args) noexcept
+                  int priority,
+                  const char* format,
+                  va_list args) noexcept
 {
     QString msg;
 
@@ -114,13 +112,12 @@ Logger_ctx::write(const vle::utils::Context& /*ctx*/,
     else if (priority > 6)
         msg = QString("[debug]: ");
 
-    #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-        msg += QString::vasprintf(format, args);
-    #else
-        msg += QString::fromStdString(vle::utils::vformat(format, args));
-    #endif
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+    msg += QString::vasprintf(format, args);
+#else
+    msg += QString::fromStdString(vle::utils::vformat(format, args));
+#endif
     logger_fwd->forwardFromCtx(msg);
 }
-
 }
 } // namepsaces

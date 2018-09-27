@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -114,9 +114,8 @@ mvle_mpi_init(int* argc, char*** argv, uint32_t* rank, uint32_t* world)
     if ((r = MPI_Init(argc, argv)) == MPI_SUCCESS) {
         if ((r = MPI_Comm_rank(MPI_COMM_WORLD, &t_rank)) == MPI_SUCCESS) {
             /* check the cast of the MPI's rank */
-            if (t_rank < 0 or
-                static_cast<unsigned int>(t_rank) >
-                  std::numeric_limits<uint32_t>::max()) {
+            if (t_rank < 0 or static_cast<unsigned int>(t_rank) >
+                                std::numeric_limits<uint32_t>::max()) {
                 fprintf(stderr, _("bad mpi rank id: %d"), t_rank);
             } else {
                 *rank = static_cast<uint32_t>(t_rank);

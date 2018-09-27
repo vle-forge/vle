@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -54,12 +54,11 @@ namespace vu = vle::utils;
 namespace vle {
 namespace gvle {
 
-
 std::map<std::string, std::string>
 gvle_win::defaultDistrib()
 {
     std::map<std::string, std::string> ret;
-    ret["http://www.vle-project.org/pub/2.0"] = "vle";
+    ret["https://www.vle-project.org/pub/2.0"] = "vle";
     ret["http://recordb.toulouse.inra.fr/distributions/2.0"] = "record";
     return ret;
 }
@@ -95,8 +94,7 @@ gvle_win::gvle_win(QWidget* parent)
     mCtx->set_log_function(
       std::unique_ptr<utils::Context::LogFunctor>(new Logger_ctx(mLogger)));
     QObject::connect(
-      mLogger, SIGNAL(logFromCtx(QString)),
-      this, SLOT(onLogFromCtx(QString)));
+      mLogger, SIGNAL(logFromCtx(QString)), this, SLOT(onLogFromCtx(QString)));
 
     // VLE init
     mCurrPackage.refreshPath();
@@ -1773,7 +1771,7 @@ gvle_win::onPackageUninstall()
 void
 gvle_win::onLogFromCtx(QString msg)
 {
-  mLogger->log(msg);
+    mLogger->log(msg);
 }
 
 void

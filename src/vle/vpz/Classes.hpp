@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -55,14 +55,12 @@ public:
     /**
      * @brief Empty constructor.
      */
-    Classes()
-    = default;
+    Classes() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Classes() override
-    = default;
+    ~Classes() override = default;
 
     /**
      * @brief Write the classes XML representation into the output stream.
@@ -219,7 +217,8 @@ public:
      * @param oldname the old name of the dynamics.
      * @param newname the new name of the dynamics.
      */
-    void updateDynamics(const std::string& oldname, const std::string& newname);
+    void updateDynamics(const std::string& oldname,
+                        const std::string& newname);
 
     /**
      * @brief purge the dymamics references of the model where the

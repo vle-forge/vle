@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -62,7 +62,7 @@ download_package()
     vle::utils::Path p(vle::utils::Path::temp_directory_path());
     p /= "packages.pkg";
 
-    dm.start("http://www.vle-project.org/pub/1.1/packages.pkg", p.string());
+    dm.start("https://www.vle-project.org/pub/1.1/packages.pkg", p.string());
     dm.join();
 
     Ensures(dm.isFinish());
@@ -81,7 +81,7 @@ download_package_bis()
     vle::utils::Path p(vle::utils::Path::temp_directory_path());
     p /= "packages.pkg";
 
-    dm.start("http://www.vle-project.org/pub/1.1/packages.pkg", p.string());
+    dm.start("https://www.vle-project.org/pub/1.1/packages.pkg", p.string());
     dm.join();
 
     Ensures(dm.isFinish());

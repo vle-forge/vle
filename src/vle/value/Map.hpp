@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -54,8 +54,7 @@ public:
     /**
      * @brief Build a Map object with an empty MapValue.
      */
-    Map()
-    = default;
+    Map() = default;
 
     /**
      * @brief Copy constructor. All the Value are cloned.
@@ -66,8 +65,7 @@ public:
     /**
      * @brief Delete all Value in the Set.
      */
-    ~Map() override
-    = default;
+    ~Map() override = default;
 
     /**
      * @brief Build a Xml.

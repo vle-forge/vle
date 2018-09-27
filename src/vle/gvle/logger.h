@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -34,9 +34,9 @@
 namespace vle {
 namespace gvle {
 
-class Logger  : public QObject
+class Logger : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
     Logger();
     void setWidget(QPlainTextEdit* widget);
@@ -46,10 +46,11 @@ public:
      * forward a log from Context, typically coming from another
      * thread than the GUI, by using QT signal/slots system
      **/
-	void forwardFromCtx(QString msg);
+    void forwardFromCtx(QString msg);
 
 signals:
-	void logFromCtx(QString msg);
+    void logFromCtx(QString msg);
+
 private:
     QPlainTextEdit* mWidget;
 };
@@ -73,7 +74,6 @@ public:
 
     Logger* logger_fwd;
 };
-
 }
 } // namespaces
 

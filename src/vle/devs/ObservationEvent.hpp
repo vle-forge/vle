@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -51,13 +51,12 @@ public:
     ObservationEvent& operator=(const ObservationEvent& other) = delete;
 
     ObservationEvent(const Time& time,
-                     std::string  viewname,
-                     std::string  portName)
+                     std::string viewname,
+                     std::string portName)
       : m_time(time)
       , m_viewName(std::move(viewname))
       , m_portName(std::move(portName))
-    {
-    }
+    {}
 
     ~ObservationEvent() = default;
 

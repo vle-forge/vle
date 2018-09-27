@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -38,8 +38,8 @@
 #include <vle/devs/RootCoordinator.hpp>
 #include <vle/oov/Plugin.hpp>
 #include <vle/utils/Filesystem.hpp>
-#include <vle/utils/unit-test.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/unit-test.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/vpz/Classes.hpp>
 #include <vle/vpz/CoupledModel.hpp>
@@ -51,35 +51,38 @@ using namespace vle;
 #define xstringify(a) stringify(a)
 #define stringify(a) #a
 
-#define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)                               \
-    extern "C" {                                                               \
-    VLE_MODULE vle::devs::Dynamics* symbol_(                                   \
-      const vle::devs::DynamicsInit& init,                                     \
-      const vle::devs::InitEventList& events)                                  \
-    {                                                                          \
-        return new model_(init, events);                                       \
-    }                                                                          \
+#define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)                              \
+    extern "C"                                                                \
+    {                                                                         \
+        VLE_MODULE vle::devs::Dynamics* symbol_(                              \
+          const vle::devs::DynamicsInit& init,                                \
+          const vle::devs::InitEventList& events)                             \
+        {                                                                     \
+            return new model_(init, events);                                  \
+        }                                                                     \
     }
 
-#define DECLARE_EXECUTIVE_SYMBOL(symbol_, model_)                              \
-    extern "C" {                                                               \
-    VLE_MODULE vle::devs::Dynamics* symbol_(                                   \
-      const vle::devs::ExecutiveInit& init,                                    \
-      const vle::devs::InitEventList& events)                                  \
-    {                                                                          \
-        std::string symbol_test(xstringify(symbol_));                          \
-        Ensures(symbol_test.length() > 4);                                     \
-        Ensures(symbol_test.compare(0, 4, "exe_") == 0);                       \
-        return new model_(init, events);                                       \
-    }                                                                          \
+#define DECLARE_EXECUTIVE_SYMBOL(symbol_, model_)                             \
+    extern "C"                                                                \
+    {                                                                         \
+        VLE_MODULE vle::devs::Dynamics* symbol_(                              \
+          const vle::devs::ExecutiveInit& init,                               \
+          const vle::devs::InitEventList& events)                             \
+        {                                                                     \
+            std::string symbol_test(xstringify(symbol_));                     \
+            Ensures(symbol_test.length() > 4);                                \
+            Ensures(symbol_test.compare(0, 4, "exe_") == 0);                  \
+            return new model_(init, events);                                  \
+        }                                                                     \
     }
 
-#define DECLARE_OOV_SYMBOL(symbol_, model_)                                    \
-    extern "C" {                                                               \
-    VLE_MODULE vle::oov::Plugin* symbol_(const std::string& location)          \
-    {                                                                          \
-        return new model_(location);                                           \
-    }                                                                          \
+#define DECLARE_OOV_SYMBOL(symbol_, model_)                                   \
+    extern "C"                                                                \
+    {                                                                         \
+        VLE_MODULE vle::oov::Plugin* symbol_(const std::string& location)     \
+        {                                                                     \
+            return new model_(location);                                      \
+        }                                                                     \
     }
 
 class MyBeep : public devs::Dynamics
@@ -87,8 +90,7 @@ class MyBeep : public devs::Dynamics
 public:
     MyBeep(const devs::DynamicsInit& model, const devs::InitEventList& events)
       : devs::Dynamics(model, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -112,8 +114,7 @@ class Branch : public devs::Executive
 public:
     Branch(const devs::ExecutiveInit& mdl, const devs::InitEventList& events)
       : devs::Executive(mdl, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -130,10 +131,8 @@ public:
         std::vector<std::string> modelname;
 
         {
-            auto it =
-              coupledmodel().getModelList().begin();
-            auto et =
-              coupledmodel().getModelList().end();
+            auto it = coupledmodel().getModelList().begin();
+            auto et = coupledmodel().getModelList().end();
 
             for (; it != et; ++it)
                 if (it->first != getModelName())
@@ -161,8 +160,7 @@ public:
       : devs::Dynamics(model, events)
       , m_counter(0)
       , m_active(false)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -172,8 +170,7 @@ public:
 
     void output(devs::Time /* time */,
                 devs::ExternalEventList& /* output */) const override
-    {
-    }
+    {}
 
     devs::Time timeAdvance() const override
     {
@@ -231,8 +228,7 @@ public:
         mRemaining = mAlarm;
     }
 
-    ~DeleteConnection() override
-    = default;
+    ~DeleteConnection() override = default;
 
     devs::Time init(devs::Time /*time*/) override
     {
@@ -275,10 +271,10 @@ public:
 class Transform : public devs::Dynamics
 {
 public:
-    Transform(const devs::DynamicsInit& atom, const devs::InitEventList& events)
+    Transform(const devs::DynamicsInit& atom,
+              const devs::InitEventList& events)
       : devs::Dynamics(atom, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -325,8 +321,7 @@ public:
     Confluent_transitionA(const devs::DynamicsInit& atom,
                           const devs::InitEventList& events)
       : devs::Dynamics(atom, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -339,19 +334,16 @@ public:
     }
 
     void internalTransition(devs::Time /* time */) override
-    {
-    }
+    {}
 
     void externalTransition(const devs::ExternalEventList& /*events*/,
                             devs::Time /* time */) override
-    {
-    }
+    {}
 
     void confluentTransitions(
       devs::Time /*time*/,
       const devs::ExternalEventList& /*extEventlist*/) override
-    {
-    }
+    {}
 
     void output(devs::Time /*time*/,
                 devs::ExternalEventList& output) const override
@@ -373,8 +365,7 @@ public:
                           const devs::InitEventList& events)
       : devs::Dynamics(atom, events)
       , state(0)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -405,13 +396,11 @@ public:
     void confluentTransitions(
       devs::Time /*time*/,
       const devs::ExternalEventList& /*extEventlist*/) override
-    {
-    }
+    {}
 
     void output(devs::Time /* time */,
                 devs::ExternalEventList& /*output*/) const override
-    {
-    }
+    {}
 
     std::unique_ptr<value::Value> observation(
       const devs::ObservationEvent&) const override
@@ -429,8 +418,7 @@ public:
     Confluent_transitionC(const devs::DynamicsInit& atom,
                           const devs::InitEventList& events)
       : devs::Dynamics(atom, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -524,8 +512,7 @@ public:
     GenExecutive(const devs::ExecutiveInit& mdl,
                  const devs::InitEventList& events)
       : devs::Executive(mdl, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -595,16 +582,16 @@ public:
             set->toSet().add(value::Integer::create(1));
             if (get_nb_model() > 0 and ev.getTime() < 50.0) {
                 set->toSet().add(value::String::create("add"));
-                auto name = vle::utils::format("MyBeep_%u",
-                    static_cast<unsigned>(m_stacknames.size()));
+                auto name = vle::utils::format(
+                  "MyBeep_%u", static_cast<unsigned>(m_stacknames.size()));
                 set->toSet().add(value::String::create(name));
                 set->toSet().add(value::String::create("2"));
                 std::string edge = name + std::string(" counter ");
                 set->toSet().add(value::String::create(edge));
             } else if (get_nb_model() > 0) {
                 set->toSet().add(value::String::create("delete"));
-                auto name = vle::utils::format("MyBeep_%u",
-                    static_cast<unsigned>(get_nb_model()));
+                auto name = vle::utils::format(
+                  "MyBeep_%u", static_cast<unsigned>(get_nb_model()));
                 set->toSet().add(value::String::create(name));
             }
 
@@ -620,8 +607,8 @@ public:
     void add_new_model()
     {
         printf("add_new_model starts\n");
-        auto name = vle::utils::format("MyBeep_%u",
-            static_cast<unsigned>(m_stacknames.size()));
+        auto name = vle::utils::format(
+          "MyBeep_%u", static_cast<unsigned>(m_stacknames.size()));
 
         std::vector<std::string> outputs{ "out" }, inputs{};
 
@@ -638,8 +625,8 @@ public:
 
         if (m_stacknames.empty())
             throw utils::InternalError(
-                "Cannot delete any model, the executive have no "
-                "element.");
+              "Cannot delete any model, the executive have no "
+              "element.");
 
         delModel(m_stacknames.top());
         printf("del_first_model finished: %s\n", m_stacknames.top().c_str());
@@ -661,8 +648,7 @@ class Leaf : public devs::Executive
 public:
     Leaf(const devs::ExecutiveInit& mdl, const devs::InitEventList& events)
       : devs::Executive(mdl, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -687,8 +673,7 @@ class Root : public devs::Executive
 public:
     Root(const devs::ExecutiveInit& mdl, const devs::InitEventList& events)
       : devs::Executive(mdl, events)
-    {
-    }
+    {}
 
     devs::Time init(devs::Time /* time */) override
     {
@@ -705,10 +690,8 @@ public:
         std::vector<std::string> modelname;
 
         {
-            auto it =
-              coupledmodel().getModelList().begin();
-            auto et =
-              coupledmodel().getModelList().end();
+            auto it = coupledmodel().getModelList().begin();
+            auto et = coupledmodel().getModelList().end();
 
             for (; it != et; ++it)
                 if (it->first != getModelName())

@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -402,9 +402,8 @@ struct Spawn::Pimpl
 
     void format(const char* function, DWORD error)
     {
-        m_context->error("%s failed: %s\n",
-                         function,
-                         format_message(error).c_str());
+        m_context->error(
+          "%s failed: %s\n", function, format_message(error).c_str());
     }
 
     bool wait()
@@ -481,10 +480,9 @@ Spawn::start(const Path& exe,
 {
     m_pimpl->init(waitchildtimeout);
 
-    m_pimpl->m_context->debug(
-         _("Spawn: command: `%s' chdir: `%s'\n"),
-         exe.string().c_str(),
-         workingdir.string().c_str());
+    m_pimpl->m_context->debug(_("Spawn: command: `%s' chdir: `%s'\n"),
+                              exe.string().c_str(),
+                              workingdir.string().c_str());
 
     for (const auto& elem : args) {
         m_pimpl->m_context->debug(_("[%s]\n"), elem.c_str());
@@ -540,7 +538,7 @@ Spawn::splitCommandLine(const std::string& command)
     if (argv.empty())
         throw utils::ArgError(
           _("Package command line: error, empty command `%s'"),
-           command.c_str());
+          command.c_str());
 
     argv.front() = m_pimpl->m_context->findProgram(argv.front()).string();
 

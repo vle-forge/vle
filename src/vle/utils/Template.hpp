@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -162,10 +162,9 @@ public:
      *
      * @param buffer The template, can be empty.
      */
-    Template(std::string  buffer = std::string())
+    Template(std::string buffer = std::string())
       : buffer_(std::move(buffer))
-    {
-    }
+    {}
 
     /**
      * @brief Open the specified template file and read the entire file into

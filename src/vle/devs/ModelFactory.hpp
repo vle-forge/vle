@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -251,7 +251,8 @@ private:
      *
      * @return Return a constant.
      */
-    utils::Context::ModuleType open(const vpz::Dynamic& dyn, std::string* path);
+    utils::Context::ModuleType open(const vpz::Dynamic& dyn,
+                                    std::string* path);
 
     /**
      * @brief Attach to the specified devs::Simulator reference a

@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -48,12 +48,10 @@ namespace gvle {
  **************************************************/
 
 DomFunctions::DomFunctions()
-{
-}
+{}
 
 DomFunctions::~DomFunctions()
-{
-}
+{}
 
 QString
 DomFunctions::attributeValue(const QDomNode& node, const QString& attrName)
@@ -250,8 +248,7 @@ DomDiffStack::DomDiff::DomDiff()
   , merge_args(0)
   , source("")
   , isDefined(false)
-{
-}
+{}
 
 DomDiffStack::DomDiff::~DomDiff()
 {
@@ -283,12 +280,10 @@ DomDiffStack::DomDiffStack(DomObject* vdo)
   , mVdo(vdo)
   , current_source("")
   , snapshotEnabled(true)
-{
-}
+{}
 
 DomDiffStack::~DomDiffStack()
-{
-}
+{}
 
 void
 DomDiffStack::init(QDomNode node)

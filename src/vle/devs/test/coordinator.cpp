@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -50,8 +50,7 @@ public:
     Model(const vle::devs::DynamicsInit& init,
           const vle::devs::InitEventList& events)
       : vle::devs::Dynamics(init, events)
-    {
-    }
+    {}
 
     ~Model() override = default;
 
@@ -76,8 +75,7 @@ public:
     }
 
     void internalTransition(vle::devs::Time /* time */) override
-    {
-    }
+    {}
 
     void externalTransition(const vle::devs::ExternalEventList& events,
                             vle::devs::Time /* time */) override
@@ -102,8 +100,7 @@ public:
     }
 
     void finish() override
-    {
-    }
+    {}
 };
 
 class ModelDbg : public vle::devs::Dynamics
@@ -114,8 +111,7 @@ public:
     ModelDbg(const vle::devs::DynamicsInit& init,
              const vle::devs::InitEventList& events)
       : vle::devs::Dynamics(init, events)
-    {
-    }
+    {}
 
     ~ModelDbg() override = default;
 
@@ -140,8 +136,7 @@ public:
     }
 
     void internalTransition(vle::devs::Time /* time */) override
-    {
-    }
+    {}
 
     void externalTransition(const vle::devs::ExternalEventList& events,
                             vle::devs::Time /* time */) override
@@ -166,8 +161,7 @@ public:
     }
 
     void finish() override
-    {
-    }
+    {}
 };
 
 class Exe : public vle::devs::Executive
@@ -178,8 +172,7 @@ public:
     Exe(const vle::devs::ExecutiveInit& init,
         const vle::devs::InitEventList& events)
       : vle::devs::Executive(init, events)
-    {
-    }
+    {}
 
     ~Exe() override = default;
 
@@ -234,8 +227,7 @@ public:
     }
 
     void finish() override
-    {
-    }
+    {}
 };
 
 class ObservationModel : public vle::devs::Dynamics
@@ -246,8 +238,7 @@ public:
     ObservationModel(const vle::devs::DynamicsInit& init,
                      const vle::devs::InitEventList& events)
       : vle::devs::Dynamics(init, events)
-    {
-    }
+    {}
 
     ~ObservationModel() override = default;
 
@@ -332,8 +323,7 @@ public:
                      const std::string& /* file */,
                      std::unique_ptr<value::Value> /* parameters */,
                      const double& /* time */) override
-    {
-    }
+    {}
 
     void onNewObservable(const std::string& simulator,
                          const std::string& parent,
@@ -351,8 +341,7 @@ public:
                          const std::string& /* port */,
                          const std::string& /* view */,
                          const double& /* time */) override
-    {
-    }
+    {}
 
     void onValue(const std::string& simulator,
                  const std::string& parent,
@@ -398,47 +387,47 @@ public:
  * symbol into the executable instead of a shared library.
  */
 
-extern "C" {
-
-VLE_MODULE vle::devs::Dynamics*
-make_new_model(const vle::devs::DynamicsInit& init,
-               const vle::devs::InitEventList& events)
+extern "C"
 {
-    return new ::Model(init, events);
-}
 
-VLE_MODULE vle::devs::Dynamics*
-make_new_model_dbg(const vle::devs::DynamicsInit& init,
-                   const vle::devs::InitEventList& events)
-{
-    return new ::ModelDbg(init, events);
-}
+    VLE_MODULE vle::devs::Dynamics* make_new_model(
+      const vle::devs::DynamicsInit& init,
+      const vle::devs::InitEventList& events)
+    {
+        return new ::Model(init, events);
+    }
 
-VLE_MODULE vle::devs::Dynamics*
-exe_make_new_exe(const vle::devs::ExecutiveInit& init,
-                 const vle::devs::InitEventList& events)
-{
-    return new ::Exe(init, events);
-}
+    VLE_MODULE vle::devs::Dynamics* make_new_model_dbg(
+      const vle::devs::DynamicsInit& init,
+      const vle::devs::InitEventList& events)
+    {
+        return new ::ModelDbg(init, events);
+    }
 
-VLE_MODULE vle::devs::Dynamics*
-make_new_observation_model(const vle::devs::DynamicsInit& init,
-                           const vle::devs::InitEventList& events)
-{
-    return new ::ObservationModel(init, events);
-}
+    VLE_MODULE vle::devs::Dynamics* exe_make_new_exe(
+      const vle::devs::ExecutiveInit& init,
+      const vle::devs::InitEventList& events)
+    {
+        return new ::Exe(init, events);
+    }
 
-VLE_MODULE vle::oov::Plugin*
-make_oovplugin(const std::string& location)
-{
-    return new ::OutputPluginSimple(location);
-}
+    VLE_MODULE vle::devs::Dynamics* make_new_observation_model(
+      const vle::devs::DynamicsInit& init,
+      const vle::devs::InitEventList& events)
+    {
+        return new ::ObservationModel(init, events);
+    }
 
-VLE_MODULE vle::oov::Plugin*
-make_oovplugin_default(const std::string& location)
-{
-    return new ::vletest::OutputPlugin(location);
-}
+    VLE_MODULE vle::oov::Plugin* make_oovplugin(const std::string& location)
+    {
+        return new ::OutputPluginSimple(location);
+    }
+
+    VLE_MODULE vle::oov::Plugin* make_oovplugin_default(
+      const std::string& location)
+    {
+        return new ::vletest::OutputPlugin(location);
+    }
 }
 
 void

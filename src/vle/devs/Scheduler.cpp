@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -132,10 +132,11 @@ Scheduler::delSimulator(Simulator* simulator)
                       simulator),
           m_current_bag.executives.end());
     else
-        m_current_bag.dynamics.erase(std::remove(m_current_bag.dynamics.begin(),
-                                                 m_current_bag.dynamics.end(),
-                                                 simulator),
-                                     m_current_bag.dynamics.end());
+        m_current_bag.dynamics.erase(
+          std::remove(m_current_bag.dynamics.begin(),
+                      m_current_bag.dynamics.end(),
+                      simulator),
+          m_current_bag.dynamics.end());
 
     m_current_bag.unique_simulators.erase(simulator);
 

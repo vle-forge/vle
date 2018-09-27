@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -58,14 +58,12 @@ public:
     /**
      * @brief Build an empty Outputs.
      */
-    Outputs()
-    = default;
+    Outputs() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Outputs() override
-    = default;
+    ~Outputs() override = default;
 
     /**
      * @brief Write the XML representation of this class.
@@ -282,8 +280,7 @@ public:
          */
         inline AddOutput(Outputs& outputs)
           : m_outputs(outputs)
-        {
-        }
+        {}
 
         /**
          * @brief Add the Output to the Outputs.

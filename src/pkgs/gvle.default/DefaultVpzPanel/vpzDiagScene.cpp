@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -28,11 +28,11 @@
 
 #include "vpzDiagScene.h"
 #include <QComboBox>
+#include <QFileDialog>
 #include <QGraphicsView>
 #include <QMenu>
 #include <QMessageBox>
 #include <QScrollBar>
-#include <QFileDialog>
 #include <QSvgGenerator>
 #include <QtDebug>
 
@@ -70,8 +70,7 @@ void
 VpzConnectionLineItem::paint(QPainter* /*painter*/,
                              const QStyleOptionGraphicsItem* /*option*/,
                              QWidget* /*widget*/)
-{
-}
+{}
 
 QRectF
 VpzConnectionLineItem::boundingRect() const
@@ -253,8 +252,7 @@ VpzModelItem::VpzModelItem(QDomNode node,
   , margin(0.0)
   , rectWidth(0)
   , rectHeight(0)
-{
-}
+{}
 
 VleLineEditItem*
 VpzModelItem::getTitle() const
@@ -462,8 +460,7 @@ void
 VpzSubModelItem::paint(QPainter* /*painter*/,
                        const QStyleOptionGraphicsItem* /*option*/,
                        QWidget* /*widget*/)
-{
-}
+{}
 
 void
 VpzSubModelItem::initializeFromDom()
@@ -957,8 +954,7 @@ void
 VpzMainModelItem::paint(QPainter* /*painter*/,
                         const QStyleOptionGraphicsItem* /*option*/,
                         QWidget* /*widget*/)
-{
-}
+{}
 
 void
 VpzMainModelItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent)
@@ -984,18 +980,15 @@ VpzMainModelItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent)
 
 void
 VpzMainModelItem::dragEnterEvent(QGraphicsSceneDragDropEvent* /*event*/)
-{
-}
+{}
 
 void
 VpzMainModelItem::dragLeaveEvent(QGraphicsSceneDragDropEvent* /*event*/)
-{
-}
+{}
 
 void
 VpzMainModelItem::dragMoveEvent(QGraphicsSceneDragDropEvent* /*event*/)
-{
-}
+{}
 
 QRectF
 VpzMainModelItem::subModelsBoundingRect(bool onlySelected)
@@ -1359,8 +1352,7 @@ VpzDiagScene::dragEnterEvent(QGraphicsSceneDragDropEvent* /*event*/)
 }
 void
 VpzDiagScene::dragLeaveEvent(QGraphicsSceneDragDropEvent* /*event*/)
-{
-}
+{}
 void
 VpzDiagScene::dragMoveEvent(QGraphicsSceneDragDropEvent* event)
 {
@@ -2163,19 +2155,25 @@ VpzDiagScene::isVpzMainModel(QGraphicsItem* item)
 void
 VpzDiagScene::saveSVG()
 {
-    QString path = QFileDialog::getSaveFileName(0, "Save SVG",
-                                                QDir::currentPath(),
-                                                "SVG files (*.svg)",
-                                                new QString("SVG files (*.svg)"));
+    QString path =
+      QFileDialog::getSaveFileName(0,
+                                   "Save SVG",
+                                   QDir::currentPath(),
+                                   "SVG files (*.svg)",
+                                   new QString("SVG files (*.svg)"));
 
     if (path.isEmpty())
         return;
 
-    QSvgGenerator generator;        // Create a file generator object
-    generator.setFileName(path);    // We set the path to the file where to save vector graphics
-    generator.setSize(QSize(width(), height()));  // Set the dimensions of the working area of the document in millimeters
-    generator.setViewBox(QRect(0, 0, width(), height())); // Set the work area in the coordinates
-    generator.setTitle(trUtf8("SVG Example"));                          // The title document
+    QSvgGenerator generator; // Create a file generator object
+    generator.setFileName(
+      path); // We set the path to the file where to save vector graphics
+    generator.setSize(
+      QSize(width(), height())); // Set the dimensions of the working area of
+                                 // the document in millimeters
+    generator.setViewBox(
+      QRect(0, 0, width(), height())); // Set the work area in the coordinates
+    generator.setTitle(trUtf8("SVG Example")); // The title document
     generator.setDescription(trUtf8("File created by SVG Example"));
 
     QPainter painter;

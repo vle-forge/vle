@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <quesnel@users.sourceforge.net>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -42,8 +42,7 @@ public:
     Simple(const vle::devs::DynamicsInit& init,
            const vle::devs::InitEventList& events)
       : vle::devs::Dynamics(init, events)
-    {
-    }
+    {}
 
     ~Simple() override = default;
 

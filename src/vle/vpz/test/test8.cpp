@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -47,8 +47,7 @@ test_rename_model()
 
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    auto* top =
-      dynamic_cast<CoupledModel*>(file.project().model().node());
+    auto* top = dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
 
     if (not top)
@@ -281,8 +280,7 @@ test_del_port()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    auto* top =
-      dynamic_cast<CoupledModel*>(file.project().model().node());
+    auto* top = dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     if (not top)
         return;
@@ -302,7 +300,8 @@ test_del_port()
     // Atomic Model -- Input Port
     d->delInputPort("in");
     EnsuresEqual(d->existInputPort("in"), false);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"), false);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"),
+                 false);
 
     // Atomic Model -- Output Port
     d->delOutputPort("out");
@@ -328,8 +327,10 @@ test_del_port()
 
     // Coupled Model -- Output Port
     EnsuresEqual(top1->existOutputPort("out"), true);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in1"), true);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in2"), true);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in1"),
+                 true);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in2"),
+                 true);
     EnsuresEqual(top1->existOutputConnection("x", "out", "out"), true);
 
     top1->delOutputPort("out");
@@ -399,8 +400,7 @@ test_clone2()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    auto* oldtop =
-      dynamic_cast<CoupledModel*>(file.project().model().node());
+    auto* oldtop = dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(oldtop);
 
     auto top = std::unique_ptr<CoupledModel>(
@@ -434,10 +434,8 @@ test_clone_different_atomic()
 
     vpz::Vpz file2(file1);
 
-    auto* top1 =
-      dynamic_cast<CoupledModel*>(file1.project().model().node());
-    auto* top2 =
-      dynamic_cast<CoupledModel*>(file2.project().model().node());
+    auto* top1 = dynamic_cast<CoupledModel*>(file1.project().model().node());
+    auto* top2 = dynamic_cast<CoupledModel*>(file2.project().model().node());
 
     Ensures(top1 and top2);
     Ensures(top1 != top2);
@@ -468,15 +466,15 @@ test_get_port_index()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    auto* top =
-      dynamic_cast<CoupledModel*>(file.project().model().node());
+    auto* top = dynamic_cast<CoupledModel*>(file.project().model().node());
 
     Ensures(top);
     if (not top)
         return;
 
     EnsuresEqual(top->getInputPortList().size(), (ConnectionList::size_type)0);
-    EnsuresEqual(top->getOutputPortList().size(), (ConnectionList::size_type)0);
+    EnsuresEqual(top->getOutputPortList().size(),
+                 (ConnectionList::size_type)0);
 
     AtomicModel* e = dynamic_cast<AtomicModel*>(top->getModelList()["e"]);
     Ensures(e);
@@ -495,8 +493,7 @@ test_rename_port()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    auto* top =
-      dynamic_cast<CoupledModel*>(file.project().model().node());
+    auto* top = dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     if (not top)
         return;
@@ -517,7 +514,8 @@ test_rename_port()
     // Atomic Model -- Input Port
     d->renameInputPort("in", "new_in");
     EnsuresEqual(d->existInputPort("in"), false);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"), false);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "d", "in"),
+                 false);
     EnsuresEqual(d->existInputPort("new_in"), true);
     EnsuresEqual(top->existInternalConnection("top1", "out", "d", "new_in"),
                  true);
@@ -552,8 +550,10 @@ test_rename_port()
 
     // Coupled Model -- Output Port
     EnsuresEqual(top1->existOutputPort("out"), true);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in1"), true);
-    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in2"), true);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in1"),
+                 true);
+    EnsuresEqual(top->existInternalConnection("top1", "out", "e", "in2"),
+                 true);
     EnsuresEqual(top1->existOutputConnection("x", "out", "out"), true);
 
     top1->renameOutputPort("out", "new_out");
@@ -578,8 +578,7 @@ test_bug_rename_port()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    auto* top =
-      dynamic_cast<CoupledModel*>(file.project().model().node());
+    auto* top = dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     if (not top)
         return;
@@ -620,8 +619,7 @@ test_bug_duplication_connections()
     auto ctx = vle::utils::make_context();
     vpz::Vpz file(VPZ_TEST_DIR "/unittest.vpz");
 
-    auto* top =
-      dynamic_cast<CoupledModel*>(file.project().model().node());
+    auto* top = dynamic_cast<CoupledModel*>(file.project().model().node());
     Ensures(top);
     if (not top)
         return;

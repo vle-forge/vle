@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -46,11 +46,9 @@ namespace gvle {
 vleDomVpz::vleDomVpz(QDomDocument* doc)
   : DomObject(doc)
 
-{
-}
+{}
 vleDomVpz::~vleDomVpz()
-{
-}
+{}
 QString
 vleDomVpz::getXQuery(QDomNode node)
 {
@@ -147,11 +145,9 @@ vleDomVpz::getNodeFromXQuery(const QString& query, QDomNode d)
 vleDomVpm::vleDomVpm(QDomDocument* doc)
   : DomObject(doc)
 
-{
-}
+{}
 vleDomVpm::~vleDomVpm()
-{
-}
+{}
 QString
 vleDomVpm::getXQuery(QDomNode node)
 {

@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -142,7 +142,7 @@ Simulator::timeAdvance()
 
     if (tn < 0.0)
         throw utils::ModellingError(
-            "Negative time advance in '%s' (%f)", getName().c_str(), tn);
+          "Negative time advance in '%s' (%f)", getName().c_str(), tn);
 
     return tn;
 }
@@ -154,7 +154,7 @@ Simulator::init(Time time)
 
     if (tn < 0.0)
         throw utils::ModellingError(
-            "Negative init function in '%s' (%f)", getName().c_str(), tn);
+          "Negative init function in '%s' (%f)", getName().c_str(), tn);
 
     m_tn = tn + time;
     return m_tn;

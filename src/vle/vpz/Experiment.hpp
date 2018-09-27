@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -52,8 +52,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    ~Experiment() override
-    = default;
+    ~Experiment() override = default;
 
     /**
      * @brief Write Experiment information under specified root node

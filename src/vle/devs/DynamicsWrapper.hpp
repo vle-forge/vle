@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -32,24 +32,25 @@
 #include <vle/devs/Dynamics.hpp>
 #include <vle/vle.hpp>
 
-#define DECLARE_DYNAMICSWRAPPER(mdl)                                           \
-    extern "C" {                                                               \
-    VLE_MODULE vle::devs::Dynamics* vle_make_new_dynamics_wrapper(             \
-      const vle::devs::DynamicsWrapperInit& init,                              \
-      const vle::devs::InitEventList& events)                                  \
-    {                                                                          \
-        return new mdl(init, events);                                          \
-    }                                                                          \
-                                                                               \
-    VLE_MODULE void vle_api_level(std::uint32_t* major,                        \
-                                  std::uint32_t* minor,                        \
-                                  std::uint32_t* patch)                        \
-    {                                                                          \
-        auto version = vle::version();                                         \
-        *major = std::get<0>(version);                                         \
-        *minor = std::get<1>(version);                                         \
-        *patch = std::get<2>(version);                                         \
-    }                                                                          \
+#define DECLARE_DYNAMICSWRAPPER(mdl)                                          \
+    extern "C"                                                                \
+    {                                                                         \
+        VLE_MODULE vle::devs::Dynamics* vle_make_new_dynamics_wrapper(        \
+          const vle::devs::DynamicsWrapperInit& init,                         \
+          const vle::devs::InitEventList& events)                             \
+        {                                                                     \
+            return new mdl(init, events);                                     \
+        }                                                                     \
+                                                                              \
+        VLE_MODULE void vle_api_level(std::uint32_t* major,                   \
+                                      std::uint32_t* minor,                   \
+                                      std::uint32_t* patch)                   \
+        {                                                                     \
+            auto version = vle::version();                                    \
+            *major = std::get<0>(version);                                    \
+            *minor = std::get<1>(version);                                    \
+            *patch = std::get<2>(version);                                    \
+        }                                                                     \
     }
 
 namespace vle {
@@ -77,8 +78,7 @@ public:
      * @brief Destructor (nothing to do).
      * @return none
      */
-    ~DynamicsWrapper() override
-    = default;
+    ~DynamicsWrapper() override = default;
 
     /**
      * @brief If this function return true, then a cast to a DynamicsWrapper

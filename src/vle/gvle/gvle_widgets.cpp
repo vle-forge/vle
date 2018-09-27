@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -64,8 +64,7 @@ VleNullWidget::VleNullWidget(QWidget* parent, const QString& idStr)
 }
 
 VleNullWidget::~VleNullWidget()
-{
-}
+{}
 
 void
 VleNullWidget::focusInEvent(QFocusEvent* /*e*/)
@@ -93,8 +92,7 @@ VleBooleanEdit::VleBooleanEdit(QWidget* parent, bool val, const QString& idStr)
 }
 
 VleBooleanEdit::~VleBooleanEdit()
-{
-}
+{}
 
 void
 VleBooleanEdit::setValue(bool val)
@@ -149,8 +147,7 @@ VleDoubleEdit::VleDoubleEdit(QWidget* parent,
 }
 
 VleDoubleEdit::~VleDoubleEdit()
-{
-}
+{}
 
 void
 VleDoubleEdit::setValue(double val)
@@ -218,8 +215,7 @@ VleDayEdit::VleDayEdit(QWidget* parent,
 }
 
 VleDayEdit::~VleDayEdit()
-{
-}
+{}
 
 void
 VleDayEdit::setValue(QString day)
@@ -272,8 +268,7 @@ VlePushButton::VlePushButton(QWidget* parent,
 }
 
 VlePushButton::~VlePushButton()
-{
-}
+{}
 
 void
 VlePushButton::onClicked(bool b)
@@ -303,8 +298,7 @@ VleSpinBox::VleSpinBox(QWidget* parent,
 }
 
 VleSpinBox::~VleSpinBox()
-{
-}
+{}
 
 void
 VleSpinBox::setMin(int min)
@@ -350,8 +344,7 @@ VleDoubleSpinBox::VleDoubleSpinBox(QWidget* parent,
       this, SIGNAL(valueChanged(double)), this, SLOT(onValueChanged(double)));
 }
 VleDoubleSpinBox::~VleDoubleSpinBox()
-{
-}
+{}
 
 void
 VleDoubleSpinBox::wheelEvent(QWheelEvent* event)
@@ -383,8 +376,7 @@ VleCombo::VleCombo(QWidget* parent, const QString& idStr)
                      SLOT(onValueChanged(const QString&)));
 }
 VleCombo::~VleCombo()
-{
-}
+{}
 
 void
 VleCombo::wheelEvent(QWheelEvent* event)
@@ -453,8 +445,7 @@ VleComboLineEdit::VleComboLineEdit(QWidget* parent,
 }
 
 VleComboLineEdit::~VleComboLineEdit()
-{
-}
+{}
 
 void
 VleComboLineEdit::setValue(const QString& val)
@@ -528,8 +519,7 @@ VleLineEdit::VleLineEdit(QWidget* parent,
 }
 
 VleLineEdit::~VleLineEdit()
-{
-}
+{}
 
 void
 VleLineEdit::setValue(const QString& val)
@@ -596,8 +586,7 @@ VleTextEdit::VleTextEdit(QWidget* parent,
     this->resize(document()->size().toSize());
 }
 VleTextEdit::~VleTextEdit()
-{
-}
+{}
 
 void
 VleTextEdit::setTextEdition(bool val)
@@ -787,8 +776,7 @@ VleValueWidget::getValueDisplay(const vle::value::Value& v,
 VleValueWidget::value_stack::value_stack()
   : startValue(nullptr)
   , stack()
-{
-}
+{}
 VleValueWidget::value_stack::~value_stack()
 {
     setStartValue(std::unique_ptr<value::Value>(nullptr));
@@ -1014,8 +1002,7 @@ VleValueWidget::VleValueWidget(QWidget* parent,
 }
 
 VleValueWidget::~VleValueWidget()
-{
-}
+{}
 
 void
 VleValueWidget::showCurrentValueDetail()
@@ -1073,7 +1060,8 @@ VleValueWidget::showCurrentValueDetail()
     }
     case value::Value::SET: {
         table->clear();
-        table->setRowCount(utils::numeric_cast<int>(editingValue.toSet().size()));
+        table->setRowCount(
+          utils::numeric_cast<int>(editingValue.toSet().size()));
         table->setColumnCount(1);
         table->setHorizontalHeaderItem(0, new QTableWidgetItem("set values"));
         value::Set::const_iterator itb = editingValue.toSet().begin();
@@ -1153,7 +1141,8 @@ VleValueWidget::showCurrentValueDetail()
     }
     case value::Value::TUPLE: {
         table->clear();
-        table->setRowCount(utils::numeric_cast<int>(editingValue.toTuple().size()));
+        table->setRowCount(
+          utils::numeric_cast<int>(editingValue.toTuple().size()));
         table->setColumnCount(1);
         table->setHorizontalHeaderItem(0,
                                        new QTableWidgetItem("tuple values"));
@@ -1219,21 +1208,21 @@ VleValueWidget::showCurrentValueDetail()
     }
 
     std::size_t nbRows = (editType == value::Value::TABLE)
-                   ? editingValue.toTable().height()
-                   : (editType == value::Value::MATRIX)
-                       ? editingValue.toMatrix().rows()
-                       : (editType == value::Value::SET)
-                           ? editingValue.toSet().size()
-                           : (editType == value::Value::MAP)
-                               ? editingValue.toMap().size()
-                               : (editType == value::Value::TUPLE)
-                                   ? editingValue.toTuple().size()
-                                   : 0;
+                           ? editingValue.toTable().height()
+                           : (editType == value::Value::MATRIX)
+                               ? editingValue.toMatrix().rows()
+                               : (editType == value::Value::SET)
+                                   ? editingValue.toSet().size()
+                                   : (editType == value::Value::MAP)
+                                       ? editingValue.toMap().size()
+                                       : (editType == value::Value::TUPLE)
+                                           ? editingValue.toTuple().size()
+                                           : 0;
     std::size_t nbCols = (editType == value::Value::TABLE)
-                   ? editingValue.toTable().width()
-                   : (editType == value::Value::MATRIX)
-                       ? editingValue.toMatrix().columns()
-                       : 0;
+                           ? editingValue.toTable().width()
+                           : (editType == value::Value::MATRIX)
+                               ? editingValue.toMatrix().columns()
+                               : 0;
 
     resize_row->setValue(utils::numeric_cast<int>(nbRows));
     resize_col->setValue(utils::numeric_cast<int>(nbCols));
@@ -2062,8 +2051,7 @@ VleCodeHighlighter::highlightBlock(const QString& text)
 VleCodeLineNumberArea::VleCodeLineNumberArea(VleCodeEdit* editor)
   : QWidget(editor)
   , codeEditor(editor)
-{
-}
+{}
 
 QSize
 VleCodeLineNumberArea::sizeHint() const

@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -31,8 +31,8 @@
 #include <string>
 #include <vle/DllDefines.hpp>
 
-#include <cmath>
 #include <ciso646>
+#include <cmath>
 
 namespace vle {
 namespace devs {
@@ -55,7 +55,8 @@ static_assert(std::numeric_limits<Time>::has_quiet_NaN == true,
               "Use an iec559 standard OS/Compiler");
 
 static const Time infinity = std::numeric_limits<Time>::infinity();
-static const Time negativeInfinity = -1 * std::numeric_limits<Time>::infinity();
+static const Time negativeInfinity =
+  -1 * std::numeric_limits<Time>::infinity();
 static const Time nan = std::numeric_limits<double>::quiet_NaN();
 
 /**

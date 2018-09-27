@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -73,7 +73,7 @@ public:
      */
     View(std::string name,
          View::Type type,
-         std::string  output,
+         std::string output,
          double timestep = 0.0,
          bool enable = true);
 
@@ -263,7 +263,8 @@ operator^(View::Type lhs, View::Type rhs) noexcept
                                    static_cast<unsigned>(rhs));
 }
 
-inline View::Type operator~(View::Type flags) noexcept
+inline View::Type
+operator~(View::Type flags) noexcept
 {
     return static_cast<View::Type>(~static_cast<unsigned>(flags));
 }

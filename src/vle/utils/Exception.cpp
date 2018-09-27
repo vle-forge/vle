@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -49,8 +49,7 @@ namespace utils {
 FileError::FileError(std::string message)
   : std::runtime_error("")
   , m_message(std::move(message))
-{
-}
+{}
 
 FileError::FileError(const char* format, ...)
   : std::runtime_error("")
@@ -87,8 +86,7 @@ FileError::what() const noexcept
 ParseError::ParseError(std::string message)
   : std::runtime_error("")
   , m_message(std::move(message))
-{
-}
+{}
 
 ParseError::ParseError(const char* format, ...)
   : std::runtime_error("")
@@ -125,8 +123,7 @@ ParseError::what() const noexcept
 ArgError::ArgError(std::string message)
   : std::logic_error("")
   , m_message(std::move(message))
-{
-}
+{}
 
 ArgError::ArgError(const char* format, ...)
   : std::logic_error("")
@@ -164,8 +161,7 @@ ArgError::what() const noexcept
 CastError::CastError(std::string message)
   : std::runtime_error("")
   , m_message(std::move(message))
-{
-}
+{}
 
 CastError::CastError(const char* format, ...)
   : std::runtime_error("")
@@ -203,8 +199,7 @@ CastError::what() const noexcept
 InternalError::InternalError(std::string message)
   : std::logic_error("")
   , m_message(std::move(message))
-{
-}
+{}
 
 InternalError::InternalError(const char* format, ...)
   : std::logic_error("")
@@ -242,8 +237,7 @@ InternalError::what() const noexcept
 ModellingError::ModellingError(std::string message)
   : std::runtime_error("")
   , m_message(std::move(message))
-{
-}
+{}
 
 ModellingError::ModellingError(const char* format, ...)
   : std::runtime_error("")
@@ -281,8 +275,7 @@ ModellingError::what() const noexcept
 NotYetImplemented::NotYetImplemented(std::string message)
   : std::logic_error("")
   , m_message(std::move(message))
-{
-}
+{}
 
 NotYetImplemented::NotYetImplemented(const char* format, ...)
   : std::logic_error("")
@@ -320,8 +313,7 @@ NotYetImplemented::what() const noexcept
 DevsGraphError::DevsGraphError(std::string message)
   : std::runtime_error("")
   , m_message(std::move(message))
-{
-}
+{}
 
 DevsGraphError::DevsGraphError(const char* format, ...)
   : std::runtime_error("")
@@ -359,8 +351,7 @@ DevsGraphError::what() const noexcept
 SaxParserError::SaxParserError(std::string message)
   : std::runtime_error("")
   , m_message(std::move(message))
-{
-}
+{}
 
 SaxParserError::SaxParserError(const char* format, ...)
   : std::runtime_error("")

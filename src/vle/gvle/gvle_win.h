@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -25,7 +25,6 @@
 #ifndef gvle_gvle_win_H
 #define gvle_gvle_win_H
 
-
 #include <QActionGroup>
 #include <QFileInfo>
 #include <QFileSystemModel>
@@ -46,8 +45,8 @@
 #endif
 
 #include "gvle_file.h"
-#include "plugin_mainpanel.h"
 #include "logger.h"
+#include "plugin_mainpanel.h"
 
 namespace Ui {
 class gvleWin;

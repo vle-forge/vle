@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -34,8 +34,8 @@
 #include <memory>
 
 #include <cassert>
-#include <cmath>
 #include <ciso646>
+#include <cmath>
 
 namespace vletest {
 inline std::string
@@ -70,8 +70,7 @@ class OutputPlugin : public vle::oov::Plugin
 public:
     OutputPlugin(const std::string& location)
       : vle::oov::Plugin(location)
-    {
-    }
+    {}
 
     ~OutputPlugin() override = default;
 
@@ -88,8 +87,8 @@ public:
                   rows,
                   static_cast<std::size_t>(std::floor(elem.second[i].first)));
 
-        auto matrix = std::make_unique<vle::value::Matrix>(
-          columns, rows + 1, 100, 100 );
+        auto matrix =
+          std::make_unique<vle::value::Matrix>(columns, rows + 1, 100, 100);
 
         size_t col = 1;
         for (auto& elem : ppD) {

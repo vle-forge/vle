@@ -24,8 +24,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/oov/Plugin.hpp>
+#ifndef VLE_VERSION_HPP
+#define VLE_VERSION_HPP
 
-namespace vle {
-namespace oov {}
-} // namespace vle oov
+//
+//  Caution: this is the only Boost header that is guaranteed to
+//  change with every Boost release. Including this header will cause
+//  a recompile every time a new Boost version is used.
+//
+//  VLE_VERSION % 100 is the patch level
+//  VLE_VERSION / 100 % 1000 is the minor version
+//  VLE_VERSION / 100000 is the major version
+
+#define VLE_VERSION 200100
+
+#endif

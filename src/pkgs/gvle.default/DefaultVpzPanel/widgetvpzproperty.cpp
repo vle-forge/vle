@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -42,8 +42,7 @@ WidgetVpzPropertyDynamics::WidgetVpzPropertyDynamics(QWidget* parent)
 }
 
 WidgetVpzPropertyDynamics::~WidgetVpzPropertyDynamics()
-{
-}
+{}
 
 void
 WidgetVpzPropertyDynamics::selectModel(vleVpz* model, const QString& mod_query)
@@ -98,12 +97,10 @@ WidgetVpzPropertyExpCond::WidgetVpzPropertyExpCond(QWidget* parent)
   : QListWidget(parent)
   , mVpz(0)
   , mModQuery("")
-{
-}
+{}
 
 WidgetVpzPropertyExpCond::~WidgetVpzPropertyExpCond()
-{
-}
+{}
 
 void
 WidgetVpzPropertyExpCond::selectModel(vleVpz* model,
@@ -179,8 +176,7 @@ WidgetVpzPropertyObservables::WidgetVpzPropertyObservables(QWidget* parent)
 }
 
 WidgetVpzPropertyObservables::~WidgetVpzPropertyObservables()
-{
-}
+{}
 
 void
 WidgetVpzPropertyObservables::refresh()

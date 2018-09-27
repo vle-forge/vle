@@ -2,7 +2,7 @@
 Gauthier Quesnel <gauthier.quesnel@inra.fr>
 2018-02-12
 :appversion: 2.0.0
-:homepage: http://www.vle-project.org
+:homepage: https://www.vle-project.org
 
 == Dependencies
 

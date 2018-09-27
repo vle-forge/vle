@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -68,7 +68,8 @@ pop(SchedulerT& scheduler) noexcept
     if (scheduler.empty())
         return;
 
-    std::pop_heap(scheduler.begin(), scheduler.end(), EventCompare<event_type>);
+    std::pop_heap(
+      scheduler.begin(), scheduler.end(), EventCompare<event_type>);
 
     scheduler.pop_back();
 }
@@ -107,8 +108,7 @@ struct HeapElement
     HeapElement(Time time, Simulator* Simulator)
       : m_time(time)
       , m_simulator(Simulator)
-    {
-    }
+    {}
 
     Time m_time;
     Simulator* m_simulator;
@@ -141,8 +141,7 @@ class VLE_LOCAL Scheduler
 public:
     Scheduler()
       : m_current_time(negativeInfinity)
-    {
-    }
+    {}
 
     ~Scheduler() = default;
 

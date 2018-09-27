@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -35,8 +35,7 @@ DefaultVpzPanel::DefaultVpzPanel()
   , m_vpzview(0)
   , m_rtool(0)
   , mGvlePlugins(0)
-{
-}
+{}
 
 DefaultVpzPanel::~DefaultVpzPanel()
 {

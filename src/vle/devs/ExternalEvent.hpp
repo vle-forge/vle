@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -54,17 +54,14 @@ public:
     ExternalEvent& operator=(ExternalEvent&& other) = default;
     ~ExternalEvent() = default;
 
-    ExternalEvent(std::string  port)
+    ExternalEvent(std::string port)
       : m_port(std::move(port))
-    {
-    }
+    {}
 
-    ExternalEvent(std::shared_ptr<value::Value>  attributes,
-                  std::string  port)
+    ExternalEvent(std::shared_ptr<value::Value> attributes, std::string port)
       : m_attributes(std::move(attributes))
       , m_port(std::move(port))
-    {
-    }
+    {}
 
     const std::string& getPortName() const
     {
