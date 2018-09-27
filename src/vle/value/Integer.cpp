@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -36,7 +36,8 @@ Integer::writeFile(std::ostream& out) const
 {
     std::streamsize old = out.precision();
 
-    out << std::setprecision(std::numeric_limits<int32_t>::digits10) << m_value;
+    out << std::setprecision(std::numeric_limits<int32_t>::digits10)
+        << m_value;
 
     out.precision(old);
 }
@@ -46,7 +47,8 @@ Integer::writeString(std::ostream& out) const
 {
     std::streamsize old = out.precision();
 
-    out << std::setprecision(std::numeric_limits<int32_t>::digits10) << m_value;
+    out << std::setprecision(std::numeric_limits<int32_t>::digits10)
+        << m_value;
 
     out.precision(old);
 }

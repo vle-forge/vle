@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -94,8 +94,7 @@ public:
     /**
      * @brief Delete all data.
      */
-    ~Matrix() override
-    = default;
+    ~Matrix() override = default;
 
     /**
      * @brief Build a new Matrix.
@@ -715,15 +714,15 @@ public:
     const Matrix& getMatrix(index column, index row) const;
 
 private:
-    MatrixValue m_matrix; /// @brief to store the values.
-    size_type m_nbcol{0};    /// @brief to store the column number.
-    size_type m_nbrow{0};    /// @brief to store the row number.
-    size_type m_nbcolmax{256}; /// @brief to store the column number.
-    size_type m_nbrowmax{1024}; /// @brief to store the row number.
-    size_type m_stepcol{1};  /// @brief the column when resize.
-    size_type m_steprow{1};  /// @brief the row when resize.
-    index m_lastX{0};        /// @brief the last columns set.
-    index m_lastY{0};        /// @brief the last row set.
+    MatrixValue m_matrix;         /// @brief to store the values.
+    size_type m_nbcol{ 0 };       /// @brief to store the column number.
+    size_type m_nbrow{ 0 };       /// @brief to store the row number.
+    size_type m_nbcolmax{ 256 };  /// @brief to store the column number.
+    size_type m_nbrowmax{ 1024 }; /// @brief to store the row number.
+    size_type m_stepcol{ 1 };     /// @brief the column when resize.
+    size_type m_steprow{ 1 };     /// @brief the row when resize.
+    index m_lastX{ 0 };           /// @brief the last columns set.
+    index m_lastY{ 0 };           /// @brief the last row set.
 };
 
 inline const Matrix&

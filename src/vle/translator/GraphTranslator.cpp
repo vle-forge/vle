@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -46,7 +46,7 @@ using graphT =
                         boost::bidirectionalS,
                         boost::property<boost::vertex_name_t, std::string>>;
 
-graph_generator::graph_generator(parameter  params)
+graph_generator::graph_generator(parameter params)
   : m_params(std::move(params))
   , m_metrics{ -1, -1, -1 }
 {}

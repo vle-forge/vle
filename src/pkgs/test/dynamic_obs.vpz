@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "http://www.vle-project.org/vle-1.1.0.dtd">
+<!DOCTYPE vle_project PUBLIC "-//VLE TEAM//DTD Strict//EN" "https://www.vle-project.org/vle-1.1.0.dtd">
 <vle_project version="0.5" date="Mon, 27 Dec 2010" author="Gauthier Quesnel">
 <structures>
 <model name="top" type="coupled" width="459"  >
@@ -111,14 +111,14 @@
 <observables>
 <observable name="obs1" >
 <port name="obs" >
-  <attachedview name="viewTimed" /> 
+  <attachedview name="viewTimed" />
   <attachedview name="viewFinish" />
   <attachedview name="viewOutput" />
   <attachedview name="viewInternal" />
 </port>
 </observable>
 </observables>
-<view name="viewTimed" output="o" type="timed" timestep="1" /> 
+<view name="viewTimed" output="o" type="timed" timestep="1" />
 <view name="viewFinish" output="o1" type="finish" />
 <view name="viewOutput" output="o2" type="output" />
 <view name="viewInternal" output="o3" type="internal" />

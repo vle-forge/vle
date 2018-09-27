@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -28,8 +28,8 @@
 #include <QObject>
 #include <QWidget>
 #include <vle/gvle/gvle_file.h>
-#include <vle/gvle/widgets/GvleCodeEdit.h>
 #include <vle/gvle/plugin_mainpanel.h>
+#include <vle/gvle/widgets/GvleCodeEdit.h>
 
 namespace vle {
 namespace gvle {
@@ -57,8 +57,7 @@ public:
     QString canBeClosed() override;
     void save() override;
     void discard() override
-    {
-    }
+    {}
     PluginMainPanel* newInstance() override
     {
         return new DefaultCppPanel();
@@ -66,8 +65,9 @@ public:
 
 private slots:
     void onTextChanged(const QString& /* id */,
-                                    const QString& old,
-                                    const QString& newVal);
+                       const QString& old,
+                       const QString& newVal);
+
 private:
     void initCpp(QString pkg, QString classname, QString filePath);
 
@@ -75,7 +75,7 @@ private:
     QString m_file;
     QString saved_text;
 };
-
-}} // namespaces
+}
+} // namespaces
 
 #endif

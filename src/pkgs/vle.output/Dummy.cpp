@@ -3,7 +3,7 @@
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -33,11 +33,9 @@ namespace plugin {
 
 Dummy::Dummy(const std::string& location)
   : Plugin(location)
-{
-}
+{}
 
-Dummy::~Dummy()
-= default;
+Dummy::~Dummy() = default;
 
 void
 Dummy::onParameter(const std::string& /*plugin*/,
@@ -55,8 +53,7 @@ Dummy::onNewObservable(const std::string& /*simulator*/,
                        const std::string& /*port*/,
                        const std::string& /*view*/,
                        const double& /*time*/)
-{
-}
+{}
 
 void
 Dummy::onDelObservable(const std::string& /*simulator*/,
@@ -64,8 +61,7 @@ Dummy::onDelObservable(const std::string& /*simulator*/,
                        const std::string& /*port*/,
                        const std::string& /*view*/,
                        const double& /*time*/)
-{
-}
+{}
 
 void
 Dummy::onValue(const std::string& /*simulator*/,

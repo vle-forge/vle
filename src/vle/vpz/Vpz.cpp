@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -53,7 +53,7 @@ Vpz::write(std::ostream& out) const
         << std::setprecision(std::numeric_limits<double>::digits10)
         << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
         << "<!DOCTYPE vle_project PUBLIC \"-//VLE TEAM//DTD Strict//EN\" "
-        << "\"http://www.vle-project.org/vle-" << vle::string_version_abi()
+        << "\"https://www.vle-project.org/vle-" << vle::string_version_abi()
         << ".dtd\">\n";
 
     m_project.write(out);

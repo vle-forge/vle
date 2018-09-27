@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -33,11 +33,10 @@
 namespace vle {
 namespace translator {
 
-regular_graph_generator::regular_graph_generator(parameter  params)
+regular_graph_generator::regular_graph_generator(parameter params)
   : m_params(std::move(params))
   , m_metrics{ -1 }
-{
-}
+{}
 
 regular_graph_generator::graph_metrics
 regular_graph_generator::metrics() const
@@ -216,7 +215,8 @@ apply_mask(vle::devs::Executive& executive,
                     break;
 
                 case regular_graph_generator::connectivity::OTHER:
-                    executive.addOutputPort(modelnames(c, r), modelnames(x, y));
+                    executive.addOutputPort(modelnames(c, r),
+                                            modelnames(x, y));
                     executive.addInputPort(modelnames(x, y), modelnames(c, r));
 
                     executive.addConnection(modelnames(c, r),
@@ -290,7 +290,8 @@ apply_wrap_mask(vle::devs::Executive& executive,
                     break;
 
                 case regular_graph_generator::connectivity::OTHER:
-                    executive.addOutputPort(modelnames(c, r), modelnames(q, p));
+                    executive.addOutputPort(modelnames(c, r),
+                                            modelnames(q, p));
                     executive.addInputPort(modelnames(q, p), modelnames(c, r));
 
                     executive.addConnection(modelnames(c, r),
@@ -322,7 +323,8 @@ regular_graph_generator::make_2d(vle::devs::Executive& executive,
                                  int x_mask,
                                  int y_mask)
 {
-    if (length.front() * std::get<1>(length) <= 0 or x_mask < 0 or y_mask < 0 or
+    if (length.front() * std::get<1>(length) <= 0 or x_mask < 0 or
+        y_mask < 0 or
         utils::numeric_cast<std::size_t>(x_mask) >= mask.columns() or
         utils::numeric_cast<std::size_t>(y_mask) >= mask.rows())
         throw vle::utils::ArgError(

@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -31,21 +31,23 @@ namespace vle {
 namespace gvle {
 
 DefaultCppPanel::DefaultCppPanel()
-  : PluginMainPanel(), m_edit(0), m_file(""), saved_text("") 
+  : PluginMainPanel()
+  , m_edit(0)
+  , m_file("")
+  , saved_text("")
 {
-  m_edit = new GvleCodeEdit;
-  QObject::connect(m_edit,
-          SIGNAL(textUpdated(const QString&, const QString&, const QString&)),
-          this,
-          SLOT(onTextChanged(const QString&, const QString&,const QString&)));
+    m_edit = new GvleCodeEdit;
+    QObject::connect(
+      m_edit,
+      SIGNAL(textUpdated(const QString&, const QString&, const QString&)),
+      this,
+      SLOT(onTextChanged(const QString&, const QString&, const QString&)));
 }
 
 DefaultCppPanel::~DefaultCppPanel()
 {
     delete m_edit;
 }
-
-
 
 void
 DefaultCppPanel::init(const gvle_file& gf,
@@ -115,15 +117,15 @@ DefaultCppPanel::rightWidget()
 void
 DefaultCppPanel::undo()
 {
-  m_edit->undo();
-  emit undoAvailable(m_edit->toPlainText() != saved_text);
+    m_edit->undo();
+    emit undoAvailable(m_edit->toPlainText() != saved_text);
 }
 
 void
 DefaultCppPanel::redo()
 {
-  m_edit->redo();
-  emit undoAvailable(m_edit->toPlainText() != saved_text);
+    m_edit->redo();
+    emit undoAvailable(m_edit->toPlainText() != saved_text);
 }
 
 void
@@ -219,5 +221,5 @@ DefaultCppPanel::initCpp(QString pkg, QString classname, QString filePath)
     outStream << out.str().c_str();
     cppfile.close();
 }
-
-}} // namespaces
+}
+} // namespaces

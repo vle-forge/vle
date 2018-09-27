@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -27,34 +27,34 @@
 namespace vle {
 namespace gvle {
 
-
 /************************** GvleTextEdit ******************************/
 GvleTextEdit::GvleTextEdit(QWidget* parent,
-                         const QString& text,
-                         const QString& idstr, 
-                         bool allowExternalUndo)
-  : QPlainTextEdit(parent), stacked_value(""), id(idstr), mtimer()
+                           const QString& text,
+                           const QString& idstr,
+                           bool allowExternalUndo)
+  : QPlainTextEdit(parent)
+  , stacked_value("")
+  , id(idstr)
+  , mtimer()
 {
-  this->setLineWrapMode(QPlainTextEdit::NoWrap);
-  this->setTextInteractionFlags(Qt::TextEditorInteraction);
-  // this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  // this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  // this->setContextMenuPolicy(Qt::NoContextMenu);
+    this->setLineWrapMode(QPlainTextEdit::NoWrap);
+    this->setTextInteractionFlags(Qt::TextEditorInteraction);
+    // this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // this->setContextMenuPolicy(Qt::NoContextMenu);
 
-  if (not allowExternalUndo){
-    setUndoRedoEnabled(false);
-  }
-  setText(text);
-  installEventFilter(this);
-  // this->resize(document()->size().toSize());
-  mtimer.setInterval(500);
-  connect(&mtimer, SIGNAL(timeout()),
-          this,    SLOT(onTimeout()));
+    if (not allowExternalUndo) {
+        setUndoRedoEnabled(false);
+    }
+    setText(text);
+    installEventFilter(this);
+    // this->resize(document()->size().toSize());
+    mtimer.setInterval(500);
+    connect(&mtimer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 
 GvleTextEdit::~GvleTextEdit()
-{
-}
+{}
 
 void
 GvleTextEdit::setText(const QString& text)
@@ -66,46 +66,46 @@ GvleTextEdit::setText(const QString& text)
 void
 GvleTextEdit::focusInEvent(QFocusEvent* e)
 {
-  mtimer.start();
-  emit selected(id);
-  QPlainTextEdit::focusInEvent(e);
+    mtimer.start();
+    emit selected(id);
+    QPlainTextEdit::focusInEvent(e);
 }
 
 void
 GvleTextEdit::focusOutEvent(QFocusEvent* e)
 {
-  mtimer.stop();
-  if (document()->toPlainText() != stacked_value) {
-    emit textUpdated(id, stacked_value, document()->toPlainText());
-    stacked_value = document()->toPlainText();
-  }
-  QPlainTextEdit::focusOutEvent(e);
+    mtimer.stop();
+    if (document()->toPlainText() != stacked_value) {
+        emit textUpdated(id, stacked_value, document()->toPlainText());
+        stacked_value = document()->toPlainText();
+    }
+    QPlainTextEdit::focusOutEvent(e);
 }
 
-bool 
+bool
 GvleTextEdit::eventFilter(QObject* watched, QEvent* event)
 {
-  if (event->type() == QEvent::ShortcutOverride) {
-      QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-    if (keyEvent->matches(QKeySequence::Undo)) {
-      event->ignore();
-      return true;
+    if (event->type() == QEvent::ShortcutOverride) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->matches(QKeySequence::Undo)) {
+            event->ignore();
+            return true;
+        }
+        if (keyEvent->matches(QKeySequence::Redo)) {
+            event->ignore();
+            return true;
+        }
     }
-    if (keyEvent->matches(QKeySequence::Redo)) {
-      event->ignore();
-      return true;
-    }
-  }
-  return QPlainTextEdit::eventFilter(watched, event);
+    return QPlainTextEdit::eventFilter(watched, event);
 }
 
 void
 GvleTextEdit::onTimeout()
 {
-  if (document()->toPlainText() != stacked_value) {
-    emit textUpdated(id, stacked_value, document()->toPlainText());
-    stacked_value = document()->toPlainText();
-  } 
+    if (document()->toPlainText() != stacked_value) {
+        emit textUpdated(id, stacked_value, document()->toPlainText());
+        stacked_value = document()->toPlainText();
+    }
 }
-
-}} // namespaces
+}
+} // namespaces

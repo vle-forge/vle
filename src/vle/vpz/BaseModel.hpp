@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -62,7 +62,7 @@ public:
      * @param parent the parent of this model, can be null if parent does
      * not exist.
      */
-    BaseModel(std::string  name, CoupledModel* parent);
+    BaseModel(std::string name, CoupledModel* parent);
 
     BaseModel(const BaseModel& mdl);
 
@@ -70,8 +70,7 @@ public:
 
     virtual BaseModel* clone() const = 0;
 
-    virtual ~BaseModel()
-    = default;
+    virtual ~BaseModel() = default;
 
     ////
     //// Base class.
@@ -191,7 +190,8 @@ public:
      * @param name the model to find.
      * @return A reference to the AtomicModel found.
      */
-    BaseModel* getModel(const CoupledModelVector& lst, const std::string& name);
+    BaseModel* getModel(const CoupledModelVector& lst,
+                        const std::string& name);
 
     /**
      * @brief Get the parent node of this model. Can be null if parent does
@@ -534,8 +534,7 @@ public:
     {
         AddInputPort(BaseModel& mdl)
           : mdl(mdl)
-        {
-        }
+        {}
 
         inline void operator()(const std::string& name) const
         {
@@ -549,8 +548,7 @@ public:
     {
         AddOutputPort(BaseModel& mdl)
           : mdl(mdl)
-        {
-        }
+        {}
 
         inline void operator()(const std::string& name) const
         {
@@ -564,8 +562,7 @@ public:
     {
         CopyWithoutConnection(ConnectionList& cnt)
           : cnt(cnt)
-        {
-        }
+        {}
 
         inline void operator()(const ConnectionList::value_type& x) const
         {
@@ -631,14 +628,14 @@ public:
       const std::set<std::string>& conditionlist) = 0;
 
 protected:
-    CoupledModel* m_parent{nullptr};
+    CoupledModel* m_parent{ nullptr };
     ConnectionList m_inPortList;
     ConnectionList m_outPortList;
 
-    int m_x{-1};
-    int m_y{-1};
-    int m_width{-1};
-    int m_height{-1};
+    int m_x{ -1 };
+    int m_y{ -1 };
+    int m_width{ -1 };
+    int m_height{ -1 };
     float m_dx;
     float m_dy;
 

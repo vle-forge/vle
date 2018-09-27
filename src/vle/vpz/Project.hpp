@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -50,8 +50,7 @@ public:
      */
     Project();
 
-    ~Project() override
-    = default;
+    ~Project() override = default;
 
     /**
      * @brief Set a new name for the experiment and a new date.
@@ -252,7 +251,7 @@ private:
     std::string m_author;
     std::string m_date;
     std::string m_version;
-    int m_instance{-1};
+    int m_instance{ -1 };
 
     Model m_model;
     Dynamics m_dynamics;

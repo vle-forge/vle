@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -563,15 +563,15 @@ public:
     QDomElement buildEmptyValueFromDoc(vle::value::Value::type vleType);
 
     /**
-    * @brief tells if a view exists
-    */
+     * @brief tells if a view exists
+     */
     bool existViewFromDoc(const QString& viewName) const;
 
     bool existDynamicFromDoc(const QString& dynName) const;
 
     /**
-    * @brief tells if a condition exists
-    */
+     * @brief tells if a condition exists
+     */
     bool existCondFromDoc(const QString& condName) const;
 
     /**
@@ -836,10 +836,10 @@ public:
     QString getAtomicModelConds(const QDomNode atom);
 
     /**
-    * @brief to know if conditions are set to
-    * @param model node
-    * @return true if there is a condition attached
-    */
+     * @brief to know if conditions are set to
+     * @param model node
+     * @return true if there is a condition attached
+     */
     bool isAtomicModelCondsSet(const QDomNode atom);
 
     /**
@@ -998,10 +998,10 @@ public:
     virtual bool setOutputPluginToDoc(const QString& viewName,
                                       const QString& outputPlugin);
     /**
-    * @brief get output plugin from a tag <output>
-    * plugin name has the form :
-    *   package/plugin
-    */
+     * @brief get output plugin from a tag <output>
+     * plugin name has the form :
+     *   package/plugin
+     */
     QString getOutputPlugin(QDomNode node);
     /**
      * @brief gives the type of a value of

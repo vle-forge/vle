@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -136,7 +136,8 @@ public:
      * @param oldname the old name of the dynamics.
      * @param newname the new name of the dynamics.
      */
-    void updateDynamics(const std::string& oldname, const std::string& newname);
+    void updateDynamics(const std::string& oldname,
+                        const std::string& newname);
 
     /**
      * @brief purge the dymamics references of the model where the
@@ -181,7 +182,7 @@ public:
 
 private:
     std::unique_ptr<BaseModel> m_graph;
-    BaseModel* m_node{nullptr};
+    BaseModel* m_node{ nullptr };
 };
 
 /**
@@ -193,21 +194,18 @@ public:
     /**
      * @brief Build a Submodels.
      */
-    Submodels()
-    = default;
+    Submodels() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Submodels() override
-    = default;
+    ~Submodels() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -228,21 +226,18 @@ public:
     /**
      * @brief Build a Connections.
      */
-    Connections()
-    = default;
+    Connections() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Connections() override
-    = default;
+    ~Connections() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -263,21 +258,18 @@ public:
     /**
      * @brief Build an InternalConnection.
      */
-    InternalConnection()
-    = default;
+    InternalConnection() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~InternalConnection() override
-    = default;
+    ~InternalConnection() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -298,21 +290,18 @@ public:
     /**
      * @brief Build an InputConnection.
      */
-    InputConnection()
-    = default;
+    InputConnection() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~InputConnection() override
-    = default;
+    ~InputConnection() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -333,21 +322,18 @@ public:
     /**
      * @brief Build an OutputConnection.
      */
-    OutputConnection()
-    = default;
+    OutputConnection() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~OutputConnection() override
-    = default;
+    ~OutputConnection() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -370,24 +356,21 @@ public:
      * @param model the name of the model source.
      * @param port the name of the port source.
      */
-    Origin(std::string  model, std::string  port)
+    Origin(std::string model, std::string port)
       : model(std::move(model))
       , port(std::move(port))
-    {
-    }
+    {}
 
     /**
      * @brief Nothing to delete.
      */
-    ~Origin() override
-    = default;
+    ~Origin() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -413,24 +396,21 @@ public:
      * @param model the name of the destination model.
      * @param port the name of the destination port.
      */
-    Destination(std::string  model, std::string  port)
+    Destination(std::string model, std::string port)
       : model(std::move(model))
       , port(std::move(port))
-    {
-    }
+    {}
 
     /**
      * @brief Nothing to delete.
      */
-    ~Destination() override
-    = default;
+    ~Destination() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.

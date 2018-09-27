@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -38,11 +38,10 @@
 namespace vle {
 namespace gvle {
 
-DefaultSimSubpanelThread::DefaultSimSubpanelThread(
-  Logger* log,
-  bool debug,
-  int nbthreads,
-  int blockSize)
+DefaultSimSubpanelThread::DefaultSimSubpanelThread(Logger* log,
+                                                   bool debug,
+                                                   int nbthreads,
+                                                   int blockSize)
   : output_map(nullptr)
   , mvpz(0)
   , mpkg(0)
@@ -69,10 +68,10 @@ DefaultSimSubpanelThread::onStarted()
     if (mdebug) {
         ctx->set_log_priority(7); // VLE_LOG_DEBUG
     } else {
-       ctx->set_log_priority(3); // VLE_LOG_ERROR
+        ctx->set_log_priority(3); // VLE_LOG_ERROR
     }
     ctx->set_log_function(
-        std::unique_ptr<utils::Context::LogFunctor>(new Logger_ctx(mLog)));
+      std::unique_ptr<utils::Context::LogFunctor>(new Logger_ctx(mLog)));
     if (mnbthreads > 0) {
         ctx->set_setting("vle.simulation.thread", (long)mnbthreads);
     }

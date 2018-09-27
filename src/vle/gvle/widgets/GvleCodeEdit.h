@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -25,9 +25,9 @@
 #ifndef GVLE_WIDGETS_GVLECODEEDIT_H
 #define GVLE_WIDGETS_GVLECODEEDIT_H
 
-#include <QTimer>
 #include <QPlainTextEdit>
 #include <QSyntaxHighlighter>
+#include <QTimer>
 
 namespace vle {
 namespace gvle {
@@ -94,9 +94,9 @@ class GvleCodeEdit : public QPlainTextEdit
 public:
     GvleCodeEdit(QWidget* parent = 0);
     GvleCodeEdit(QWidget* parent,
-                const QString& text,
-                const QString& id = "",
-                bool allowExternalUndo = false);
+                 const QString& text,
+                 const QString& id = "",
+                 bool allowExternalUndo = false);
     ~GvleCodeEdit() override;
 
     void setText(const QString& text);
@@ -111,7 +111,7 @@ signals:
 protected:
     void focusOutEvent(QFocusEvent* e) override;
     void focusInEvent(QFocusEvent* e) override;
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject* watched, QEvent* event);
     void resizeEvent(QResizeEvent* event) override;
 
 private slots:
@@ -119,15 +119,15 @@ private slots:
     void updateVleCodeLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();
     void updateVleCodeLineNumberArea(const QRect&, int);
+
 private:
     QString stacked_value;
     QString id;
     QTimer mtimer;
     GvleCodeHighlighter* m_highlighter;
     QWidget* m_lineNumberArea;
-
 };
-
-}} // namespaces
+}
+} // namespaces
 
 #endif

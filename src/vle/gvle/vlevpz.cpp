@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -4580,8 +4580,8 @@ vleVpz::modifyImportSourceForImport(QDomNode dest_node,
                   vleDomStatic::attachedObsToAtomic(src_node);
                 // detach all views of the observable
                 if (src_obs_att != "") {
-                    vleDomStatic::detachViewsToObsPorts(src.obsFromObss(
-                      src.obsFromDoc(), src_obs_att));
+                    vleDomStatic::detachViewsToObsPorts(
+                      src.obsFromObss(src.obsFromDoc(), src_obs_att));
                     QString dest_obs_new = src_obs_att;
                     if (not DomFunctions::childWhithNameAttr(
                               obsFromDoc(), "observable", src_obs_att)

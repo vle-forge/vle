@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -74,8 +74,7 @@ public:
     /**
      * @brief Nothing to delete.
      */
-    ~Table() override
-    = default;
+    ~Table() override = default;
 
     ///
     ////
@@ -277,8 +276,8 @@ public:
 
 private:
     TableValue m_value;
-    index m_width{1};
-    index m_height{1};
+    index m_width{ 1 };
+    index m_height{ 1 };
 };
 
 inline const Table&

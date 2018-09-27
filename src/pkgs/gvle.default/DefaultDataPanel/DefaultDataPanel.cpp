@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -42,8 +42,7 @@ DefaultDataPanel::DefaultDataPanel()
 }
 
 DefaultDataPanel::~DefaultDataPanel()
-{
-}
+{}
 
 void
 DefaultDataPanel::initData(QString pkg, QString classname, QString filePath)
@@ -135,13 +134,11 @@ DefaultDataPanel::rightWidget()
 
 void
 DefaultDataPanel::undo()
-{
-}
+{}
 
 void
 DefaultDataPanel::redo()
-{
-}
+{}
 
 void
 DefaultDataPanel::onUndoAvailable(bool b)

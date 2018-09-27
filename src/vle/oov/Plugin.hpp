@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -35,22 +35,24 @@
 #include <vle/value/Matrix.hpp>
 #include <vle/vle.hpp>
 
-#define DECLARE_OOV_PLUGIN(x)                                                  \
-    extern "C" {                                                               \
-    VLE_MODULE vle::oov::Plugin* vle_make_new_oov(const std::string& location) \
-    {                                                                          \
-        return new x(location);                                                \
-    }                                                                          \
-                                                                               \
-    VLE_MODULE void vle_api_level(std::uint32_t* major,                        \
-                                  std::uint32_t* minor,                        \
-                                  std::uint32_t* patch)                        \
-    {                                                                          \
-        auto version = vle::version();                                         \
-        *major = std::get<0>(version);                                         \
-        *minor = std::get<1>(version);                                         \
-        *patch = std::get<2>(version);                                         \
-    }                                                                          \
+#define DECLARE_OOV_PLUGIN(x)                                                 \
+    extern "C"                                                                \
+    {                                                                         \
+        VLE_MODULE vle::oov::Plugin* vle_make_new_oov(                        \
+          const std::string& location)                                        \
+        {                                                                     \
+            return new x(location);                                           \
+        }                                                                     \
+                                                                              \
+        VLE_MODULE void vle_api_level(std::uint32_t* major,                   \
+                                      std::uint32_t* minor,                   \
+                                      std::uint32_t* patch)                   \
+        {                                                                     \
+            auto version = vle::version();                                    \
+            *major = std::get<0>(version);                                    \
+            *minor = std::get<1>(version);                                    \
+            *patch = std::get<2>(version);                                    \
+        }                                                                     \
     }
 
 namespace vle {
@@ -84,16 +86,14 @@ public:
      * @param location this string represents the name of the default
      * directory
      */
-    Plugin(std::string  location)
+    Plugin(std::string location)
       : m_location(std::move(location))
-    {
-    }
+    {}
 
     /**
      * Nothing to delete.
      */
-    virtual ~Plugin()
-    = default;
+    virtual ~Plugin() = default;
 
     /**
      * Return a clone of the \c value::Matrix.

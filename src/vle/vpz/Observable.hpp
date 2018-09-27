@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -69,16 +69,14 @@ public:
      * @brief Build a new ObservablePort with a specific name.
      * @param portname The name of the port.
      */
-    ObservablePort(std::string  portname)
+    ObservablePort(std::string portname)
       : m_name(std::move(portname))
-    {
-    }
+    {}
 
     /**
      * @brief Nothing to delete.
      */
-    ~ObservablePort() override
-    = default;
+    ~ObservablePort() override = default;
 
     /**
      * @brief Write the XML representation of this class.
@@ -232,16 +230,14 @@ public:
      * @brief Build a new Observable with specified name.
      * @param name The name of this Observable.
      */
-    Observable(std::string  name)
+    Observable(std::string name)
       : m_name(std::move(name))
-    {
-    }
+    {}
 
     /**
      * @brief Nothing to delete.
      */
-    ~Observable() override
-    = default;
+    ~Observable() override = default;
 
     /**
      * @brief Write the XML representation of this class.
@@ -457,8 +453,7 @@ public:
          */
         HasView(const std::string& name)
           : m_name(name)
-        {
-        }
+        {}
 
         /**
          * @brief Check if the specified ObservablePort have the View
@@ -488,8 +483,7 @@ public:
         AddAttachedViewPortname(PortNameList& lst, const std::string& viewname)
           : m_list(lst)
           , m_viewname(viewname)
-        {
-        }
+        {}
 
         /**
          * @brief Add the ObservablePort to the PortNameList if the

@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -42,21 +42,18 @@ public:
     /**
      * @brief Build a new In.
      */
-    In()
-    = default;
+    In() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~In() override
-    = default;
+    ~In() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -77,21 +74,18 @@ public:
     /**
      * @brief Build a new Out.
      */
-    Out()
-    = default;
+    Out() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Out() override
-    = default;
+    ~Out() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -112,21 +106,18 @@ public:
     /**
      * @brief Build a new Init.
      */
-    Init()
-    = default;
+    Init() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Init() override
-    = default;
+    ~Init() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -147,21 +138,18 @@ public:
     /**
      * @brief Build a new State.
      */
-    State()
-    = default;
+    State() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~State() override
-    = default;
+    ~State() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.
@@ -182,21 +170,18 @@ public:
     /**
      * @brief Build a new Port.
      */
-    Port()
-    = default;
+    Port() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Port() override
-    = default;
+    ~Port() override = default;
 
     /**
      * @brief Nothing to output.
      */
     void write(std::ostream& /* out */) const override
-    {
-    }
+    {}
 
     /**
      * @brief Get the type of this class.

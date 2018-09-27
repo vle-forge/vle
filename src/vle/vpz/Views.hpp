@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -57,14 +57,12 @@ public:
     /**
      * @brief Build an empty Views.
      */
-    Views()
-    = default;
+    Views() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Views() override
-    = default;
+    ~Views() override = default;
 
     /**
      * @brief Write into the stream the XML representation of these class.
@@ -269,7 +267,8 @@ public:
      * @param outputname the name of the original vpz::Output
      * @param copyname the name of the copy vpz::Output
      */
-    void copyOutput(const std::string& outputname, const std::string& copyname);
+    void copyOutput(const std::string& outputname,
+                    const std::string& copyname);
 
     /**
      * @brief Copy a specified vpz::View.
@@ -400,8 +399,7 @@ public:
          */
         AddViews(Views& views)
           : m_views(views)
-        {
-        }
+        {}
 
         /**
          * @brief Add View to the Views.
@@ -427,8 +425,7 @@ public:
          */
         UseOutput(const std::string& output)
           : m_output(output)
-        {
-        }
+        {}
 
         /**
          * @brief Check if the View use Output m_output.

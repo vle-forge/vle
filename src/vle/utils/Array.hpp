@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -125,16 +125,14 @@ Array<T, Container>::Array()
   : m_c()
   , m_rows(0)
   , m_columns(0)
-{
-}
+{}
 
 template<typename T, class Container>
 Array<T, Container>::Array(size_type columns, size_type rows)
   : m_c(rows * columns)
   , m_rows(rows)
   , m_columns(columns)
-{
-}
+{}
 
 template<typename T, class Container>
 Array<T, Container>::Array(size_type columns,
@@ -143,8 +141,7 @@ Array<T, Container>::Array(size_type columns,
   : m_c(rows * columns, value)
   , m_rows(rows)
   , m_columns(columns)
-{
-}
+{}
 
 template<typename T, class Container>
 Array<T, Container>&

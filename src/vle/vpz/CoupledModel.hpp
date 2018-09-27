@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -549,7 +549,7 @@ public:
      */
     struct UpdateDynamics
     {
-        UpdateDynamics(std::string  oldname, std::string  newname)
+        UpdateDynamics(std::string oldname, std::string newname)
           : oldname(std::move(oldname))
           , newname(std::move(newname))
         {}
@@ -570,7 +570,7 @@ public:
      */
     struct PurgeDynamics
     {
-        PurgeDynamics(std::set<std::string>  dynamics)
+        PurgeDynamics(std::set<std::string> dynamics)
           : dynamics(std::move(dynamics))
         {}
 
@@ -589,8 +589,7 @@ public:
      */
     struct UpdateObservable
     {
-        UpdateObservable(std::string  oldname,
-                         std::string  newname)
+        UpdateObservable(std::string oldname, std::string newname)
           : oldname(std::move(oldname))
           , newname(std::move(newname))
         {}
@@ -611,7 +610,7 @@ public:
      */
     struct PurgeObservable
     {
-        PurgeObservable(std::set<std::string>  observables)
+        PurgeObservable(std::set<std::string> observables)
           : observables(std::move(observables))
         {}
 
@@ -630,8 +629,7 @@ public:
      */
     struct UpdateConditions
     {
-        UpdateConditions(std::string  oldname,
-                         std::string  newname)
+        UpdateConditions(std::string oldname, std::string newname)
           : oldname(std::move(oldname))
           , newname(std::move(newname))
         {}
@@ -652,7 +650,7 @@ public:
      */
     struct PurgeConditions
     {
-        PurgeConditions(std::set<std::string>  conditions)
+        PurgeConditions(std::set<std::string> conditions)
           : conditions(std::move(conditions))
         {}
 

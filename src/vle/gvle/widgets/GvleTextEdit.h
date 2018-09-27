@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -40,9 +40,9 @@ class GvleTextEdit : public QPlainTextEdit
     Q_OBJECT
 public:
     GvleTextEdit(QWidget* parent,
-                const QString& text,
-                const QString& id = "",
-                bool  allowExternalUndo=false);
+                 const QString& text,
+                 const QString& id = "",
+                 bool allowExternalUndo = false);
     ~GvleTextEdit() override;
 
     void setText(const QString& text);
@@ -55,16 +55,17 @@ signals:
 protected:
     void focusInEvent(QFocusEvent* e) override;
     void focusOutEvent(QFocusEvent* e) override;
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject* watched, QEvent* event);
 
 private slots:
     void onTimeout();
+
 private:
     QString stacked_value;
     QString id;
     QTimer mtimer;
 };
-
-}} // namespaces
+}
+} // namespaces
 
 #endif

@@ -5,7 +5,7 @@
 #define MyABI GetEnv('VLE_ABI')
 #define MyAppVersion GetEnv('VLE_VERSION')
 #define MyAppPublisher "VLE Development Team"
-#define MyAppURL "http://www.vle-project.org"
+#define MyAppURL "https://www.vle-project.org"
 #define MyAppExeName "gvle.exe"
 
 #define SourcePath GetEnv('SourcePath')

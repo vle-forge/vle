@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -527,11 +527,12 @@ private:
     }
 
 public:
-    Columns(bool more_output_details) :
-        m_more_output_details(more_output_details),
-        keep_vector(), value_vector(), indices()
-    {
-    }
+    Columns(bool more_output_details)
+      : m_more_output_details(more_output_details)
+      , keep_vector()
+      , value_vector()
+      , indices()
+    {}
 
     bool more_output_details() const
     {
@@ -627,7 +628,6 @@ public:
                 } else {
                     os << columns.keep_vector[elem.second].str.c_str() << ',';
                 }
-
             }
 
         return os;
@@ -723,8 +723,7 @@ struct ConditionsBackup
             return "no_id";
         }
         const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
-        auto it_id =
-          cond_cvle.conditionvalues().find("id");
+        auto it_id = cond_cvle.conditionvalues().find("id");
         if (it_id == cond_cvle.conditionvalues().end()) {
             return "no_id";
         }
@@ -835,22 +834,21 @@ private:
                    << " (try storage as output plugin)\n";
             }
         } else {
-            for (auto & it : *result) {
+            for (auto& it : *result) {
                 if (it.second && it.second->isMatrix()) {
-                    if(m_more_output_details) {
-                        os << "view:" << it.first << "\n" <<
-                                vle::value::toMatrixValue(it.second);
+                    if (m_more_output_details) {
+                        os << "view:" << it.first << "\n"
+                           << vle::value::toMatrixValue(it.second);
                     } else {
                         it.second->writeFile(os);
                     }
-
                 }
             }
         }
     }
 
 public:
-    Worker(std::string  package,
+    Worker(std::string package,
            std::chrono::milliseconds timeout,
            const std::string& vpz,
            bool withoutspawn,
@@ -874,10 +872,10 @@ public:
         } else {
             m_simulator = std::make_unique<vle::manager::Simulation>(
               m_context,
-                                           vle::manager::LOG_NONE,
-                                           vle::manager::SIMULATION_NONE,
-                                           m_timeout,
-                                           nullptr);
+              vle::manager::LOG_NONE,
+              vle::manager::SIMULATION_NONE,
+              m_timeout,
+              nullptr);
         }
         m_context->set_log_priority(3);
         vle::utils::Package pack(m_context);
@@ -1121,8 +1119,8 @@ run_as_worker(const std::string& package,
               bool more_output_details)
 {
     try {
-        Worker w(package, timeout, vpz, withoutspawn, warnings,
-                 more_output_details);
+        Worker w(
+          package, timeout, vpz, withoutspawn, warnings, more_output_details);
         std::string block;
         int from;
         int first, last;
@@ -1322,9 +1320,12 @@ main(int argc, char* argv[])
 
         status = run_as_master(input_file, output_file, block_size);
     } else {
-        status = run_as_worker(
-          package_name, vpz.front(), timeout, withoutspawn, warnings,
-          more_output_details);
+        status = run_as_worker(package_name,
+                               vpz.front(),
+                               timeout,
+                               withoutspawn,
+                               warnings,
+                               more_output_details);
     }
 
     MPI_Finalize();

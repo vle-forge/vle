@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -31,7 +31,6 @@
 #include <ostream>
 #include <stack>
 #include <thread>
-#include <vle/vle.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
@@ -40,6 +39,7 @@
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/i18n.hpp>
+#include <vle/vle.hpp>
 
 namespace {
 
@@ -604,7 +604,7 @@ std::string
 Package::getBuildDir(VLE_PACKAGE_TYPE type) const
 {
     Path p(getDir(type));
-    p /= "buildvle"+vle::string_version_abi();
+    p /= "buildvle" + vle::string_version_abi();
 
     return p.string();
 }

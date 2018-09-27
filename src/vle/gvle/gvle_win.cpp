@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -24,10 +24,10 @@
 
 #include <algorithm>
 #include <iostream>
-#include <vle/vle.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/vle.hpp>
 
 #include <QActionGroup>
 #include <QDebug>
@@ -55,16 +55,15 @@ namespace vu = vle::utils;
 namespace vle {
 namespace gvle {
 
-
 std::map<std::string, std::string>
 gvle_win::defaultDistrib()
 {
     std::map<std::string, std::string> ret;
-    std::string remote_vle = "http://www.vle-project.org/pub/"+
-            vle::string_version_abi();
+    std::string remote_vle =
+      "https://www.vle-project.org/pub/" + vle::string_version_abi();
     ret[remote_vle] = "vle";
-    std::string remote_rec = "http://recordb.toulouse.inra.fr/distributions/"+
-            vle::string_version_abi();
+    std::string remote_rec = "http://recordb.toulouse.inra.fr/distributions/" +
+                             vle::string_version_abi();
     ret[remote_rec] = "record";
     return ret;
 }
@@ -100,8 +99,7 @@ gvle_win::gvle_win(QWidget* parent)
     mCtx->set_log_function(
       std::unique_ptr<utils::Context::LogFunctor>(new Logger_ctx(mLogger)));
     QObject::connect(
-      mLogger, SIGNAL(logFromCtx(QString)),
-      this, SLOT(onLogFromCtx(QString)));
+      mLogger, SIGNAL(logFromCtx(QString)), this, SLOT(onLogFromCtx(QString)));
 
     // VLE init
     mCurrPackage.refreshPath();
@@ -1778,7 +1776,7 @@ gvle_win::onPackageUninstall()
 void
 gvle_win::onLogFromCtx(QString msg)
 {
-  mLogger->log(msg);
+    mLogger->log(msg);
 }
 
 void

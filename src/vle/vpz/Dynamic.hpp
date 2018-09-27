@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -58,29 +58,26 @@ public:
      * @brief Build a new local Dynamic with a specific name.
      * @param name Name of the Dynamic.
      */
-    Dynamic(std::string  name)
+    Dynamic(std::string name)
       : m_name(std::move(name))
       , m_ispermanent(true)
-    {
-    }
+    {}
 
-    Dynamic(std::string  name,
-            std::string  package,
-            std::string  library,
-            std::string  language = std::string())
+    Dynamic(std::string name,
+            std::string package,
+            std::string library,
+            std::string language = std::string())
       : m_name(std::move(name))
       , m_package(std::move(package))
       , m_library(std::move(library))
       , m_language(std::move(language))
       , m_ispermanent(true)
-    {
-    }
+    {}
 
     /**
      * @brief Nothing to clean.
      */
-    ~Dynamic() override
-    = default;
+    ~Dynamic() override = default;
 
     /**
      * @brief Write the XML representation of this class in the output

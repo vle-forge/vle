@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -153,11 +153,9 @@ class DomObject
 public:
     DomObject(QDomDocument* doc)
       : mDoc(doc)
-    {
-    }
+    {}
     virtual ~DomObject()
-    {
-    }
+    {}
     virtual QString getXQuery(QDomNode node) = 0;
     virtual QDomNode getNodeFromXQuery(const QString& query,
                                        QDomNode d = QDomNode()) = 0;

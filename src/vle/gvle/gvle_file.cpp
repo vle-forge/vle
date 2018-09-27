@@ -1,7 +1,7 @@
 ﻿/*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -33,16 +33,14 @@ gvle_file::gvle_file()
   , metadata_file("")
   , plug_type(gvleplug::GVLE_PLUG_NONE)
   , plug_name("")
-{
-}
+{}
 gvle_file::gvle_file(const gvle_file& f)
   : relPath(f.relPath)
   , source_file(f.source_file)
   , metadata_file(f.metadata_file)
   , plug_type(f.plug_type)
   , plug_name(f.plug_name)
-{
-}
+{}
 
 gvle_file::gvle_file(const utils::Package& pkg, QString l_relPath)
   : relPath(l_relPath)

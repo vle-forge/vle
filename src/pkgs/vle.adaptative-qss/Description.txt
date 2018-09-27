@@ -7,6 +7,6 @@ Maintainer: Gauthier Quesnel <gauthier.quesnel@inra.fr>
 Description: A set of simulators to build ordinary differential equation systems using the quantized state systems (QSS) methods for numerical integration solvers.
  .
 Tags: qss
-Url: http://www.vle-project.org/pub/2.0
+Url: https://www.vle-project.org/pub/2.0
 Size: 0
 MD5sum: xxxx

@@ -3,7 +3,7 @@
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -33,8 +33,7 @@ namespace vle {
 namespace oov {
 namespace plugin {
 
-CSV::~CSV()
-= default;
+CSV::~CSV() = default;
 
 std::string
 CSV::extension() const
@@ -64,8 +63,7 @@ CSV::writeHead(std::ostream& out, const std::vector<std::string>& heads)
     out << '\n';
 }
 
-Text::~Text()
-= default;
+Text::~Text() = default;
 
 std::string
 Text::extension() const
@@ -83,14 +81,13 @@ void
 Text::writeHead(std::ostream& out, const std::vector<std::string>& heads)
 {
     out << '#';
-    for (const auto & head : heads) {
+    for (const auto& head : heads) {
         out << "\"" << head << "\"\t";
     }
     out << '\n';
 }
 
-Rdata::~Rdata()
-= default;
+Rdata::~Rdata() = default;
 
 std::string
 Rdata::extension() const
@@ -107,7 +104,7 @@ Rdata::writeSeparator(std::ostream& out)
 void
 Rdata::writeHead(std::ostream& out, const std::vector<std::string>& heads)
 {
-    for (const auto & head : heads) {
+    for (const auto& head : heads) {
         out << "\"" << head << "\"\t";
     }
     out << '\n';

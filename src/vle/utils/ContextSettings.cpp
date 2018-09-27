@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -120,7 +120,7 @@ Context::reset_settings() noexcept
 
     auto version = vle::version_abi();
 
-    auto url = utils::format("http://www.vle-project.org/pub/%d.%d",
+    auto url = utils::format("https://www.vle-project.org/pub/%d.%d",
                              std::get<0>(version),
                              std::get<1>(version));
 

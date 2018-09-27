@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -165,8 +165,7 @@ GvleCodeHighlighter::highlightBlock(const QString& text)
 GvleCodeLineNumberArea::GvleCodeLineNumberArea(GvleCodeEdit* editor)
   : QWidget(editor)
   , codeEditor(editor)
-{
-}
+{}
 
 ///////////////////////////////////////////////
 
@@ -187,93 +186,101 @@ GvleCodeLineNumberArea::paintEvent(QPaintEvent* event)
 GvleCodeEdit::GvleCodeEdit(QWidget* parent)
   : QPlainTextEdit(parent)
 {
-  //handle highlighting 
-  QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-  font.setPointSize(9);
-  setFont(font);
+    // handle highlighting
+    QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    font.setPointSize(9);
+    setFont(font);
 
-  m_highlighter = new GvleCodeHighlighter(document());
-  m_lineNumberArea = new GvleCodeLineNumberArea(this);
+    m_highlighter = new GvleCodeHighlighter(document());
+    m_lineNumberArea = new GvleCodeLineNumberArea(this);
 
-  connect(this, SIGNAL(blockCountChanged(int)),
-          this, SLOT(updateVleCodeLineNumberAreaWidth(int)));
-  connect(this, SIGNAL(updateRequest(QRect, int)),
-          this, SLOT(updateVleCodeLineNumberArea(QRect, int)));
-  connect(this, SIGNAL(cursorPositionChanged()),
-          this, SLOT(highlightCurrentLine()));
+    connect(this,
+            SIGNAL(blockCountChanged(int)),
+            this,
+            SLOT(updateVleCodeLineNumberAreaWidth(int)));
+    connect(this,
+            SIGNAL(updateRequest(QRect, int)),
+            this,
+            SLOT(updateVleCodeLineNumberArea(QRect, int)));
+    connect(this,
+            SIGNAL(cursorPositionChanged()),
+            this,
+            SLOT(highlightCurrentLine()));
 
-  updateVleCodeLineNumberAreaWidth(0);
-  highlightCurrentLine();
+    updateVleCodeLineNumberAreaWidth(0);
+    highlightCurrentLine();
 
-  //setUndoRedoEnabled(false);
-  installEventFilter(this);
-  mtimer.setInterval(500);
-  connect(&mtimer, SIGNAL(timeout()),
-          this,    SLOT(onTimeout()));
-
+    // setUndoRedoEnabled(false);
+    installEventFilter(this);
+    mtimer.setInterval(500);
+    connect(&mtimer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 
 GvleCodeEdit::GvleCodeEdit(QWidget* parent,
-                         const QString& text,
-                         const QString& idstr,
-                         bool allowExternalUndo)
+                           const QString& text,
+                           const QString& idstr,
+                           bool allowExternalUndo)
   : QPlainTextEdit(parent)
   , stacked_value("")
   , id(idstr)
 {
-  //handle highlighting 
-  QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-  font.setPointSize(9);
-  setFont(font);
+    // handle highlighting
+    QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    font.setPointSize(9);
+    setFont(font);
 
-  m_highlighter = new GvleCodeHighlighter(document());
-  m_lineNumberArea = new GvleCodeLineNumberArea(this);
+    m_highlighter = new GvleCodeHighlighter(document());
+    m_lineNumberArea = new GvleCodeLineNumberArea(this);
 
-  connect(this, SIGNAL(blockCountChanged(int)),
-          this, SLOT(updateVleCodeLineNumberAreaWidth(int)));
-  connect(this, SIGNAL(updateRequest(QRect, int)),
-          this, SLOT(updateVleCodeLineNumberArea(QRect, int)));
-  connect(this, SIGNAL(cursorPositionChanged()),
-          this, SLOT(highlightCurrentLine()));
+    connect(this,
+            SIGNAL(blockCountChanged(int)),
+            this,
+            SLOT(updateVleCodeLineNumberAreaWidth(int)));
+    connect(this,
+            SIGNAL(updateRequest(QRect, int)),
+            this,
+            SLOT(updateVleCodeLineNumberArea(QRect, int)));
+    connect(this,
+            SIGNAL(cursorPositionChanged()),
+            this,
+            SLOT(highlightCurrentLine()));
 
-  updateVleCodeLineNumberAreaWidth(0);
-  highlightCurrentLine();
+    updateVleCodeLineNumberAreaWidth(0);
+    highlightCurrentLine();
 
+    this->setLineWrapMode(QPlainTextEdit::NoWrap);
+    // this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // this->setTextInteractionFlags(Qt::NoTextInteraction);
+    // this->setContextMenuPolicy(Qt::NoContextMenu);
+    this->setFocusPolicy(Qt::ClickFocus);
+    const int tabStop = 4; // 4 characters
 
-  this->setLineWrapMode(QPlainTextEdit::NoWrap);
-  // this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  // this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  // this->setTextInteractionFlags(Qt::NoTextInteraction);
-  // this->setContextMenuPolicy(Qt::NoContextMenu);
-  this->setFocusPolicy(Qt::ClickFocus);
-  const int tabStop = 4; // 4 characters
+    QFontMetrics metrics(font);
+    this->setTabStopWidth(tabStop * metrics.width(' '));
 
-  QFontMetrics metrics(font);
-  this->setTabStopWidth(tabStop * metrics.width(' '));
+    setText(text);
+    this->resize(document()->size().toSize());
 
-  setText(text);
-  this->resize(document()->size().toSize());
-  
-  if (not allowExternalUndo){
-    setUndoRedoEnabled(false);
-  }
-  installEventFilter(this);
-  mtimer.setInterval(500);
-  connect(&mtimer, SIGNAL(timeout()),
-          this,    SLOT(onTimeout()));
+    if (not allowExternalUndo) {
+        setUndoRedoEnabled(false);
+    }
+    installEventFilter(this);
+    mtimer.setInterval(500);
+    connect(&mtimer, SIGNAL(timeout()), this, SLOT(onTimeout()));
 }
 
 GvleCodeEdit::~GvleCodeEdit()
 {
-  delete m_highlighter;
-  delete m_lineNumberArea;
+    delete m_highlighter;
+    delete m_lineNumberArea;
 }
 
 void
 GvleCodeEdit::setText(const QString& text)
 {
-  this->document()->setPlainText(text);
-  stacked_value = text;
+    this->document()->setPlainText(text);
+    stacked_value = text;
 }
 
 void
@@ -320,37 +327,37 @@ GvleCodeEdit::GvleCodelineNumberAreaWidth()
 void
 GvleCodeEdit::focusInEvent(QFocusEvent* e)
 {
-  mtimer.start();
-  emit selected(id);
-  QPlainTextEdit::focusInEvent(e);
+    mtimer.start();
+    emit selected(id);
+    QPlainTextEdit::focusInEvent(e);
 }
 
 void
 GvleCodeEdit::focusOutEvent(QFocusEvent* e)
 {
-  mtimer.stop();
-  if (document()->toPlainText() != stacked_value) {
-    emit textUpdated(id, stacked_value, document()->toPlainText());
-    stacked_value = document()->toPlainText();
-  }
-  QPlainTextEdit::focusOutEvent(e);
+    mtimer.stop();
+    if (document()->toPlainText() != stacked_value) {
+        emit textUpdated(id, stacked_value, document()->toPlainText());
+        stacked_value = document()->toPlainText();
+    }
+    QPlainTextEdit::focusOutEvent(e);
 }
 
-bool 
+bool
 GvleCodeEdit::eventFilter(QObject* watched, QEvent* event)
 {
-  if (event->type() == QEvent::ShortcutOverride) {
-      QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-    if (keyEvent->matches(QKeySequence::Undo)) {
-      event->ignore();
-      return true;
+    if (event->type() == QEvent::ShortcutOverride) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->matches(QKeySequence::Undo)) {
+            event->ignore();
+            return true;
+        }
+        if (keyEvent->matches(QKeySequence::Redo)) {
+            event->ignore();
+            return true;
+        }
     }
-    if (keyEvent->matches(QKeySequence::Redo)) {
-      event->ignore();
-      return true;
-    }
-  }
-  return QPlainTextEdit::eventFilter(watched, event);
+    return QPlainTextEdit::eventFilter(watched, event);
 }
 
 void
@@ -363,13 +370,13 @@ GvleCodeEdit::resizeEvent(QResizeEvent* e)
       QRect(cr.left(), cr.top(), GvleCodelineNumberAreaWidth(), cr.height()));
 }
 
-void 
+void
 GvleCodeEdit::onTimeout()
 {
-  if (document()->toPlainText() != stacked_value) {
-    emit textUpdated(id, stacked_value, document()->toPlainText());
-    stacked_value = document()->toPlainText();
-  } 
+    if (document()->toPlainText() != stacked_value) {
+        emit textUpdated(id, stacked_value, document()->toPlainText());
+        stacked_value = document()->toPlainText();
+    }
 }
 
 void
@@ -410,5 +417,5 @@ GvleCodeEdit::updateVleCodeLineNumberArea(const QRect& rect, int dy)
     if (rect.contains(viewport()->rect()))
         updateVleCodeLineNumberAreaWidth(0);
 }
-
-}} // namespaces
+}
+} // namespaces

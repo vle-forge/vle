@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2014-2018 INRA http://www.inra.fr
  *
@@ -173,8 +173,7 @@ public:
 public slots:
     void onValueChanged(int i);
     void onEditingFinished()
-    {
-    }
+    {}
 signals:
     void valUpdated(const QString& id, int i);
     void selected(const QString& id);
@@ -474,8 +473,7 @@ class VleLineEditItem : public QGraphicsTextItem
 public:
     explicit VleLineEditItem(const QString& text, QGraphicsItem* parent = 0)
       : QGraphicsTextItem(text, parent)
-    {
-    }
+    {}
 signals:
     void returnPressed();
 
@@ -495,7 +493,7 @@ protected:
 
 /**
  * C++ code Editor
- * @deprecated : use instead widgets/GvleCodeEdit 
+ * @deprecated : use instead widgets/GvleCodeEdit
  */
 
 class VleCodeEdit;

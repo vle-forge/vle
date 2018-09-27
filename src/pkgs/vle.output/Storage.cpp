@@ -3,7 +3,7 @@
  *
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -80,8 +80,7 @@ public:
       , m_matrix(nullptr)
       , m_time(devs::negativeInfinity)
       , m_headertype(STORAGE_HEADER_NONE)
-    {
-    }
+    {}
 
     /**
      * We do not remove the m_matrix attribute. The @c
@@ -89,8 +88,7 @@ public:
      * devs::RootCoordinator. Users have in charge to freed the
      * m_matrix.
      */
-    ~Storage() override
-    = default;
+    ~Storage() override = default;
 
     /**
      * Return a clone of the current matrix
@@ -99,8 +97,7 @@ public:
     std::unique_ptr<value::Matrix> matrix() const override
     {
         if (m_matrix) {
-            return std::make_unique<value::Matrix>(
-              *m_matrix);
+            return std::make_unique<value::Matrix>(*m_matrix);
         }
         return {};
     }
@@ -181,8 +178,7 @@ public:
                          const std::string& /*port*/,
                          const std::string& /*view*/,
                          const double& /*time*/) override
-    {
-    }
+    {}
 
     void onValue(const std::string& simulator,
                  const std::string& parent,

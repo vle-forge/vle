@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -117,7 +117,8 @@ operator^(LogOptions lhs, LogOptions rhs)
                                    static_cast<unsigned>(rhs));
 }
 
-inline LogOptions operator~(LogOptions flags)
+inline LogOptions
+operator~(LogOptions flags)
 {
     return static_cast<LogOptions>(~static_cast<unsigned>(flags));
 }
@@ -164,7 +165,8 @@ operator^(SimulationOptions lhs, SimulationOptions rhs)
                                           static_cast<unsigned>(rhs));
 }
 
-inline SimulationOptions operator~(SimulationOptions flags)
+inline SimulationOptions
+operator~(SimulationOptions flags)
 {
     return static_cast<SimulationOptions>(~static_cast<unsigned>(flags));
 }

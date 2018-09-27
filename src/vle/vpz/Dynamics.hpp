@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -67,14 +67,12 @@ public:
     /**
      * @brief Build a new Dynamics.
      */
-    Dynamics()
-    = default;
+    Dynamics() = default;
 
     /**
      * @brief Nothing to delete.
      */
-    ~Dynamics() override
-    = default;
+    ~Dynamics() override = default;
 
     /**
      * @brief A operator to retrieve the list of keys
@@ -272,8 +270,7 @@ public:
          */
         AddDynamic(Dynamics& dynamics)
           : m_dynamics(dynamics)
-        {
-        }
+        {}
 
         /**
          * @brief Add the DynamicList to the Dynamics.

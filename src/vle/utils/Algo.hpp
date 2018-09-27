@@ -1,7 +1,7 @@
 /*
  * This file is part of VLE, a framework for multi-modeling, simulation
  * and analysis of complex dynamical systems.
- * http://www.vle-project.org
+ * https://www.vle-project.org
  *
  * Copyright (c) 2003-2018 Gauthier Quesnel <gauthier.quesnel@inra.fr>
  * Copyright (c) 2003-2018 ULCO http://www.univ-littoral.fr
@@ -336,7 +336,8 @@ struct select1st
      * @param x The pair.
      * @return A constant reference to the first element.
      */
-    const typename __vle_pair::first_type& operator()(const __vle_pair& x) const
+    const typename __vle_pair::first_type& operator()(
+      const __vle_pair& x) const
     {
         return x.first;
     }
