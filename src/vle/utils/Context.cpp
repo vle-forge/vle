@@ -781,7 +781,7 @@ Context::debug(const char* format, ...) const
         m_pimpl->log_fn->write(*this, VLE_LOG_DEBUG, format, args);
         va_end(args);
     }
-}
 #endif
+}
 }
 } // namespace vle utils
