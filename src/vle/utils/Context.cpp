@@ -199,10 +199,6 @@ Context::Context(const Path& /* prefix */)
     }
 #endif
 
-    this->debug("Context initialized [prefix=%s] [home=%s]\n",
-                m_pimpl->m_prefix.string().c_str(),
-                m_pimpl->m_home.string().c_str());
-
 #if defined(VLE_HAVE_NLS)
     bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
     textdomain(VLE_LOCALE_NAME);
@@ -309,11 +305,6 @@ Context::Context(std::string locale, const Path& /* prefix */)
         FreeEnvironmentStringsW(env);
     }
 #endif
-
-    this->debug("Context initialized [prefix=%s] [home=%s] [locale=%s]\n",
-                m_pimpl->m_prefix.string().c_str(),
-                m_pimpl->m_home.string().c_str(),
-                locale.c_str());
 
 #if defined(VLE_HAVE_NLS)
     bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
