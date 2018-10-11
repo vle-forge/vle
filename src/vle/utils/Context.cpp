@@ -609,17 +609,19 @@ Context::get_log_priority() const noexcept
 void
 Context::log(int priority, const std::string& str) const
 {
-    m_pimpl->log_fn->write(*this, priority, str);
+    if (m_pimpl->log_priority >= priority)
+        m_pimpl->log_fn->write(*this, priority, str);
 }
 
 void
 Context::log(int priority, const char* format, ...) const
 {
-    va_list args;
-
-    va_start(args, format);
-    m_pimpl->log_fn->write(*this, priority, format, args);
-    va_end(args);
+    if (m_pimpl->log_priority >= priority) {
+        va_list args;
+        va_start(args, format);
+        m_pimpl->log_fn->write(*this, priority, format, args);
+        va_end(args);
+    }
 }
 
 void
