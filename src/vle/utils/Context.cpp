@@ -393,13 +393,9 @@ Context::getLogFile() const
 Path
 Context::getLogFile(const std::string& prefix) const
 {
-    auto version = vle::version_abi();
-    auto lf = utils::format("%s-%d_%d.log",
-                            prefix.c_str(),
-                            std::get<0>(version),
-                            std::get<1>(version));
+    auto path = prefix + ".log";
 
-    return getHomeFile(lf);
+    return getHomeFile(path);
 }
 
 std::vector<Path>
@@ -408,7 +404,7 @@ Context::getBinaryPackagesDir() const
     std::vector<Path> ret(2);
 
     ret[0] = m_pimpl->m_home;
-    ret[0] /= utils::format("pkgs-%s", vle::string_version_abi().c_str());
+    ret[0] /= "pkgs";
 
     ret[1] = m_pimpl->m_prefix;
     ret[1] /= "lib";
@@ -483,11 +479,8 @@ Context::getTemplate(const std::string& name) const
 void
 Context::initVleHomeDirectory()
 {
-    auto version = vle::version_abi();
-
     Path homedir = getHomeDir();
-    homedir /=
-      utils::format("pkgs-%d.%d", std::get<0>(version), std::get<1>(version));
+    homedir /= "pkgs";
 
     if (not homedir.is_directory()) {
         if (homedir.is_file())
@@ -508,13 +501,15 @@ Context::readHomeDir()
 
     if (not vlehome.empty()) {
         Path path(vlehome);
+        path /= format("vle-%d", VERSION_MAJOR * 1000 + VERSION_MINOR);
 
         if (path.is_directory()) {
             m_pimpl->m_home = path;
             return;
         }
 
-        if (path.create_directories()) {
+        path.create_directories();
+        if (path.is_directory()) {
             m_pimpl->m_home = path;
             return;
         }
@@ -525,7 +520,7 @@ Context::readHomeDir()
 
     Path home(homedrive);
     home /= homepath;
-    home /= "vle";
+    home /= format("vle-%d", VERSION_MAJOR * 1000 + VERSION_MINOR);
 
     if (home.is_directory()) {
         m_pimpl->m_home = home;
@@ -546,13 +541,15 @@ Context::readHomeDir()
     char* cvlehome = std::getenv("VLE_HOME");
     if (cvlehome) {
         Path home(cvlehome);
+        home /= format("vle-%d", VERSION_MAJOR * 1000 + VERSION_MINOR);
 
         if (home.is_directory()) {
             m_pimpl->m_home = home;
             return;
         }
 
-        if (home.create_directories()) {
+        home.create_directories();
+        if (home.is_directory()) {
             m_pimpl->m_home = home;
             return;
         }
@@ -564,7 +561,7 @@ Context::readHomeDir()
     char* chome = std::getenv("HOME");
     if (chome) {
         Path home(chome);
-        home /= ".vle";
+        home /= format(".vle-%d", VERSION_MAJOR * 1000 + VERSION_MINOR);
 
         if (home.is_directory()) {
             m_pimpl->m_home = home;
