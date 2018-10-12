@@ -230,17 +230,16 @@ public:
 
         is_running();
 
-        std::vector<char> buffer;
-        buffer.reserve(BUFSIZ);
+        auto buffer = std::make_unique<char[]>(BUFSIZ);
         int result;
 
         if ((result = input_timeout(m_pipeout[0], m_waitchildtimeout)) == -1)
             return false;
 
         if (result) {
-            auto size = read(m_pipeout[0], &buffer[0], BUFSIZ);
+            auto size = read(m_pipeout[0], buffer.get(), BUFSIZ);
             if (size > 0 and output) {
-                output->append(&buffer[0], size);
+                output->append(buffer.get(), size);
             }
         }
 
@@ -248,9 +247,9 @@ public:
             return false;
 
         if (result) {
-            auto size = read(m_pipeerr[0], &buffer[0], BUFSIZ);
+            auto size = read(m_pipeerr[0], buffer.get(), BUFSIZ);
             if (size > 0 and error) {
-                error->append(&buffer[0], size);
+                error->append(buffer.get(), size);
             }
         }
 
