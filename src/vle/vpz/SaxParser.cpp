@@ -188,7 +188,8 @@ struct scope_exit
 void
 SaxParser::parse(std::istream& is, std::size_t size)
 {
-    std::vector<char> buffer(size == 0 ? 1024 : size);
+    size = size == 0 ? static_cast<size_t>(BUFSIZ) : size;
+    auto buffer = std::make_unique<char[]>(size);
 
     xmlSAXHandler sax;
     memset(&sax, 0, sizeof(xmlSAXHandler));
@@ -203,13 +204,13 @@ SaxParser::parse(std::istream& is, std::size_t size)
     sax.error = &SaxParser::onError;
     sax.fatalError = &SaxParser::onFatalError;
 
-    is.read(buffer.data(), 4);
+    is.read(buffer.get(), 4);
 
     if (not is.good() or is.gcount() <= 0)
         throw utils::SaxParserError(_("Error parsing the 4 first bytes)"));
 
     xmlParserCtxtPtr ctx = xmlCreatePushParserCtxt(
-      &sax, this, buffer.data(), static_cast<int>(is.gcount()), nullptr);
+      &sax, this, buffer.get(), static_cast<int>(is.gcount()), nullptr);
     m_ctxt = static_cast<void*>(ctx);
 
     scope_exit se([this, ctx]() {
@@ -218,9 +219,9 @@ SaxParser::parse(std::istream& is, std::size_t size)
     });
 
     while (is.good() and not is.eof()) {
-        is.read(buffer.data(), buffer.size());
+        is.read(buffer.get(), size);
         int err = xmlParseChunk(
-          ctx, buffer.data(), static_cast<int>(is.gcount()), is.eof());
+          ctx, buffer.get(), static_cast<int>(is.gcount()), is.eof());
 
         if (err == 0)
             continue;
