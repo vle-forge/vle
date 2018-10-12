@@ -189,65 +189,54 @@ struct Spawn::Pimpl
 
         is_running();
 
-        std::vector<char> buffer(4096, '\0');
+        const auto size = 4096;
+        auto buffer = std::make_unique<char[]>(size);
         unsigned long bread;
         unsigned long avail;
 
         {
-            PeekNamedPipe(hOutputRead,
-                          &buffer[0],
-                          buffer.size() - 1,
-                          &bread,
-                          &avail,
-                          NULL);
+            PeekNamedPipe(
+              hOutputRead, buffer.get(), size - 1, &bread, &avail, NULL);
 
             if (bread) {
                 ouputfs << "get PeekNamedPipe success " << bread << " "
                         << avail << "\n";
 
-                std::fill(buffer.begin(), buffer.end(), '\0');
-                if (avail > buffer.size() - 1) {
+                std::fill(buffer.get(), buffer.get() + size, '\0');
+                if (avail > size - 1) {
                     ouputfs << "get PeekNamedPipe " << avail << "\n"
-                            << buffer.size() - 1 << "\n";
-                    while (bread >= buffer.size() - 1) {
-                        ReadFile(hOutputRead,
-                                 &buffer[0],
-                                 buffer.size() - 1,
-                                 &bread,
-                                 NULL);
+                            << size - 1 << "\n";
+                    while (bread >= size - 1) {
+                        ReadFile(
+                          hOutputRead, buffer.get(), size - 1, &bread, NULL);
 
                         ouputfs << "get: " << bread << "\n";
 
                         if (bread > 0) {
                             unsigned long sz = std::min(
-                              bread,
-                              static_cast<unsigned long>(buffer.size() - 1));
+                              bread, static_cast<unsigned long>(size - 1));
 
-                            output->append(&buffer[0], sz);
-                            ouputfs.write(&buffer[0], sz);
+                            output->append(buffer.get(), sz);
+                            ouputfs.write(buffer.get(), sz);
                         }
 
-                        std::fill(buffer.begin(), buffer.end(), '\0');
+                        std::fill(buffer.get(), buffer.get() + size, '\0');
                     }
                 } else {
                     ouputfs << "get PeekNamedPipe success (else) " << bread
                             << " " << avail << "\n";
 
-                    ReadFile(hOutputRead,
-                             &buffer[0],
-                             buffer.size() - 1,
-                             &bread,
-                             NULL);
+                    ReadFile(
+                      hOutputRead, buffer.get(), size - 1, &bread, NULL);
 
                     ouputfs << "get: " << bread << "\n";
 
                     if (bread > 0) {
                         unsigned long sz = std::min(
-                          bread,
-                          static_cast<unsigned long>(buffer.size() - 1));
+                          bread, static_cast<unsigned long>(size - 1));
 
-                        output->append(&buffer[0], sz);
-                        ouputfs.write(&buffer[0], sz);
+                        output->append(buffer.get(), sz);
+                        ouputfs.write(buffer.get(), sz);
                     }
                 }
             }
@@ -255,42 +244,36 @@ struct Spawn::Pimpl
 
         {
             PeekNamedPipe(
-              hErrorRead, &buffer[0], buffer.size() - 1, &bread, &avail, NULL);
+              hErrorRead, buffer.get(), size - 1, &bread, &avail, NULL);
 
             if (bread) {
                 errorfs << "[err] get PeekNamedPipe success " << avail << "\n";
 
                 std::fill(buffer.begin(), buffer.end(), '\0');
-                if (avail > buffer.size() - 1) {
-                    while (bread >= buffer.size() - 1) {
-                        ReadFile(hErrorRead,
-                                 &buffer[0],
-                                 buffer.size() - 1,
-                                 &bread,
-                                 NULL);
+                if (avail > size - 1) {
+                    while (bread >= size - 1) {
+                        ReadFile(
+                          hErrorRead, buffer.get(), size - 1, &bread, NULL);
 
                         if (bread > 0) {
                             unsigned long sz = std::min(
-                              bread,
-                              static_cast<unsigned long>(buffer.size() - 1));
+                              bread, static_cast<unsigned long>(size - 1));
 
-                            error->append(&buffer[0], sz);
-                            errorfs.write(&buffer[0], sz);
+                            error->append(buffer.get(), sz);
+                            errorfs.write(buffer.get(), sz);
                         }
 
                         std::fill(buffer.begin(), buffer.end(), '\0');
                     }
                 } else {
-                    ReadFile(
-                      hErrorRead, &buffer[0], buffer.size() - 1, &bread, NULL);
+                    ReadFile(hErrorRead, buffer.get(), size - 1, &bread, NULL);
 
                     if (bread > 0) {
                         unsigned long sz = std::min(
-                          bread,
-                          static_cast<unsigned long>(buffer.size() - 1));
+                          bread, static_cast<unsigned long>(size - 1));
 
-                        error->append(&buffer[0], sz);
-                        errorfs.write(&buffer[0], sz);
+                        error->append(buffer.get(), sz);
+                        errorfs.write(buffer.get(), sz);
                     }
                 }
             }
