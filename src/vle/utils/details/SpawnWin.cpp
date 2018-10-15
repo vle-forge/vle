@@ -249,7 +249,7 @@ struct Spawn::Pimpl
             if (bread) {
                 errorfs << "[err] get PeekNamedPipe success " << avail << "\n";
 
-                std::fill(buffer.begin(), buffer.end(), '\0');
+                std::fill(buffer.get(), buffer.get() + size, '\0');
                 if (avail > size - 1) {
                     while (bread >= size - 1) {
                         ReadFile(
@@ -263,7 +263,7 @@ struct Spawn::Pimpl
                             errorfs.write(buffer.get(), sz);
                         }
 
-                        std::fill(buffer.begin(), buffer.end(), '\0');
+                        std::fill(buffer.get(), buffer.get() + size, '\0');
                     }
                 } else {
                     ReadFile(hErrorRead, buffer.get(), size - 1, &bread, NULL);
