@@ -358,7 +358,7 @@ public:
             return true;
         case 0:
             std::cout.flush();
-            assert(false);
+            return false;
         default:
             std::cout.flush();
             m_finish = true;
