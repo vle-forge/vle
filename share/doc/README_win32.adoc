@@ -66,39 +66,47 @@ md %VleDeps%\lib
 md %VleDeps%\include
 md %VleDeps%\include\lzma
 md %VleDeps%\include\libxml2
+md %VleDeps%\ssl
+md %VleDeps%\ssl\certs
+
 cd %MingwPath%
-xcopy -i bin\curl.exe %VleDeps%\bin
-xcopy -i include\iconv.h %VleDeps%\include
-xcopy -i include\libintl.h %VleDeps%\include
-xcopy -i include\lzma.h %VleDeps%\include
-xcopy -i include\zlib.h %VleDeps%\include
-xcopy -si include\lzma\* %VleDeps%\include\lzma\
-xcopy -si include\libxml2\* %VleDeps%\include\libxml2\
-xcopy -si bin\libcurl-4.dll %VleDeps%\bin
-xcopy -si bin\libeay32.dll %VleDeps%\bin
-xcopy -si bin\libexpat-1.dll %VleDeps%\bin
-xcopy -si bin\libiconv-2.dll %VleDeps%\bin
-xcopy -si bin\libidn2-0.dll %VleDeps%\bin
-xcopy -si bin\libintl-8.dll %VleDeps%\bin
-xcopy -si bin\liblzma-5.dll %VleDeps%\bin
-xcopy -si bin\libmetalink-3.dll %VleDeps%\bin
-xcopy -si bin\libnghttp2-14.dll %VleDeps%\bin
-xcopy -si bin\libssh2-1.dll %VleDeps%\bin
-xcopy -si bin\libunistring-2.dll %VleDeps%\bin
-xcopy -si bin\libxml2-2.dll %VleDeps%\bin
-xcopy -si bin\ssleay32.dll %VleDeps%\bin
-xcopy -si bin\zlib1.dll %VleDeps%\bin
-xcopy -si bin\curl.exe %VleDeps%\bin
-xcopy -si lib\liblzma.a %VleDeps%\lib
-xcopy -si lib\liblzma.dll.a %VleDeps%\lib
-xcopy -si lib\libxml2.a %VleDeps%\lib
-xcopy -si lib\libxml2.dll.a %VleDeps%\lib
-xcopy -si lib\libz.a %VleDeps%\lib
-xcopy -si lib\libz.dll.a %VleDeps%\lib
-xcopy -si lib\libiconv.a %VleDeps%\lib
-xcopy -si lib\libiconv.dll.a %VleDeps%\lib
-xcopy -si lib\libintl.a %VleDeps%\lib
-xcopy -si lib\libintl.dll.a %VleDeps%\lib
+xcopy /Y bin\curl.exe %VleDeps%\bin
+xcopy /Y include\iconv.h %VleDeps%\include
+xcopy /Y include\libintl.h %VleDeps%\include
+xcopy /Y include\lzma.h %VleDeps%\include
+xcopy /Y include\zlib.h %VleDeps%\include
+xcopy /YSI include\lzma\* %VleDeps%\include\lzma\
+xcopy /YSI include\libxml2\* %VleDeps%\include\libxml2\
+xcopy /Y bin\libbrotlicommon.dll %InstallPath%\bin
+xcopy /Y bin\libbrotlidec.dll %InstallPath%\bin
+xcopy /Y bin\libcrypto-1_1.dll %InstallPath%\bin
+xcopy /Y bin\libpsl-5.dll %InstallPath%\bin
+xcopy /Y bin\libssl-1_1.dll %InstallPath%\bin
+xcopy /Y bin\libcurl-4.dll %VleDeps%\bin
+xcopy /Y bin\libexpat-1.dll %VleDeps%\bin
+xcopy /Y bin\libiconv-2.dll %VleDeps%\bin
+xcopy /Y bin\libidn2-0.dll %VleDeps%\bin
+xcopy /Y bin\libintl-8.dll %VleDeps%\bin
+xcopy /Y bin\liblzma-5.dll %VleDeps%\bin
+xcopy /Y bin\libmetalink-3.dll %VleDeps%\bin
+xcopy /Y bin\libnghttp2-14.dll %VleDeps%\bin
+xcopy /Y bin\libssh2-1.dll %VleDeps%\bin
+xcopy /Y bin\libunistring-2.dll %VleDeps%\bin
+xcopy /Y bin\libxml2-2.dll %VleDeps%\bin
+xcopy /Y bin\zlib1.dll %VleDeps%\bin
+xcopy /Y bin\curl.exe %VleDeps%\bin
+xcopy /Y lib\liblzma.a %VleDeps%\lib
+xcopy /Y lib\liblzma.dll.a %VleDeps%\lib
+xcopy /Y lib\libxml2.a %VleDeps%\lib
+xcopy /Y lib\libxml2.dll.a %VleDeps%\lib
+xcopy /Y lib\libz.a %VleDeps%\lib
+xcopy /Y lib\libz.dll.a %VleDeps%\lib
+xcopy /Y lib\libiconv.a %VleDeps%\lib
+xcopy /Y lib\libiconv.dll.a %VleDeps%\lib
+xcopy /Y lib\libintl.a %VleDeps%\lib
+xcopy /Y lib\libintl.dll.a %VleDeps%\lib
+xcopy /YSI ssl\* %VleDeps%\ssl
+xcopy /YSI ssl\certs\* %VleDeps%\ssl\certs
 
 rem Build the VLE software
 rem ----------------------
