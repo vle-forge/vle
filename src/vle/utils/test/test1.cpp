@@ -344,7 +344,7 @@ to_scientific_string_function()
     EnsuresEqual(vu::toScientificString(0.0), "0");
     EnsuresEqual(vu::toScientificString(-1504), "-1504");
     EnsuresEqual(vu::toScientificString(3022), "3022");
-#ifdef BOOST_WINDOWS
+#ifdef _WIN32
     EnsuresEqual(vu::toScientificString(123456789123456789.0),
                  "1.23456789123457e+017");
     EnsuresEqual(vu::toScientificString(0.00000000000000000000982),
