@@ -191,11 +191,11 @@ ConditionUpdater::get(vle::vpz::Vpz& file,
 
             if (it == current->toMap().end())
                 throw vle::utils::ArgError(
-                  _("Fails to convert '%s.%s' parameter '%zu'"
+                  _("Fails to convert '%s.%s' parameter '%lu'"
                     " as correct map index"),
                   access.condition.c_str(),
                   access.port.c_str(),
-                  i);
+                  static_cast<unsigned long>(i));
 
             current = it->second.get();
         } else {

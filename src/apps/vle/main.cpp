@@ -106,12 +106,20 @@ private:
 #if defined(__unix__)
         return isatty(fileno(f)) == 1;
 #else
+        (void)f;
+
         return false;
 #endif
     }
 
 public:
     vle_log_standard() = default;
+
+    ~vle_log_standard() override
+    {
+        if (stream && (stream != stderr || stream != stdout))
+            fclose(stream);
+    }
 
     vle_log_standard(FILE* f)
       : stream(f)
@@ -414,7 +422,7 @@ run_manager(vle::utils::ContextPtr ctx,
                 file->project().experiment().setName(name);
 
             std::unique_ptr<vle::value::Matrix> res =
-              man.run(std::move(file), processor, 0, 1, &error);
+              man.run(std::move(file), static_cast<std::uint32_t>(processor), 0, 1, &error);
 
             if (error.code) {
                 fprintf(stderr,
