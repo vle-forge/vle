@@ -14,6 +14,7 @@
 #define InstallPath GetEnv('InstallPath')
 #define CMakePath GetEnv('CMakePath')
 #define VleDeps GetEnv('VleDeps')
+#define MingwPath GetEnv('MingwPath')
 #define MyAppVersionString StringChange(MyAppVersion, ".", "_")
 
 [Setup]
@@ -60,7 +61,45 @@ Source: "{#InstallPath}\share\vle-{#MyABI}\qt.conf"; DestDir: "{app}\bin"; Flags
 
 Source: "{#QtDirTools}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-Source: "{#VleDeps}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MingwPath}\bin\curl.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\include\iconv.h"; DestDir: "{app}\include"; Flags: ignoreversion
+Source: "{#MingwPath}\include\libintl.h"; DestDir: "{app}\include"; Flags: ignoreversion
+Source: "{#MingwPath}\include\lzma.h"; DestDir: "{app}\include"; Flags: ignoreversion
+Source: "{#MingwPath}\include\zlib.h"; DestDir: "{app}\include"; Flags: ignoreversion
+Source: "{#MingwPath}\include\lzma\*"; DestDir: "{app}\include\lzma"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MingwPath}\include\libxml2\*"; DestDir: "{app}\include\libxml2"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+Source: "{#MingwPath}\bin\libbrotlicommon.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libbrotlidec.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libcrypto-1_1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libpsl-5.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libssl-1_1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+
+Source: "{#MingwPath}\bin\libcurl-4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libexpat-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libiconv-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libidn2-0.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libintl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\liblzma-5.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libmetalink-3.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libnghttp2-14.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libssh2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libunistring-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libxml2-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\zlib1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\curl.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\liblzma.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\liblzma.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libxml2.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libxml2.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libz.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libz.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libiconv.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libiconv.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libintl.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libintl.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\ssl\*"; DestDir: "{app}\ssl"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MingwPath}\ssl\certs\*"; DestDir: "{app}\ssl\certs"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 Source: "{#CMakePath}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
