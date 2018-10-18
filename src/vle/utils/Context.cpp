@@ -199,6 +199,16 @@ Context::Context(const Path& /* prefix */)
     }
 #endif
 
+    // To determine which version of VLE is running the sub-processor (CMake
+    // for example), we dynamically define a environment variable VLE_VERSION
+    // equal to the current ABI version.
+
+#ifdef _WIN32
+    set_environment_variable("VLE_VERSION", string_version_abi());
+#else
+    ::setenv("VLE_VERSION", string_version_abi().c_str(), 1);
+#endif
+
 #if defined(VLE_HAVE_NLS)
     bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
     textdomain(VLE_LOCALE_NAME);
