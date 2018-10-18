@@ -34,6 +34,7 @@
 # Environment variables used by this module:
 #
 #  VLE_BASEPATH          - environment variable for base path of vle
+#  VLE_VERSION           - environment variable with ABI version (2.0, 2.1 etc.)
 #
 #
 # Example of use, find VLE with the minimal version of 2.0 :
@@ -46,7 +47,13 @@
 # Check VLE_VERSION
 #
 
-set (_find_vle_all_versions 2.2 2.1 2.0)
+if (DEFINED ENV{VLE_VERSION})
+  message(STATUS "FindVLE detects VLE ABI $ENV{VLE_VERSION}")
+  set (_find_vle_all_versions $ENV{VLE_VERSION})
+else ()
+  message(STATUS "FindVLE searches VLE")
+  set (_find_vle_all_versions 2.2 2.1 2.0)
+endif ()
 
 #
 # Set default behavior of find vle
@@ -76,8 +83,6 @@ if (${_vle_debug})
   message ("[FindVLE]  - using internal cmake tools : ${_find_vle_using_cmake}")
 endif ()
 
-
-
 #
 # Find VLE
 #
@@ -90,25 +95,25 @@ foreach (_find_vle_test_version ${_find_vle_all_versions})
     find_path(_vle_base_include vle-${_find_vle_test_version}/vle/vle.hpp PATHS
       $ENV{VLE_BASEPATH}/include
       ${VLE_BASEPATH_LOCAL}/include
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;Path]/include"
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;]/include"
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version}.0;]/include"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version};Path]/include"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version};]/include"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version};]/include"
       NO_DEFAULT_PATH)
 
     find_path(_vle_base_bin vle.exe PATHS
       $ENV{VLE_BASEPATH}/bin
       ${VLE_BASEPATH_LOCAL}/bin
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;Path]/bin"
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;]/bin"
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version}.0;]/bin"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version};Path]/bin"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version};]/bin"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version};]/bin"
       NO_DEFAULT_PATH)
 
     find_path(_vle_base_lib libvle-${_find_vle_test_version}.a PATHS
       $ENV{VLE_BASEPATH}/lib
       ${VLE_BASEPATH_LOCAL}/lib
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;Path]/lib"
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version}.0;]/lib"
-      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version}.0;]/lib"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version};Path]/lib"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version};]/lib"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version};]/lib"
       NO_DEFAULT_PATH)
  
     if (${_vle_debug})
@@ -117,21 +122,23 @@ foreach (_find_vle_test_version ${_find_vle_all_versions})
       message ("[FindVLE] cmake _vle_base_lib ${_vle_base_lib}")
     endif ()
 
-    if(NOT _vle_base_include OR NOT _vle_base_bin OR NOT _vle_base_lib)
-       message (FATAL_ERROR "Missing vle dependencies")
+    if(_vle_base_include AND _vle_base_bin AND _vle_base_lib)
+      set(VLE_INCLUDE_DIRS
+        ${_vle_base_include}/vle-${_find_vle_test_version}; ${_vle_base_include};
+        ${_vle_base_include}/libxml2)
+
+      set(VLE_LIBRARY_DIRS
+        ${_vle_base_bin};${_vle_base_lib})
+
+      set(VLE_LIBRARIES
+        vle-${_find_vle_test_version} xml2 intl)
+
+      set (VLE_SHARE_DIR "${_vle_base_include}/../share/vle-${_find_vle_test_version}")
+
+      set(VLE_VERSION ${_find_vle_test_version})
+
+      break()
     endif ()
-
-    set(VLE_INCLUDE_DIRS
-      ${_vle_base_include}/vle-${_find_vle_test_version}; ${_vle_base_include};
-      ${_vle_base_include}/libxml2)
-
-    set(VLE_LIBRARY_DIRS
-      ${_vle_base_bin};${_vle_base_lib})
-
-    set(VLE_LIBRARIES
-      vle-${_find_vle_test_version} xml2 intl)
-
-    set (VLE_SHARE_DIR "${_vle_base_include}/../share/vle-${_find_vle_test_version}")
   else (${_find_vle_using_cmake})
     pkg_check_modules(_VLE-${_find_vle_test_version}
 		vle-${_find_vle_test_version} QUIET)
