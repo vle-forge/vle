@@ -19,7 +19,7 @@ install:
 
 before_build:
   - cmd: set OLD_PATH=C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\
-  - cmd: set SourcePath=c:\projects\vle
+  - cmd: set SourcePath=%APPVEYOR_BUILD_FOLDER%
   - cmd: set QtDir=c:\Qt\5.9\mingw53_32
   - cmd: set QtDirTools=c:\Qt\Tools\mingw530_32
   - cmd: set BoostPath=C:\Libraries\boost_1_63_0
