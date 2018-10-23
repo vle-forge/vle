@@ -1,6 +1,15 @@
 VLE 2.0
 =======
 
+2.0.1
+-----
+
+- Windows: updating build and runtime dependencies (ssl, certificates) and bump the Qt version to 5.9.6.
+
+- VLE: switches default url from http to https.
+
+- cvle : fix the use of more_output_details option. When using more_output_details the comma cannot be used as separator since the comma is already used in the format of output variables (Closes #346)
+
 Release highlights
 ------------------
 
