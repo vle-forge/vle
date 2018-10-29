@@ -27,8 +27,8 @@
 #
 #  VLE_DEBUG    - if true, prints debug traces (default OFF)
 #  VLE_VERSION  - it gives the ABI version of installed vle. For example, if 
-#                  VLE_VERSION = "2.0", then packages are expected to
-#                  be installed into VLE_HOME/pkgs-2.0.
+#                  VLE_VERSION = "2.1", then packages are expected to
+#                  be installed into VLE_HOME/vle-2001/pkgs.
 #
 # This script provides utils macros for vle cmake files :
 #
@@ -37,7 +37,7 @@
 # VleCheckPackage: it checks if a package is installed into the binary
 #     packages. And sets the variables used to link to the designated package.
 #
-#> find_package(VLE 2.0 REQUIRED)
+#> find_package(VLE 2.1 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleCheckPackage(MYPKG mypackage)
 #> VleCheckPackage(MYPKG2 mypackage2(>=1.0))
@@ -52,11 +52,11 @@
 #####
 #
 # VleCheckDependencies: it checks if vle dependencies are installed into the
-#     binary packages (VLE_HOME/pkgs-${VLE_VERSION}). Dependencies are
+#     binary packages (VLE_HOME/vle-${VLE_MACRO_VERSION}/pkgs). Dependencies are
 #     declared into the flag "Build-Depends" of the file Description.txt
 #     (${CMAKE_SRC_DIR}/Description.txt).
 #
-#> find_package(VLE 2.0 REQUIRED)
+#> find_package(VLE 2.1 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleCheckDependencies()
 #
@@ -65,7 +65,7 @@
 # VleBuildDynamic: it builds a vle dynamic from a cpp file taking into account
 #     packages dependencies declared into tag "@@tagdepends" into the cpp file
 #
-#> find_package(VLE 2.0 REQUIRED)
+#> find_package(VLE 2.1 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildDynamic(Simple "Simple.cpp;otherSouce.cpp")
 #
@@ -77,7 +77,7 @@
 #
 # VleBuildTest: it builds test for the current project, from a cpp file
 #
-#> find_package(VLE 2.0 REQUIRED)
+#> find_package(VLE 2.1 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildTest(test_pkg "test.cpp")
 #
@@ -89,7 +89,7 @@
 #
 # VleBuildOovPlugin: it builds a oov plugin from a cpp file
 #
-#> find_package(VLE 2.0 REQUIRED)
+#> find_package(VLE 2.1 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildOovPlugin(oovplug_name "source1.cpp;source2.cpp")
 #
@@ -99,7 +99,7 @@
 #     if the tag "@@tagdynamic@@" is present then it builds a vle dynamic
 #     using VleBuildDynamic.
 #
-#> find_package(VLE 2.0 REQUIRED)
+#> find_package(VLE 2.1 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildAllDyn()
 #
@@ -109,13 +109,13 @@
 #     if the tag "@@tagtest@@" is present then it builds a vle test
 #     using VleBuildTest.
 #
-#> find_package(VLE 2.0 REQUIRED)
+#> find_package(VLE 2.1 REQUIRED)
 #> find_package(VleUtils REQUIRED)
 #> VleBuildAllTest()
 #
 # ===========================================================================
 
-set(VleUtils_VERSION 2.0)
+set(VleUtils_VERSION 2.1)
 
 if (NOT DEFINED VLE_DEBUG)
     message(FATAL_ERROR "VLE_DEBUG is not set ")
@@ -274,7 +274,12 @@ function(IntVleHomePkgs out)
       message(STATUS "The VLE_HOME defined: ${_vle_home}")
     endif ()
   endif ()
-  set(_vle_package_dir "${_vle_home}/pkgs-${VLE_VERSION}")
+  #https://stackoverflow.com/questions/18658233/split-string-to-3-variables-in-cmake
+  string(REPLACE "." ";" VERSION_LIST ${VLE_VERSION})
+  list(GET VERSION_LIST 0 VLE_MAJOR)
+  list(GET VERSION_LIST 1 VLE_MINOR)
+  math(EXPR VLE_MACRO_VERSION "${VLE_MAJOR} * 1000 + ${VLE_MINOR}")
+  set(_vle_package_dir "${_vle_home}/vle-${VLE_MACRO_VERSION}/pkgs")
   if (VLE_DEBUG)
     message(STATUS "VLE_VERSION defined for package directory: "
                    "${_vle_package_dir}")
@@ -287,7 +292,7 @@ endfunction()
 
 ###
 # Get the VLE system packages directory:
-#   out: /usr/lib/vle-2.0/pkgs
+#   out: /usr/lib/vle-2.1/pkgs
 ###
 
 function(IntVleSystemPkgs out)
