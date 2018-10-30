@@ -46,37 +46,43 @@ before_build:
   - cmd: md %VleDeps%\include
   - cmd: md %VleDeps%\include\lzma
   - cmd: md %VleDeps%\include\libxml2
-  - cmd: xcopy /s /i %MingwPath%\bin\curl.exe %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\include\iconv.h %VleDeps%\include
-  - cmd: xcopy /s /i %MingwPath%\include\libintl.h %VleDeps%\include
-  - cmd: xcopy /s /i %MingwPath%\include\lzma.h %VleDeps%\include
-  - cmd: xcopy /s /i %MingwPath%\include\zlib.h %VleDeps%\include
-  - cmd: xcopy /s /i %MingwPath%\include\lzma\* %VleDeps%\include\lzma\
-  - cmd: xcopy /s /i %MingwPath%\include\libxml2\* %VleDeps%\include\libxml2\
-  - cmd: xcopy /s /i %MingwPath%\bin\libcurl-4.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libeay32.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libexpat-1.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libiconv-2.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libidn2-0.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libintl-8.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\liblzma-5.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libmetalink-3.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libnghttp2-14.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libssh2-1.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libunistring-2.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\libxml2-2.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\ssleay32.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\bin\zlib1.dll %VleDeps%\bin
-  - cmd: xcopy /s /i %MingwPath%\lib\liblzma.a %VleDeps%\lib
-  - cmd: xcopy /s /i %MingwPath%\lib\liblzma.dll.a %VleDeps%\lib
-  - cmd: xcopy /s /i %MingwPath%\lib\libxml2.a %VleDeps%\lib
-  - cmd: xcopy /s /i %MingwPath%\lib\libxml2.dll.a %VleDeps%\lib
-  - cmd: xcopy /s /i %MingwPath%\lib\libz.a %VleDeps%\lib
-  - cmd: xcopy /s /i %MingwPath%\lib\libz.dll.a %VleDeps%\lib
-  - cmd: xcopy /s /i %MingwPath%\lib\libiconv.a %VleDeps%\lib
-  - cmd: xcopy /s /i %MingwPath%\lib\libiconv.dll.a %VleDeps%\lib
-  - cmd: xcopy /s /i %MingwPath%\lib\libintl.a %VleDeps%\lib
-  - cmd: xcopy /s /i %MingwPath%\lib\libintl.dll.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\bin\curl.exe %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\include\iconv.h %VleDeps%\include
+  - cmd: xcopy /Y %MingwPath%\include\libintl.h %VleDeps%\include
+  - cmd: xcopy /Y %MingwPath%\include\lzma.h %VleDeps%\include
+  - cmd: xcopy /Y %MingwPath%\include\zlib.h %VleDeps%\include
+  - cmd: xcopy /Y /S /I %MingwPath%\include\lzma\*.* %VleDeps%\include\lzma
+  - cmd: xcopy /Y /S /I %MingwPath%\include\libxml2\*.* %VleDeps%\include\libxml2
+  - cmd: xcopy /Y /S /I %MingwPath%\bin\libcurl-4.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libbrotlicommon.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libbrotlidec.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libcrypto-1_1.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libpsl-5.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libssl-1_1.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libexpat-1.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libiconv-2.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libidn2-0.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libintl-8.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\liblzma-5.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libmetalink-3.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libnghttp2-14.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libssh2-1.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libunistring-2.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libxml2-2.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\zlib1.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\curl.exe %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\lib\liblzma.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\lib\liblzma.dll.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\lib\libxml2.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\lib\libxml2.dll.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\lib\libz.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\lib\libz.dll.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\lib\libiconv.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\lib\libiconv.dll.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\lib\libintl.a %VleDeps%\lib
+  - cmd: xcopy /Y %MingwPath%\lib\libintl.dll.a %VleDeps%\lib
+  - cmd: xcopy /Y /S /I ssl\*.* %VleDeps%\ssl
+  - cmd: xcopy /Y /S /I ssl\certs\*.* %VleDeps%\ssl\certs
 
 build_script:
   - cmd: set PATH=%QtDirTools%\bin;%QtDir%\bin;%CMakePath%\bin;%OLD_PATH%
