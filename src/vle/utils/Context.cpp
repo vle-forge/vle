@@ -521,6 +521,7 @@ Context::readHomeDir()
 
     Path home(homedrive);
     home /= homepath;
+    home /= "vle";
     home /= format("vle-%d", VERSION_MAJOR * 1000 + VERSION_MINOR);
 
     if (home.is_directory()) {
@@ -562,7 +563,8 @@ Context::readHomeDir()
     char* chome = std::getenv("HOME");
     if (chome) {
         Path home(chome);
-        home /= format(".vle-%d", VERSION_MAJOR * 1000 + VERSION_MINOR);
+        home /= ".vle";
+        home /= format("vle-%d", VERSION_MAJOR * 1000 + VERSION_MINOR);
 
         if (home.is_directory()) {
             m_pimpl->m_home = home;
