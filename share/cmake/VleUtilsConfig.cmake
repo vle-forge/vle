@@ -26,7 +26,7 @@
 # Following CMake variables have to be defined :
 #
 #  VLE_DEBUG    - if true, prints debug traces (default OFF)
-#  VLE_VERSION  - it gives the ABI version of installed vle. For example, if 
+#  VLE_VERSION  - it gives the ABI version of installed vle. For example, if
 #                  VLE_VERSION = "2.1", then packages are expected to
 #                  be installed into VLE_HOME/vle-2001/pkgs.
 #
@@ -266,7 +266,7 @@ function(IntVleHomePkgs out)
     else ()
       file(TO_CMAKE_PATH "$ENV{HOME}/.vle" _vle_home)
     endif ()
-    if (_vle_debug)
+    if (VLE_DEBUG)
       message(STATUS "The VLE_HOME undefined, try default ${_vle_home}")
     endif()
   else ()
