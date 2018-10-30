@@ -14,8 +14,9 @@ init:
 install:
   - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
-  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S mingw-w64-i686-libxml2"
-  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S mingw-w64-i686-curl"
+  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S --overwrite * mingw-w64-i686-libxml2"
+  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S --overwrite * mingw-w64-i686-openssl"
+  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S --overwrite * mingw-w64-i686-curl"
 
 before_build:
   - cmd: set OLD_PATH=C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\
