@@ -81,8 +81,8 @@ before_build:
   - cmd: xcopy /Y %MingwPath%\lib\libiconv.dll.a %VleDeps%\lib
   - cmd: xcopy /Y %MingwPath%\lib\libintl.a %VleDeps%\lib
   - cmd: xcopy /Y %MingwPath%\lib\libintl.dll.a %VleDeps%\lib
-  - cmd: xcopy /Y /S /I ssl\*.* %VleDeps%\ssl
-  - cmd: xcopy /Y /S /I ssl\certs\*.* %VleDeps%\ssl\certs
+  - cmd: xcopy /Y /S /I %MingwPath%\ssl\*.* %VleDeps%\ssl
+  - cmd: xcopy /Y /S /I %MingwPath%\ssl\certs\*.* %VleDeps%\ssl\certs
 
 build_script:
   - cmd: set PATH=%QtDirTools%\bin;%QtDir%\bin;%CMakePath%\bin;%OLD_PATH%
