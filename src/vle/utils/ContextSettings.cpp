@@ -49,7 +49,7 @@
     "--target package_source"
 #define VLE_COMMAND_TAR "cmake.exe -E tar jcf '%1%' '%2%'"
 #define VLE_COMMAND_UNTAR "cmake.exe -E tar jxf '%1%' ."
-#define VLE_COMMAND_URL_GET "curl.exe '%1%' -o '%2%'"
+#define VLE_COMMAND_URL_GET "curl.exe -L '%1%' -o '%2%'"
 #define VLE_COMMAND_DIR_COPY "cmake.exe -E copy_directory '%1%' '%2%'"
 #define VLE_COMMAND_DIR_REMOVE "cmake.exe -E remove_directory '%1%'"
 #define VLE_COMMAND_VLE_SIMULATION "vle.exe --write-output '%1%' '%2%'"
@@ -68,7 +68,7 @@
     "cmake --build '%1%' --target package_source"
 #define VLE_COMMAND_TAR "cmake -E tar jcf '%1%' '%2%'"
 #define VLE_COMMAND_UNTAR "cmake -E tar jxf '%1%'"
-#define VLE_COMMAND_URL_GET "curl --progress-bar '%1%' -o '%2%'"
+#define VLE_COMMAND_URL_GET "curl -L '%1%' -o '%2%'"
 #define VLE_COMMAND_DIR_COPY "cmake -E copy_directory '%1%' '%2%'"
 #define VLE_COMMAND_DIR_REMOVE "cmake -E remove_directory '%1%'"
 #define VLE_COMMAND_VLE_SIMULATION                                            \
