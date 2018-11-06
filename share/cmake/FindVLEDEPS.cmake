@@ -119,38 +119,39 @@ find_package_handle_standard_args(iconv
 mark_as_advanced(ICONV_INCLUDE_DIR ICONV_LIBRARY)
 
 
-if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  #
-  # Try to found libintl
-  #
-  find_path(INTL_INCLUDE_DIR
-    NAMES libintl.h
-    HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
+# if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+#   #
+#   # Try to found libintl
+#   #
+#   find_path(INTL_INCLUDE_DIR
+#     NAMES libintl.h
+#     HINTS $ENV{VLEDEPS_BASEPATH}/include ${VLEDEPS_PATH}/include)
 
-  find_library(INTL_LIBRARY
-    NAMES intl libintl
-    HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
+#   find_library(INTL_LIBRARY
+#     NAMES intl libintl
+#     HINTS $ENV{VLEDEPS_BASEPATH}/lib ${VLEDEPS_PATH}/lib)
 
-  find_package_handle_standard_args(intl
-    DEFAULT_MSG
-    INTL_LIBRARY
-    INTL_INCLUDE_DIR)
-else ()
-  set(ICONV_INCLUDE_DIR)
-  set(ICONV_LIBRARY)
-endif()
+#   find_package_handle_standard_args(intl
+#     DEFAULT_MSG
+#     INTL_LIBRARY
+#     INTL_INCLUDE_DIR)
+# else ()
+#   set(ICONV_INCLUDE_DIR)
+#   set(ICONV_LIBRARY)
+# endif()
 
-mark_as_advanced(ICONV_INCLUDE_DIR ICONV_LIBRARY)
+# mark_as_advanced(ICONV_INCLUDE_DIR ICONV_LIBRARY)
 
 #
 # Build variable
 #
 
 list(APPEND VLEDEPS_INCLUDE_DIRS ${LIBXML2_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR}
-  ${ICONV_INCLUDE_DIR} ${INTL_INCLUDE_DIR})
+  ${ICONV_INCLUDE_DIR}) # ${INTL_INCLUDE_DIR})
 
 list(APPEND VLEDEPS_LIBRARIES ${LIBXML2_LIBRARY} ${ICONV_LIBRARY}
-  ${INTL_LIBRARY} ${ICONV_LIBRARY} ${ZLIB_LIBRARY})
+  # ${INTL_LIBRARY}
+  ${ICONV_LIBRARY} ${ZLIB_LIBRARY})
 
 if (_vledeps_debug)
   message ("[FindVLEDEPS] libxml2 include path : ${LIBXML2_INCLUDE_DIR}")
@@ -159,8 +160,8 @@ if (_vledeps_debug)
   message ("              zlib libs : ${ZLIB_LIBRARY}")
   message ("              iconv include path : ${ICONV_INCLUDE_DIR}")
   message ("              iconv libs : ${ICONV_LIBRARY}")
-  message ("              intl include path : ${INTL_INCLUDE_DIR}")
-  message ("              intl libs : ${INTL_LIBRARY}")
+  # message ("              intl include path : ${INTL_INCLUDE_DIR}")
+  # message ("              intl libs : ${INTL_LIBRARY}")
 endif()
 
 message ("VLEDEPS_LIBRARIES:" ${VLEDEPS_LIBRARIES})
