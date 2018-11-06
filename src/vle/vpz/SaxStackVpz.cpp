@@ -768,7 +768,7 @@ SaxStackVpz::pushView(const xmlChar** att)
               _("View tag does not have a timestep attribute"));
         }
         views.addTimedView(xmlCharToString(name),
-                           xmlXPathCastStringToNumber(timestep),
+                           xmlCharToDouble(timestep),
                            xmlCharToString(output),
                            enable_b);
     } else {
