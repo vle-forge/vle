@@ -30,6 +30,7 @@
 #include <boost/cast.hpp>
 #include <cerrno>
 #include <cstring>
+#include <cstdlib>
 #include <fstream>
 #include <libxml/SAX2.h>
 #include <libxml/parser.h>
@@ -725,7 +726,7 @@ void
 SaxParser::onEndDouble()
 {
     m_valuestack.pushOnVectorValue<value::Double>(
-      xmlXPathCastStringToNumber(((xmlChar*)lastCharactersStored().c_str())));
+      xmlCharToDouble(((xmlChar*)lastCharactersStored().c_str())));
 }
 
 void
@@ -772,7 +773,7 @@ SaxParser::onEndTuple()
         boost::algorithm::trim(elem);
         if (not(elem).empty()) {
             tuple.add(
-              xmlXPathCastStringToNumber((const xmlChar*)((elem).c_str())));
+              xmlCharToDouble((const xmlChar*)((elem).c_str())));
         }
     }
 
@@ -812,7 +813,7 @@ SaxParser::onEndTable()
         boost::algorithm::trim(elem);
         if (not(elem).empty()) {
             table.get(i, j) =
-              xmlXPathCastStringToNumber((const xmlChar*)((elem).c_str()));
+              xmlCharToDouble((const xmlChar*)((elem).c_str()));
             if (i + 1 >= table.width()) {
                 i = 0;
                 if (j + 1 >= table.height()) {
@@ -1043,13 +1044,44 @@ xmlCharToBoolean(const xmlChar* str)
 long int
 xmlCharToInt(const xmlChar* str)
 {
-    return (long int)xmlXPathCastStringToNumber(str);
+    auto c_str = reinterpret_cast<const char*>(str);
+    
+    errno = 0;
+    auto val = std::strtol(c_str, nullptr, 10);
+
+    if (errno && (val == 0 || val == LONG_MAX || val == LONG_MIN))
+        throw utils::SaxParserError(_("fail to convert to int `%s'"), c_str);
+
+    return val;
 }
 
 unsigned long int
 xmlCharToUnsignedInt(const xmlChar* str)
 {
-    return (unsigned long int)xmlXPathCastStringToNumber(str);
+    auto c_str = reinterpret_cast<const char*>(str);
+    
+    errno = 0;
+    auto val = std::strtoul(c_str, nullptr, 10);
+
+    if (errno && (val == 0 || val == ULONG_MAX))
+        throw utils::SaxParserError(_("fail to convert to unsigned int `%s'"), c_str);
+
+    return val;
 }
+
+double
+xmlCharToDouble(const xmlChar* str)
+{
+    auto c_str = reinterpret_cast<const char*>(str);
+    
+    errno = 0;
+    auto val = std::strtod(c_str, nullptr);
+
+    if (errno && (val == 0 || val == HUGE_VAL))
+        throw utils::SaxParserError(_("fail to convert to double `%s'"), c_str);
+
+    return val;
+}
+
 }
 } // namespace vle vpz

@@ -320,6 +320,17 @@ xmlCharToInt(const xmlChar* str);
  */
 VLE_LOCAL unsigned long int
 xmlCharToUnsignedInt(const xmlChar* str);
+
+/**
+ * @brief Convert the xmlChar pointer to double.
+ * @param str The constant xmlChar pointer to translate.
+ * @throw utils::SaxParserError if the xmlChar can not be translated into an
+ * double.
+ * @return The double.
+ */
+VLE_LOCAL double
+xmlCharToDouble(const xmlChar *str);
+
 }
 } // namespace vle vpz
 
