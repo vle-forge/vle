@@ -38,7 +38,6 @@
 #include <algorithm>
 
 #include <cstring>
-#include <libxml/xpath.h>
 
 namespace {
 
