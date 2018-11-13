@@ -1,6 +1,29 @@
 VLE 2.0
 =======
 
+2.0.2
+-----
+
+VLE:
+
+- curl: add `-L` option to the curl command line. According to the curl
+  documentation, if the server reports that the requested page has moved to a
+  different location (indicated with a Location: header and a 3XX response
+  code), this option will make curl redo the request on the new place.
+  (Closes: #357).
+
+- vpz: In SAX parser, replace xmlXPath functions dependencies with
+  `boost::spirit::qi` function.
+
+RVLE:
+
+- fix compilation toolchain: use the same rtools compiler for both VLE and
+  VLE's dependencies.
+
+Appveyor:
+
+- fix compilation scripts to use curl, ssl and certificats.
+
 2.0.1
 -----
 
