@@ -191,8 +191,10 @@ public:
 
 class VpzMainModelItem : public VpzModelItem
 {
-
 public:
+    QList<VpzSubModelItem*> cache_submodels;
+    bool cache_submodels_valid;
+
     enum SEL_TYPE
     {
         TOP,

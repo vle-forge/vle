@@ -646,7 +646,8 @@ VpzMainModelItem::VpzMainModelItem(QDomNode node,
                                    vleVpz* vpz,
                                    QGraphicsItem* parent,
                                    QGraphicsScene* scene)
-  : VpzModelItem(node, vpz, parent, scene)
+  : VpzModelItem(node, vpz, parent, scene), cache_submodels(),
+    cache_submodels_valid(false)
 {
     scene->addItem(this);
 
@@ -724,6 +725,7 @@ VpzMainModelItem::initializeFromDom()
     VleLineEditItem* it = new VleLineEditItem(getModelName(), this);
     it->setFont(vpzscene->getFontModel());
     it->setDefaultTextColor(vpzscene->getColorModelNameNotSelected());
+    cache_submodels_valid = false;
     update();
     addConnLines();
 }
@@ -755,6 +757,7 @@ VpzMainModelItem::clearSubModels()
         scene()->removeItem(subs[i]);
         delete subs[i];
     }
+    cache_submodels_valid = false;
 }
 
 void
@@ -1025,14 +1028,10 @@ VpzMainModelItem::subModelsBoundingRect(bool onlySelected)
 VpzSubModelItem*
 VpzMainModelItem::getSubModel(const QString& subMod)
 {
-    QList<QGraphicsItem*> children = childItems();
-    for (int i = 0; i < children.length(); i++) {
-        if (VpzDiagScene::isVpzSubModel(children.at(i))) {
-            VpzSubModelItem* modItem =
-              static_cast<VpzSubModelItem*>(children.at(i));
-            if (modItem->getModelName() == subMod) {
-                return modItem;
-            }
+    getSubModels();//update model cache if necessary
+    for (VpzSubModelItem* mod :  cache_submodels) {
+        if (mod->getModelName() == subMod) {
+            return mod;
         }
     }
     return 0;
@@ -1041,14 +1040,18 @@ VpzMainModelItem::getSubModel(const QString& subMod)
 QList<VpzSubModelItem*>
 VpzMainModelItem::getSubModels()
 {
-    QList<VpzSubModelItem*> res;
-    QList<QGraphicsItem*> children = childItems();
-    for (int i = 0; i < children.length(); i++) {
-        if (VpzDiagScene::isVpzSubModel(children.at(i))) {
-            res.append(static_cast<VpzSubModelItem*>(children.at(i)));
+    if (not cache_submodels_valid) {
+        cache_submodels.clear();
+        QList<QGraphicsItem*> children = childItems();
+        for (int i = 0; i < children.length(); i++) {
+            if (VpzDiagScene::isVpzSubModel(children.at(i))) {
+                cache_submodels.append(
+                        static_cast<VpzSubModelItem*>(children.at(i)));
+            }
         }
+        cache_submodels_valid = true;
     }
-    return res;
+    return cache_submodels;
 }
 
 QList<VpzSubModelItem*>
@@ -1667,6 +1670,7 @@ VpzDiagScene::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
                             delete it;
                         }
                         this->blockSignals(oldBlock);
+                        mCoupled->cache_submodels_valid = false;
                         mCoupled->update();
                     }
                 }
