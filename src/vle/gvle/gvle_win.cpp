@@ -153,6 +153,9 @@ gvle_win::gvle_win(QWidget* parent)
                      SIGNAL(toggled(bool)),
                      this,
                      SLOT(onSelectSimulator(bool)));
+
+    QObject::connect(
+      ui->actionResetConfig, SIGNAL(triggered()), this, SLOT(onResetConfig()));
     QObject::connect(
       ui->actionHelp, SIGNAL(triggered()), this, SLOT(onHelp()));
     QObject::connect(
@@ -791,6 +794,46 @@ gvle_win::onSelectSimulator(bool isChecked)
 }
 
 /**
+ * @brief gvle_win::onResetConfig Handler of menu Help > ResetConfig
+ *        Open a window asking if the userdoes want to reset the config
+ */
+void
+gvle_win::onResetConfig()
+{
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::critical(this,
+                                  tr("Question"),
+                                  tr("Are you sure you want to reset the vle" \
+                                     " configuration file to the default?"),
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        mLogger->log(tr("Reset the vle configuration!"));
+        try {
+            using vle::utils::Path;
+
+            {
+                Path filepath(mCtx->getConfigurationFile());
+                filepath.remove();
+            }
+
+            {
+                Path filepath(mCtx->getLogFile());
+                filepath.remove();
+            }
+
+            mCtx->reset_settings();
+            mCtx->write_settings();
+        } catch (const std::exception& e) {
+            mLogger->log(QString(
+                             utils::format("Failed to reset the vle configuration file: %s\n",
+                                           e.what())
+                             .c_str()));
+        }
+    }
+}
+
+/**
  * @brief gvle_win::onHelp Handler of menu Help > Help
  *        Open a new tab and display embedded help page
  */
@@ -997,7 +1040,7 @@ gvle_win::menuPackagesInstallRefresh()
                                 itb->major,
                                 itb->minor,
                                 itb->patch)
-                    .c_str()));
+                  .c_str()));
             }
         }
     }

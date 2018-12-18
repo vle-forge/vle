@@ -105,6 +105,7 @@ private slots:
     void onUndo();
     void onRedo();
     void onSelectSimulator(bool isChecked);
+    void onResetConfig();
     void onHelp();
     void onAbout();
     void onTabChange(int index);
