@@ -462,6 +462,7 @@ QPushButton:hover{background:url(:/icon/resources/icon/arrow_up_blue.png);}</str
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionResetConfig"/>
     <addaction name="actionHelp"/>
     <addaction name="actionAbout"/>
    </widget>
@@ -637,6 +638,11 @@ QPushButton:hover{background:url(:/icon/resources/icon/arrow_up_blue.png);}</str
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionResetConfig">
+   <property name="text">
+    <string>Reset Config</string>
    </property>
   </action>
   <action name="actionAbout">
