@@ -579,6 +579,31 @@ Path::create_directories(const Path& p)
     return p.create_directories();
 }
 
+UnlinkPath::UnlinkPath(const Path& path_to_delete)
+  : m_unlink_path(path_to_delete)
+{}
+
+UnlinkPath::~UnlinkPath() noexcept
+{
+    try {
+        if (m_unlink_path.exists())
+            m_unlink_path.remove();
+    } catch (...) {
+    }
+}
+
+Path
+UnlinkPath::path() const
+{
+    return m_unlink_path;
+}
+
+std::string
+UnlinkPath::string() const
+{
+    return m_unlink_path.string();
+}
+
 //
 // DirectoryEntry, DirectoryIterator implementation
 //
