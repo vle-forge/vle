@@ -325,12 +325,14 @@ public:
             filename /= "vledl-%%%%%%%%.pkg";
             filename = Path::unique_path(filename.string());
 
-            dl.start(url + "/packages.pkg", filename.string());
+            UnlinkPath path(filename);
+
+            dl.start(url + "/packages.pkg", path.string());
             dl.join();
 
             if (not dl.hasError()) {
                 try {
-                    parser->extract(filename.string(), url);
+                    parser->extract(path.string(), url);
                 } catch (const utils::FileError& err) {
                     *remoteHasError = true;
                     remoteMessageError->assign(utils::format(

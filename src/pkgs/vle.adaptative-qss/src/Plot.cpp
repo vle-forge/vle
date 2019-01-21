@@ -228,9 +228,9 @@ class Plot : public vle::devs::Dynamics
     std::chrono::time_point<std::chrono::steady_clock> m_time;
     std::thread m_runner;
 
-    vle::utils::Path m_data_file;
-    vle::utils::Path m_gp_file;
-    vle::utils::Path m_config_file;
+    vle::utils::UnlinkPath m_data_file;
+    vle::utils::UnlinkPath m_gp_file;
+    vle::utils::UnlinkPath m_config_file;
     vle::utils::Path m_command;
 
     std::ofstream m_data_os;
@@ -333,7 +333,8 @@ public:
 
             if (not m_gnuplot_started) {
                 m_gnuplot_started = true;
-                m_runner = std::thread(start_plot, m_command, m_gp_file);
+                m_runner =
+                  std::thread(start_plot, m_command, m_gp_file.path());
                 m_runner.detach();
             }
 
@@ -476,7 +477,7 @@ public:
         write(0, false);
 
         if (not m_gnuplot_started) {
-            m_runner = std::thread(start_plot, m_command, m_gp_file);
+            m_runner = std::thread(start_plot, m_command, m_gp_file.path());
             m_runner.detach();
         }
     }
