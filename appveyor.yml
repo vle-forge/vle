@@ -61,7 +61,7 @@ before_build:
   - cmd: xcopy /Y %MingwPath%\bin\libssl-1_1.dll %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\libexpat-1.dll %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\libiconv-2.dll %VleDeps%\bin
-  - cmd: xcopy /Y %MingwPath%\bin\libidn2-0.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libidn2-4.dll %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\libintl-8.dll %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\liblzma-5.dll %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\libmetalink-3.dll %VleDeps%\bin
