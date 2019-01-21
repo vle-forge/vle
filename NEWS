@@ -1,6 +1,36 @@
 VLE 2.0
 =======
 
+VLE 2.0.2
+---------
+
+- VLE:
+  - `curl`: add `-L` option to the curl command line. According to the curl
+    documentation, if the server reports that the requested page has moved to a
+    different location (indicated with a Location: header and a 3XX response
+    code), this option will make curl redo the request on the new place.
+    (Closes: #357).
+  - `vpz` In SAX parser, replace `xmlXPath` functions dependencies with
+    `boost::spirit::qi` function.
+
+- RVLE:
+  - Fix compilation toolchain: use the same rtools compiler for both VLE and
+    VLE’s dependencies.
+
+- Appveyor
+  - fix compilation scripts to use curl, ssl and certificats.
+
+VLE 2.0.1
+---------
+
+- VLE:
+  - Windows binary: updating build and runtime dependencies (ssl, certificates)
+    and bump the Qt version to 5.9.6.
+  - Switches default url from http to https.
+  - cvle : fix the use of `more_output_details` option. When using
+    `more_output_details` the comma cannot be used as separator since the comma
+    is already used in the format of output variables (Closes #346)
+
 Release highlights
 ------------------
 
