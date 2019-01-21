@@ -40,38 +40,47 @@ public:
     {
         return m_path.begin();
     }
+
     inline const_iterator begin() const noexcept
     {
         return m_path.cbegin();
     }
+
     inline const_iterator cbegin() const noexcept
     {
         return m_path.cbegin();
     }
+
     inline reverse_iterator rbegin() noexcept
     {
         return m_path.rbegin();
     }
+
     inline const_reverse_iterator crbegin() const noexcept
     {
         return m_path.crbegin();
     }
+
     inline iterator end() noexcept
     {
         return m_path.end();
     }
+
     inline const_iterator end() const noexcept
     {
         return m_path.cend();
     }
+
     inline const_iterator cend() const noexcept
     {
         return m_path.cend();
     }
+
     inline reverse_iterator rend() noexcept
     {
         return m_path.rend();
     }
+
     inline const_reverse_iterator crend() const noexcept
     {
         return m_path.crend();
@@ -221,8 +230,8 @@ public:
 
 private:
     std::vector<std::string> m_path;
-    path_type m_type{native_path};
-    bool m_absolute{false};
+    path_type m_type{ native_path };
+    bool m_absolute{ false };
 };
 
 /**

@@ -18,8 +18,8 @@
 #define NOMINMAX
 #include <Windows.h>
 
-#include <vle/utils/details/UtilsWin.hpp>
 #include <ctime>
+#include <vle/utils/details/UtilsWin.hpp>
 #endif
 
 #include <array>
@@ -41,10 +41,10 @@
 #include <vle/utils/i18n.hpp>
 
 #ifndef _WIN32
-#include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 #endif
 
 #ifdef __unix__
@@ -393,8 +393,8 @@ Path::current_path()
     return Path(temp);
 #else
     std::wstring buffer(MAX_PATH, '\0');
-    DWORD ret = ::GetCurrentDirectoryW(
-        static_cast<DWORD>(buffer.size()), &buffer[0]);
+    DWORD ret =
+      ::GetCurrentDirectoryW(static_cast<DWORD>(buffer.size()), &buffer[0]);
 
     while (ret > buffer.size()) {
         buffer.resize(ret, '\0');
@@ -440,13 +440,11 @@ Path::temp_directory_path()
     return { "/tmp" };
 #else
     std::wstring buffer(MAX_PATH, '\0');
-    auto ret = ::GetTempPathW(
-        static_cast<DWORD>(buffer.size()), &buffer[0]);
+    auto ret = ::GetTempPathW(static_cast<DWORD>(buffer.size()), &buffer[0]);
 
     while (ret > buffer.size()) {
         buffer.resize(ret, '\0');
-        ret = ::GetTempPathW(
-            static_cast<DWORD>(buffer.size()), &buffer[0]);
+        ret = ::GetTempPathW(static_cast<DWORD>(buffer.size()), &buffer[0]);
     }
 
     if (ret == 0)
@@ -753,7 +751,8 @@ DirectoryIterator::DirectoryIterator(const Path& p)
 
 DirectoryIterator::~DirectoryIterator() = default;
 
-DirectoryIterator& DirectoryIterator::operator++()
+DirectoryIterator&
+DirectoryIterator::operator++()
 {
     if (not m_pimpl)
         return *this;
