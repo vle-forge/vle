@@ -248,12 +248,42 @@ public:
     }
 };
 
+/**
+ * This class uses the RAII paradigm to automatically remove (using
+ * @c Path::remove) when the object is destroyed.
+ *
+ * \example
+ * Path tmp;
+ * {
+ *     UnlinkPath p(Path::unique_path("vle-%%%%-%%%%-%%%%-%%%%.tmp"));
+ *     tmp = p.get_path();
+ *     std::ofstream ofs(p.get_path().string());
+ *     ...
+ * }
+ * assert(tmp.exists() == false);
+ * \endexample
+ */
+class VLE_API UnlinkPath
+{
+public:
+    UnlinkPath(const Path& path_to_delete);
+
+    ~UnlinkPath() noexcept;
+
+    Path path() const;
+
+    std::string string() const;
+
+private:
+    Path m_unlink_path;
+};
+
 class DirectoryIterator;
 class VLE_API DirectoryEntry
 {
     Path m_path;
-    bool m_is_file{false};
-    bool m_is_directory{false};
+    bool m_is_file{ false };
+    bool m_is_directory{ false };
 
 public:
     DirectoryEntry();
