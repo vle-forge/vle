@@ -57,46 +57,48 @@ using namespace vle;
 struct F
 {
     vle::Init a;
-    vle::utils::Path current_path;
+    vle::utils::UnlinkPath path;
 
-    F()
+    static vle::utils::Path init()
     {
-        current_path = vle::utils::Path::temp_directory_path();
-        printf("directory 1: %s\n", current_path.string().c_str());
-        current_path /= "vle-%%%%-%%%%-%%%%";
-        printf("directory 2: %s\n", current_path.string().c_str());
+        auto ret = vle::utils::Path::temp_directory_path();
+        printf("directory 1: %s\n", ret.string().c_str());
 
-        printf("directory is_absolute: %d\n", current_path.is_absolute());
+        ret /= "vle-%%%%-%%%%-%%%%";
+        printf("directory 2: %s\n", ret.string().c_str());
 
-        current_path = vle::utils::Path::unique_path(current_path.string());
-        printf("directory 3: %s\n", current_path.string().c_str());
-        current_path.create_directory();
-        printf("directory 4: %s\n", current_path.string().c_str());
+        printf("directory is_absolute: %d\n", ret.is_absolute());
+
+        ret = vle::utils::Path::unique_path(ret.string());
+        printf("directory 3: %s\n", ret.string().c_str());
+
+        ret.create_directory();
+        printf("directory 4: %s\n", ret.string().c_str());
 
         /* We need to ensure each file really installed. */
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
-        if (not current_path.is_directory())
+        if (not ret.is_directory())
             throw std::runtime_error("Fails to found temporary directory");
 
+        return ret;
+    }
+
+    F()
+      : path(init())
+    {
 #ifdef _WIN32
         ::_putenv(
-          vle::utils::format("VLE_HOME=%s", current_path.string().c_str())
-            .c_str());
+          vle::utils::format("VLE_HOME=%s", path.string().c_str()).c_str());
 #else
-        ::setenv("VLE_HOME", current_path.string().c_str(), 1);
+        ::setenv("VLE_HOME", path.string().c_str(), 1);
 #endif
 
-        vle::utils::Path::current_path(current_path);
-        std::cout << "test start in " << current_path.string() << '\n';
+        vle::utils::Path::current_path(path.path());
+        std::cout << "test start in " << path.string() << '\n';
 
         auto ctx = vle::utils::make_context();
         ctx->write_settings();
-    }
-
-    ~F()
-    {
-        std::cout << "test finish in " << current_path.string() << '\n';
     }
 };
 

@@ -44,7 +44,7 @@
 namespace vle {
 namespace manager {
 
-utils::Path
+static utils::Path
 make_temp(const char* format)
 {
     assert(format);
@@ -88,8 +88,8 @@ public:
     utils::ContextPtr m_context;
     std::chrono::milliseconds m_timeout;
     std::ostream* m_out;
-    utils::Path m_vpz_file;
-    utils::Path m_output_file;
+    utils::UnlinkPath m_vpz_file;
+    utils::UnlinkPath m_output_file;
     LogOptions m_logoptions;
     SimulationOptions m_simulationoptions;
 
@@ -340,9 +340,8 @@ public:
 
                 return {};
             }
-            std::unique_ptr<value::Map> results = read_value(m_output_file);
-            m_output_file.remove();
-            m_vpz_file.remove();
+            std::unique_ptr<value::Map> results =
+              read_value(m_output_file.path());
             return results;
         } catch (const std::exception& e) {
             m_context->error(_("VLE sub process: unable to start "
