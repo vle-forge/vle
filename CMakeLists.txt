@@ -110,6 +110,12 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0020 NEW)#for qt link
 endif (COMMAND CMAKE_POLICY)
 
+
+find_package(EXPAT REQUIRED)
+if (NOT EXPAT_FOUND)
+  message(FATAL_ERROR "expat library is required. Install libexpat first (libexpat1-dev Debian/Ubuntu)")
+endif ()
+
 #
 # Detect thread library to use
 #
