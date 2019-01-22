@@ -65,7 +65,7 @@ target_compile_definitions(vlelib
 
 target_include_directories(vlelib PUBLIC ${VLEDEPS_INCLUDE_DIRS})
 
-target_link_libraries(vlelib ${VLEDEPS_LIBRARIES}
+target_link_libraries(vlelib ${VLEDEPS_LIBRARIES} EXPAT::EXPAT
   ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
