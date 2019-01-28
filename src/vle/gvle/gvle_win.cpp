@@ -1684,7 +1684,8 @@ gvle_win::getPackageToBuildDepends()
          ++it) {
         QString line = *it;
         if (line.startsWith("Build-Depends: ")) {
-            line.replace("Build-Depends: ", "");
+            line.remove(' ');
+            line.replace("Build-Depends:", "");
             QStringList dep = line.split(",");
             dep.removeAll("");
             return dep;
