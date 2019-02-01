@@ -709,7 +709,7 @@ void
 BaseModel::getAtomicModelList(BaseModel* model, AtomicModelVector& list)
 {
     if (model->isAtomic()) {
-        list.push_back((AtomicModel*)model);
+        list.push_back(static_cast<AtomicModel*>(model));
     } else {
         std::list<CoupledModel*> coupledModelList;
         coupledModelList.push_back((CoupledModel*)model);

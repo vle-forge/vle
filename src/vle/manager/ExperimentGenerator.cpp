@@ -102,11 +102,14 @@ class ExperimentGenerator::Pimpl
         uint32_t number = mCompleteSize / mWorld;
         uint32_t modulo = mCompleteSize % mWorld;
 
-        mMin =
-          (number + 1) * std::min(mRank, modulo) +
-          number * uint32_t(std::max((int32_t)0, int32_t(mRank - modulo)));
-        mMax = std::min(mCompleteSize,
-                        mMin + number + 1 * uint32_t(mRank < modulo));
+        auto max = std::max(mRank - modulo, { 0 });
+
+        mMin = (number + 1) * std::min(mRank, modulo) +
+               number * static_cast<uint32_t>(max);
+
+        mMax =
+          std::min(mCompleteSize,
+                   mMin + number + 1 * static_cast<uint32_t>(mRank < modulo));
     }
 
 public:

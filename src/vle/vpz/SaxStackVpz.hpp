@@ -77,7 +77,7 @@ public:
      * @return A reference to the vpz::Vpz.
      * @throw utils::SaxParserError if stack is not empty.
      */
-    vpz::Vpz* pushVpz(const xmlChar** name);
+    vpz::Vpz* pushVpz(const char** name);
 
     /**
      * @brief Push the structure into the stack.
@@ -91,7 +91,7 @@ public:
      * @throw utils::SaxParserError if stack is empty and parent it not
      * Structures, Submodels or Class.
      */
-    void pushModel(const xmlChar** att);
+    void pushModel(const char** att);
 
     /**
      * @brief Push Port (condition or observation) into the stack.
@@ -99,7 +99,7 @@ public:
      * @throw utils::SaxParserError if stack is empty and parent it not
      * Conditions, Observables or Connection (In or Out).
      */
-    void pushPort(const xmlChar** att);
+    void pushPort(const char** att);
 
     /**
      * @brief Push the type of port.
@@ -130,7 +130,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Connections.
      */
-    void pushConnection(const xmlChar** att);
+    void pushConnection(const char** att);
 
     /**
      * @brief Push an Origin of Connection into the stack.
@@ -138,7 +138,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * InternalConnection, InputConnection or OutputConnection.
      */
-    void pushOrigin(const xmlChar** att);
+    void pushOrigin(const char** att);
 
     /**
      * @brief Push an Destination of Connection into the stack.
@@ -146,7 +146,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * InternalConnection, InputConnection or OutputConnection.
      */
-    void pushDestination(const xmlChar** att);
+    void pushDestination(const char** att);
 
     /**
      * @brief Push a Dynamics into the stack.
@@ -160,14 +160,14 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not a
      * Dynamics.
      */
-    void pushDynamic(const xmlChar** att);
+    void pushDynamic(const char** att);
 
     /**
      * @brief Push an Experiment into the stack.
      * @param att The attribute list.
      * @throw utils::SaxParserError if stack is empty or parent is not Vpz.
      */
-    void pushExperiment(const xmlChar** att);
+    void pushExperiment(const char** att);
 
     /**
      * @brief Push a Conditions into th stack.
@@ -182,7 +182,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Conditions.
      */
-    void pushCondition(const xmlChar** att);
+    void pushCondition(const char** att);
 
     /**
      * @brief Push a ConditionPort into a Condition.
@@ -190,7 +190,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Condition.
      */
-    void pushConditionPort(const xmlChar** att);
+    void pushConditionPort(const char** att);
 
     /**
      * @brief Push a Views into th stack.
@@ -212,7 +212,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Outputs.
      */
-    void pushOutput(const xmlChar** att);
+    void pushOutput(const char** att);
 
     /**
      * @brief Push an View into th stack.
@@ -220,7 +220,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Views.
      */
-    void pushView(const xmlChar** att);
+    void pushView(const char** att);
 
     /**
      * @brief Push an attachedview into th stack.
@@ -228,7 +228,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * ObservablePort.
      */
-    void pushAttachedView(const xmlChar** att);
+    void pushAttachedView(const char** att);
 
     /**
      * @brief Push an Observables into th stack.
@@ -243,7 +243,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Observables.
      */
-    void pushObservable(const xmlChar** att);
+    void pushObservable(const char** att);
 
     /**
      * @brief Push an ObservablePort into th stack.
@@ -251,7 +251,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Observable.
      */
-    void pushObservablePort(const xmlChar** att);
+    void pushObservablePort(const char** att);
 
     /**
      * @brief Push a View to an ObservablePort.
@@ -259,7 +259,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * ObservablePort.
      */
-    void pushObservablePortOnView(const xmlChar** att);
+    void pushObservablePortOnView(const char** att);
 
     /**
      * @brief Push a Classes into the stack.
@@ -274,7 +274,7 @@ public:
      * @throw utils::SaxParserError if stack is empty or parent is not
      * Classes.
      */
-    void pushClass(const xmlChar** att);
+    void pushClass(const char** att);
 
     /**
      * @brief Pop the Classes

@@ -196,7 +196,7 @@ public:
      */
     static inline double weeks(unsigned int n)
     {
-        return (int)(7 * n);
+        return static_cast<double>(7 * n);
     }
 
     /**
@@ -206,7 +206,7 @@ public:
      */
     static inline double days(unsigned int n)
     {
-        return (int)n;
+        return static_cast<double>(n);
     }
 
     /**
