@@ -137,26 +137,6 @@ public:
         return m_vpz;
     }
 
-    static void onStartDocument(void* ctx);
-
-    static void onEndDocument(void* ctx);
-
-    static void onStartElement(void* ctx,
-                               const xmlChar* name,
-                               const xmlChar** atts);
-
-    static void onEndElement(void* ctx, const xmlChar* att);
-
-    static void onCharacters(void* ctx, const xmlChar* ch, int len);
-
-    static void onCDataBlock(void* ctx, const xmlChar* value, int len);
-
-    static void onWarning(void* user_data, const char* msg, ...);
-
-    static void onError(void* user_data, const char* msg, ...);
-
-    static void onFatalError(void* user_data, const char* msg, ...);
-
     /**
      * @brief Get the last characters from internal buffer.
      * @return A characters buffer.
@@ -184,49 +164,75 @@ public:
     }
 
     /**
+     * @brief Get the last characters from internal buffer.
+     * @return A characters buffer.
+     */
+    const std::string& lastCdataStored() const
+    {
+        return m_cdata;
+    }
+
+    /**
+     * @brief Clear the internal buffer for last characters.
+     */
+    void clearLastCdataStored()
+    {
+        m_cdata.clear();
+    }
+
+    /**
+     * @brief Append characters to the last characters readed.
+     * @param characters The characters to append.
+     */
+    void addToCdata(const std::string& characters)
+    {
+        m_cdata.append(characters);
+    }
+
+    /**
      * @brief Stop the parsing of the XML file.
      * @param error The message to store into the error's buffer string.
      */
     void stopParser(const std::string& error);
 
-    void onBoolean(const xmlChar** att);
-    void onInteger(const xmlChar** att);
-    void onDouble(const xmlChar** att);
-    void onString(const xmlChar** att);
-    void onSet(const xmlChar** att);
-    void onMatrix(const xmlChar** att);
-    void onMap(const xmlChar** att);
-    void onKey(const xmlChar** att);
-    void onTuple(const xmlChar** att);
-    void onTable(const xmlChar** att);
-    void onXML(const xmlChar** att);
-    void onNull(const xmlChar** att);
-    void onVLEProject(const xmlChar** att);
-    void onStructures(const xmlChar** att);
-    void onModel(const xmlChar** att);
-    void onIn(const xmlChar** att);
-    void onOut(const xmlChar** att);
-    void onPort(const xmlChar** att);
-    void onSubModels(const xmlChar** att);
-    void onConnections(const xmlChar** att);
-    void onConnection(const xmlChar** att);
-    void onOrigin(const xmlChar** att);
-    void onDestination(const xmlChar** att);
-    void onDynamics(const xmlChar** att);
-    void onDynamic(const xmlChar** att);
-    void onExperiment(const xmlChar** att);
-    void onReplicas(const xmlChar** att);
-    void onConditions(const xmlChar** att);
-    void onCondition(const xmlChar** att);
-    void onViews(const xmlChar** att);
-    void onOutputs(const xmlChar** att);
-    void onOutput(const xmlChar** att);
-    void onView(const xmlChar** att);
-    void onObservables(const xmlChar** att);
-    void onObservable(const xmlChar** att);
-    void onAttachedView(const xmlChar** att);
-    void onClasses(const xmlChar** att);
-    void onClass(const xmlChar** att);
+    void onBoolean(const char** att);
+    void onInteger(const char** att);
+    void onDouble(const char** att);
+    void onString(const char** att);
+    void onSet(const char** att);
+    void onMatrix(const char** att);
+    void onMap(const char** att);
+    void onKey(const char** att);
+    void onTuple(const char** att);
+    void onTable(const char** att);
+    void onXML(const char** att);
+    void onNull(const char** att);
+    void onVLEProject(const char** att);
+    void onStructures(const char** att);
+    void onModel(const char** att);
+    void onIn(const char** att);
+    void onOut(const char** att);
+    void onPort(const char** att);
+    void onSubModels(const char** att);
+    void onConnections(const char** att);
+    void onConnection(const char** att);
+    void onOrigin(const char** att);
+    void onDestination(const char** att);
+    void onDynamics(const char** att);
+    void onDynamic(const char** att);
+    void onExperiment(const char** att);
+    void onReplicas(const char** att);
+    void onConditions(const char** att);
+    void onCondition(const char** att);
+    void onViews(const char** att);
+    void onOutputs(const char** att);
+    void onOutput(const char** att);
+    void onView(const char** att);
+    void onObservables(const char** att);
+    void onObservable(const char** att);
+    void onAttachedView(const char** att);
+    void onClasses(const char** att);
+    void onClass(const char** att);
 
     void onEndBoolean();
     void onEndInteger();
@@ -267,6 +273,10 @@ public:
     void onEndClasses();
     void onEndClass();
 
+    void clear();
+    void error(std::string error);
+    std::string error() const;
+
 private:
     void* m_ctxt;
     std::string m_error;
@@ -281,56 +291,44 @@ private:
 };
 
 /**
- * @brief Convert the xmlChar pointer to a char pointer.
- * @param str The constant xmlChar pointer to cast.
- * @return A constant char pointer to cast.
- */
-inline const char*
-xmlCharToString(const xmlChar* str)
-{
-    return (const char*)str;
-}
-
-/**
- * @brief Convert the xmlChar pointer to a boolean.
- * @param str The constant xmlChar pointer to translator.
- * @throw utils::SaxParserError if the xmlChar can not be translated into a
+ * @brief Convert the char pointer to a boolean.
+ * @param str The constant char pointer to translator.
+ * @throw utils::SaxParserError if the char can not be translated into a
  * boolean
  * @return The boolean.
  */
 VLE_LOCAL bool
-xmlCharToBoolean(const xmlChar* str);
+charToBoolean(const char* str);
 
 /**
- * @brief Convert the xmlChar pointer to a long integer.
- * @param str The constant xmlChar pointer to translate.
- * @throw utils::SaxParserError if the xmlChar can not be translated into a
+ * @brief Convert the char pointer to a long integer.
+ * @param str The constant char pointer to translate.
+ * @throw utils::SaxParserError if the char can not be translated into a
  * long integer.
  * @return The long integer.
  */
 VLE_LOCAL long int
-xmlCharToInt(const xmlChar* str);
+charToInt(const char* str);
 
 /**
- * @brief Convert the xmlChar pointer to an unsigned long integer.
- * @param str The constant xmlChar pointer to translate.
- * @throw utils::SaxParserError if the xmlChar can not be translated into an
+ * @brief Convert the char pointer to an unsigned long integer.
+ * @param str The constant char pointer to translate.
+ * @throw utils::SaxParserError if the char can not be translated into an
  * unsigned long integer.
  * @return The unsigned long integer.
  */
 VLE_LOCAL unsigned long int
-xmlCharToUnsignedInt(const xmlChar* str);
+charToUnsignedInt(const char* str);
 
 /**
- * @brief Convert the xmlChar pointer to double.
- * @param str The constant xmlChar pointer to translate.
- * @throw utils::SaxParserError if the xmlChar can not be translated into an
+ * @brief Convert the char pointer to double.
+ * @param str The constant char pointer to translate.
+ * @throw utils::SaxParserError if the char can not be translated into an
  * double.
  * @return The double.
  */
 VLE_LOCAL double
-xmlCharToDouble(const xmlChar *str);
-
+charToDouble(const char* str);
 }
 } // namespace vle vpz
 

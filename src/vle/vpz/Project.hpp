@@ -213,7 +213,7 @@ public:
      *
      * @return The number of the instance.
      */
-    inline int instance() const
+    inline long instance() const
     {
         return m_instance;
     }
@@ -223,7 +223,7 @@ public:
      *
      * @param instance
      */
-    inline void setInstance(int instance)
+    inline void setInstance(long instance)
     {
         m_instance = instance;
     }
@@ -251,7 +251,7 @@ private:
     std::string m_author;
     std::string m_date;
     std::string m_version;
-    int m_instance{ -1 };
+    long m_instance{ -1 };
 
     Model m_model;
     Dynamics m_dynamics;

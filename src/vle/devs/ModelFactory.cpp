@@ -112,7 +112,7 @@ ModelFactory::createModels(Coordinator& coordinator, const vpz::Model& model)
 
     if (mdl) {
         if (mdl->isAtomic()) {
-            atomicmodellist.push_back((vpz::AtomicModel*)mdl);
+            atomicmodellist.push_back(static_cast<vpz::AtomicModel*>(mdl));
         } else {
             vpz::BaseModel::getAtomicModelList(mdl, atomicmodellist);
         }

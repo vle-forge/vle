@@ -76,7 +76,7 @@ public:
     void init(const vpz::Model& mdls,
               Time current,
               Time duration,
-              int instance);
+              long instance);
 
     /**
      * @brief Pop the next devs::CompleteEventBagModel from the
@@ -312,7 +312,7 @@ private:
      *
      * @throw utils::ArgError if the output or the view does not exist.
      */
-    void buildViews(int instance);
+    void buildViews(long instance);
 
     /**
      * @brief build the simulator from the vpz::BaseModel stock.

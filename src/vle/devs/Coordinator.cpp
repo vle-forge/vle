@@ -87,7 +87,7 @@ void
 Coordinator::init(const vpz::Model& mdls,
                   Time current,
                   Time duration,
-                  int instance)
+                  long instance)
 {
     m_currentTime = current;
     m_durationTime = duration;
@@ -487,7 +487,7 @@ Coordinator::dispatchExternalEvent(std::vector<Simulator*>& simulators,
 }
 
 void
-Coordinator::buildViews(int instance)
+Coordinator::buildViews(long instance)
 {
     const vpz::Outputs& outs(m_modelFactory.outputs());
     const vpz::Views& views(m_modelFactory.views());
@@ -499,7 +499,7 @@ Coordinator::buildViews(int instance)
 
             file =
               instance >= 0
-                ? utils::format("%s_%s-%d",
+                ? utils::format("%s_%s-%ld",
                                 m_modelFactory.experiment().name().c_str(),
                                 elem.first.c_str(),
                                 instance)

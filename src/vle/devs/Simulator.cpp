@@ -102,8 +102,7 @@ Simulator::addTargetPort(const std::string& port)
 {
     assert(mTargets.find(port) == mTargets.end());
 
-    mTargets.insert(
-      value_type(port, TargetSimulator((Simulator*)nullptr, std::string())));
+    mTargets.insert(value_type(port, TargetSimulator(nullptr, std::string())));
 }
 
 void
