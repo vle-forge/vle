@@ -22,7 +22,7 @@ Specification formalism (DEVS).
 
 For the VFL API:
 
-* libxml2 (≥ 2.8)
+* expat (≥ 2.0)
 * boost (≥ 1.47)
 * cmake (≥ 3.0)
 * c++ compiler (gcc ≥ 4.9, clang ≥ 3.3, intel icc (≥ 11.0)
@@ -49,7 +49,7 @@ git clone git://github.com/vle-forge/vle.git
 Install dependencies (recent ubuntu/debian). Copy/paste the following lines:
 
 ```bash
-apt-get install curl libxml2-dev libboost-dev cmake pkg-config g++ \
+apt-get install curl libexpat1-dev libboost-dev cmake pkg-config g++ \
         qttools5-dev qttools5-dev-tools qtbase5-dev qtbase5-dev-tools \
         qtchooser qt5-default asciidoctor ruby-asciidoctor
 ```
