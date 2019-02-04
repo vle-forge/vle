@@ -115,7 +115,6 @@ main(int argc, char* argv[])
     qputenv("QT_HASH_SEED", "0");
 
     QApplication a(argc, argv);
-    vle::Init m_app;
 
     bool result;
 

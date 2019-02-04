@@ -515,8 +515,6 @@ test_regular_2d_wrap()
 int
 main()
 {
-    vle::Init app;
-
     test_smallworld();
     test_scalefree();
     test_sorted_erdos_renyi();

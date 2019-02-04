@@ -24,7 +24,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <libxml/parser.h>
 #include <vle/utils/Tools.hpp>
 #include <vle/vle.hpp>
 
@@ -71,26 +70,6 @@ std::string
 string_version_abi()
 {
     return vle::utils::format("%d.%d", VERSION_MAJOR, VERSION_MINOR);
-}
-
-/* From libxml2 website: http://xmlsoft.org/threads.html
- *
- * Starting with 2.4.7, libxml2 makes provisions to ensure that concurrent
- * threads can safely work in parallel parsing different documents. There
- * is however a couple of things to do to ensure it:
- *
- * - configure the library accordingly using the --with-threads options
- * - call xmlInitParser() in the "main" thread before using any of the
- *   libxml2 API (except possibly selecting a different memory allocator)
- */
-Init::Init()
-{
-    xmlInitParser();
-}
-
-Init::~Init()
-{
-    xmlCleanupParser();
 }
 
 } // namespace vle

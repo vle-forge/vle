@@ -845,8 +845,6 @@ test_name()
 int
 main()
 {
-    vle::Init app;
-
     test_rename_model();
     test_findModelFromPath();
     test_del_all_connection();

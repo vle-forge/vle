@@ -422,7 +422,11 @@ run_manager(vle::utils::ContextPtr ctx,
                 file->project().experiment().setName(name);
 
             std::unique_ptr<vle::value::Matrix> res =
-              man.run(std::move(file), static_cast<std::uint32_t>(processor), 0, 1, &error);
+              man.run(std::move(file),
+                      static_cast<std::uint32_t>(processor),
+                      0,
+                      1,
+                      &error);
 
             if (error.code) {
                 fprintf(stderr,
@@ -1017,7 +1021,6 @@ main(int argc, char** argv)
     // Otherwise, starts the simulation engines
     //
     auto ctx = vle::utils::make_context();
-    vle::Init m_app;
     verbose_level = verbose_level < 7 ? std::max(verbose_level, 0)
                                       : std::min(verbose_level, 7);
 

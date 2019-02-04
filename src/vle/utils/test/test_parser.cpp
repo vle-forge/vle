@@ -80,8 +80,6 @@ ParserStr()
 int
 main()
 {
-    vle::Init app;
-
     ParserStr();
 
     return unit_test::report_errors();

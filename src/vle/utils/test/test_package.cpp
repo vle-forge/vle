@@ -56,7 +56,6 @@ using namespace vle;
 
 struct F
 {
-    vle::Init a;
     vle::utils::UnlinkPath path;
 
     static vle::utils::Path init()

@@ -72,8 +72,6 @@ vpz_add_output()
 int
 main()
 {
-    vle::Init app;
-
     vpz_obs_port();
     vpz_add_output();
 

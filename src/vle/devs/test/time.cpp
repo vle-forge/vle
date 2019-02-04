@@ -187,8 +187,6 @@ prefix_and_postfix_operator()
 int
 main()
 {
-    vle::Init app;
-
     compare();
     modify();
     modify_and_infinity();

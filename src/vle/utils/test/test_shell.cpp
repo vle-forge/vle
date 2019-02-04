@@ -391,8 +391,6 @@ g_shell()
 int
 main()
 {
-    vle::Init app;
-
     g_shell();
 
     return unit_test::report_errors();

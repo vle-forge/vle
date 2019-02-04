@@ -498,8 +498,6 @@ test_tokenize()
 int
 main()
 {
-    vle::Init app;
-
     Ensures(true == true);
     EnsuresEqual(10, 10);
     EnsuresNotEqual(10, 11);

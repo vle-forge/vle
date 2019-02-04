@@ -330,8 +330,6 @@ test_template_tag()
 int
 main()
 {
-    vle::Init app;
-
     test_template_simple();
     test_template_for();
     test_template_for_if();

@@ -94,8 +94,6 @@ download_package_bis()
 int
 main()
 {
-    vle::Init app;
-
     download_dtd();
     download_package();
     download_package_bis();

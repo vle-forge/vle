@@ -45,7 +45,5 @@
 int
 main()
 {
-    vle::Init app;
-
     return 0;
 }
