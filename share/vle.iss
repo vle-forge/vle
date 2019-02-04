@@ -85,13 +85,12 @@ Source: "{#MingwPath}\bin\libmetalink-3.dll"; DestDir: "{app}\bin"; Flags: ignor
 Source: "{#MingwPath}\bin\libnghttp2-14.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libssh2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libunistring-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#MingwPath}\bin\libxml2-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\zlib1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\curl.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\lib\liblzma.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#MingwPath}\lib\liblzma.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#MingwPath}\lib\libxml2.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#MingwPath}\lib\libxml2.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libexpat.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libexpat.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#MingwPath}\lib\libz.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#MingwPath}\lib\libz.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#MingwPath}\lib\libiconv.a"; DestDir: "{app}\lib"; Flags: ignoreversion
