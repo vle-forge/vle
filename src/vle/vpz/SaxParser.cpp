@@ -173,20 +173,6 @@ SaxParser::SaxParser(Vpz& vpz)
   , m_isVPZ(false)
 {}
 
-struct scope_exit
-{
-    std::function<void(void)> fn;
-
-    scope_exit(std::function<void(void)> fn_)
-      : fn(std::move(fn_))
-    {}
-
-    ~scope_exit()
-    {
-        fn();
-    }
-};
-
 struct parser_data
 {
     std::weak_ptr<XML_ParserStruct> parser;
@@ -374,118 +360,6 @@ SaxParser::parseMemory(const std::string& buffer)
 
     parse(iss, BUFSIZ);
 }
-
-// void
-// SaxParser::onEndDocument(void* ctx)
-// {
-//     auto* sax = static_cast<parser_data*>(ctx);
-
-//     if (sax->m_isVPZ == false) {
-//         if (not sax->m_valuestack.getResults().empty()) {
-//             sax->m_isValue = true;
-//         }
-//     }
-// }
-
-// void
-// SaxParser::onStartElement(void* ctx, const char* name, const char**
-// atts)
-// {
-//     auto* sax = static_cast<parser_data*>(ctx);
-
-//     sax->clearLastCharactersStored();
-
-//     auto it = starts().find(name);
-//     if (it != starts().end()) {
-//         try {
-//             (sax->*(it->second))(atts);
-//         } catch (const std::exception& e) {
-//             sax->stopParser(e.what());
-//         }
-//     } else {
-//         sax->stopParser(
-//           utils::format(_("Unknown tag '%s'"), name));
-//     }
-// }
-
-// void
-// SaxParser::onEndElement(void* ctx, const char* name)
-// {
-//     auto* sax = static_cast<parser_data*>(ctx);
-
-//     auto it = ends().find(name);
-//     if (it != ends().end()) {
-//         try {
-//             (sax->*(it->second))();
-//         } catch (const std::exception& e) {
-//             sax->stopParser(e.what());
-//         }
-//     } else {
-//         sax->stopParser(
-//           utils::format(_("Unknown end tag '%s'"), name));
-//     }
-// }
-
-// void
-// SaxParser::onCharacters(void* ctx, const char* ch, int len)
-// {
-//     auto* sax = static_cast<parser_data*>(ctx);
-
-//     std::string buf(ch, len);
-//     sax->addToCharacters(buf);
-// }
-
-// void
-// SaxParser::onCDataBlock(void* ctx, const char* value, int len)
-// {
-//     auto* sax = static_cast<parser_data*>(ctx);
-
-//     std::string buf(value, len);
-//     sax->m_cdata.assign(buf);
-// }
-
-// void
-// SaxParser::onWarning(void* ctx, const char* msg, ...)
-// {
-//     auto* sax = static_cast<parser_data*>(ctx);
-
-//     va_list args;
-//     va_start(args, msg);
-//     std::string buffer = utils::vformat(msg, args);
-//     va_end(args);
-
-//     sax->m_error = buffer;
-// }
-
-// void
-// SaxParser::onError(void* ctx, const char* msg, ...)
-// {
-//     auto* sax = static_cast<parser_data*>(ctx);
-
-//     va_list args;
-//     va_start(args, msg);
-//     std::string buffer = utils::vformat(msg, args);
-//     va_end(args);
-
-//     sax->stopParser(buffer);
-// }
-
-// void
-// SaxParser::onFatalError(void* ctx, const char* msg, ...)
-// {
-//     auto* sax = static_cast<parser_data*>(ctx);
-
-//     va_list args;
-//     va_start(args, msg);
-//     std::string buffer = vle::utils::vformat(msg, args);
-//     va_end(args);
-
-//     sax->stopParser(buffer);
-// }
-
-//
-//
-//
 
 void
 SaxParser::onBoolean(const char**)
