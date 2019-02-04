@@ -41,8 +41,8 @@ class Vpz;
 class BaseModel;
 
 /**
- * @brief The SaxParser is a C/C++ interface between the libxml-2.0 and the
- * VLE classes vpz.
+ * @brief The SaxParser is a C/C++ interface between the libexpat and the VLE
+ *     classes vpz.
  */
 class VLE_LOCAL SaxParser
 {
@@ -74,8 +74,8 @@ public:
 
     /**
      * @brief Read vpz xml from the input stream.
-     * @details Use the libxml2 to parse the input stream using chunk of @c
-     * size bytes.
+     * @details Use the libexpat to parse the input stream using chunk of @c
+     *     size bytes.
      *
      * @param is the input stream.
      * @param size the size in byte of the chunk.

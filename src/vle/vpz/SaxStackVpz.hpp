@@ -27,7 +27,6 @@
 #ifndef VLE_VPZ_SAXSTACKVPZ_HPP
 #define VLE_VPZ_SAXSTACKVPZ_HPP
 
-#include <libxml/xmlstring.h>
 #include <list>
 #include <vle/DllDefines.hpp>
 #include <vle/value/Set.hpp>
