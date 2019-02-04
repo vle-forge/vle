@@ -382,8 +382,6 @@ single_class_utf8()
 int
 main()
 {
-    vle::Init app;
-
     single_class();
     single_class_utf8();
 

@@ -923,8 +923,6 @@ test_confluent_transition_2()
 int
 main()
 {
-    vle::Init app;
-
     test_normal_behaviour();
     test_confluent_transition();
     test_confluent_transition_2();

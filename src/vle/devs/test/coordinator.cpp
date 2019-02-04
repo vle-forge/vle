@@ -786,8 +786,6 @@ test_observation_timed_disabled()
 int
 main()
 {
-    vle::Init app;
-
     instantiate_mode();
     test_del_coupled_model();
     test_loading_dynamics_from_executable();

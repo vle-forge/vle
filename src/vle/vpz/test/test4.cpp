@@ -875,8 +875,6 @@ test_equal_views()
 int
 main()
 {
-    vle::Init app;
-
     test_remove_dyns();
     test_rename_dyns();
     test_remove_conds();

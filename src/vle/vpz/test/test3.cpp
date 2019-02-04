@@ -415,8 +415,6 @@ atomicmodel_vpz_throw2()
 int
 main()
 {
-    vle::Init app;
-
     atomicmodel_timed_vpz();
     atomicmodel_vpz_event_output();
     atomicmodel_vpz_internal_output();

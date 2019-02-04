@@ -398,8 +398,6 @@ test_table()
 int
 main()
 {
-    vle::Init app;
-
     check_simple_value();
     check_map_value();
     check_set_value();

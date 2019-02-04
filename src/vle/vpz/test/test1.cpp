@@ -608,8 +608,6 @@ value_matrix_of_matrix_io()
 int
 main()
 {
-    vle::Init app;
-
     value_bool();
     value_integer();
     value_double();

@@ -224,8 +224,6 @@ experimentgenerator_max_1_max_1()
 int
 main()
 {
-    vle::Init app;
-
     experimentgenerator_lower_than_exp();
     experimentgenerator_greater_than_exp();
     experimentgenerator_max_1_max_1();

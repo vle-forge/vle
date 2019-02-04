@@ -430,8 +430,6 @@ experiment_measures_vpz()
 int
 main()
 {
-    vle::Init app;
-
     atomicmodel_vpz();
     coupledmodel_vpz();
     dynamic_vpz();
