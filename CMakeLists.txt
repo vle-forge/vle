@@ -110,7 +110,6 @@ if (COMMAND CMAKE_POLICY)
   cmake_policy(SET CMP0020 NEW)#for qt link
 endif (COMMAND CMAKE_POLICY)
 
-
 find_package(EXPAT REQUIRED)
 if (NOT EXPAT_FOUND)
   message(FATAL_ERROR "expat library is required. Install libexpat first (libexpat1-dev Debian/Ubuntu)")
@@ -155,19 +154,12 @@ if (WITH_GVLE)
   set(VLE_HAVE_GVLE 1 CACHE INTERNAL "" FORCE)
 endif ()
 
-
 message (" dbg Root ${Qt5Widgets_INCLUDES} ${Qt5Widgets_INCLUDE_DIRS}")
 
 if (WIN32)
   SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/share/cmake ${CMAKE_MODULE_PATH})
   set(VLEDEPS_DEBUG 1)
   find_package(VLEDEPS REQUIRED)
-else ()
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(VLEDEPS libxml-2.0)
-  if (NOT VLEDEPS_FOUND)
-    message(FATAL_ERROR "Failed to find minimal dependencies: libxml-2.0")
-  endif ()
 endif ()
 
 # Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER

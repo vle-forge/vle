@@ -126,10 +126,9 @@ using Packages = std::vector<PackageId>;
  * in \c VLE_HOME/packages stores the packages availables. Each update will
  * rewrite this file with newly available packages.
  *
- * This class uses the \c libxml2 \c nanohttp function to download resources
- * from the http protocol. \c RemoteManager is thread-safe and multi-threaded
- * class. \c RemoteManager can not be copied or assigned to another \c
- * RemoteManager.
+ * This class uses the \c curl or \c wget program to download resources from
+ * the http protocol. \c RemoteManager is thread-safe and multi-threaded class.
+ * \c RemoteManager can not be copied or assigned to another \c RemoteManager.
  *
  * @code
  * utils::RemoteManager mgr;
