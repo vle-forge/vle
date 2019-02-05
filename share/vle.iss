@@ -62,12 +62,6 @@ Source: "{#InstallPath}\share\vle-{#MyABI}\qt.conf"; DestDir: "{app}\bin"; Flags
 Source: "{#QtDirTools}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 Source: "{#MingwPath}\bin\curl.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#MingwPath}\include\iconv.h"; DestDir: "{app}\include"; Flags: ignoreversion
-Source: "{#MingwPath}\include\libintl.h"; DestDir: "{app}\include"; Flags: ignoreversion
-Source: "{#MingwPath}\include\lzma.h"; DestDir: "{app}\include"; Flags: ignoreversion
-Source: "{#MingwPath}\include\zlib.h"; DestDir: "{app}\include"; Flags: ignoreversion
-Source: "{#MingwPath}\include\lzma\*"; DestDir: "{app}\include\lzma"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#MingwPath}\include\libxml2\*"; DestDir: "{app}\include\libxml2"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 Source: "{#MingwPath}\bin\libbrotlicommon.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libbrotlidec.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
