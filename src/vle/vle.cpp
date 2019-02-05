@@ -36,13 +36,10 @@
 
 namespace vle {
 
-std::tuple<int, int, int, std::string>
+std::tuple<int, int, int>
 version()
 {
-    return std::make_tuple(VERSION_MAJOR,
-                           VERSION_MINOR,
-                           VERSION_PATCH,
-                           VLE_STRINGIFY(VERSION_EXTRA));
+    return std::make_tuple(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 }
 
 std::tuple<int, int>
@@ -54,16 +51,8 @@ version_abi()
 std::string
 string_version()
 {
-#ifdef VERSION_EXTRA
     return vle::utils::format(
       "%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
-#else
-    return vle::utils::format("%d.%d.%d-%s",
-                              VERSION_MAJOR,
-                              VERSION_MINOR,
-                              VERSION_PATCH,
-                              VERSION_EXTRA);
-#endif
 }
 
 std::string

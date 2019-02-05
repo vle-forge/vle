@@ -24,22 +24,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/cast.hpp>
-#include <boost/format.hpp>
-#include <cstring>
-#include <fstream>
-#include <ostream>
-#include <stack>
-#include <thread>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
+
+#include "utils/ContextPrivate.hpp"
+#include "utils/i18n.hpp"
+
+#include <boost/cast.hpp>
+#include <boost/format.hpp>
+
+#include <fstream>
+#include <ostream>
+#include <stack>
+#include <thread>
+
+#include <cstring>
 
 namespace {
 

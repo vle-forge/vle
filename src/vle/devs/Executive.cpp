@@ -24,12 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/devs/Coordinator.hpp>
-#include <vle/devs/DynamicsInit.hpp>
 #include <vle/devs/Executive.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/Vpz.hpp>
+
+#include "devs/Coordinator.hpp"
+#include "devs/DynamicsInit.hpp"
+#include "utils/i18n.hpp"
 
 namespace vle {
 namespace devs {

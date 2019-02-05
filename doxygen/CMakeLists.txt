@@ -29,11 +29,11 @@ if (WIN32)
 
     if (EXISTS "${VLE_BINARY_DIR}/doxygen/html/vle.chm")
       install(FILES "${VLE_BINARY_DIR}/doxygen/html/vle.chm"
-	    DESTINATION "${VLE_SHARE_DIRS}/doc")
+	    DESTINATION "${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/doc")
     endif (EXISTS "${VLE_BINARY_DIR}/doxygen/html/vle.chm")
   endif(HTML_HELP_COMPILER)
 else (WIN32)
   install(DIRECTORY "${VLE_BINARY_DIR}/doxygen/html"
-    DESTINATION "${VLE_SHARE_DIRS}/doc")
+    DESTINATION "${CMAKE_INSTALL_DOCDIR}")
 endif (WIN32)
 

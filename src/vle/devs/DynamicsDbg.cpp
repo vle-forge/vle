@@ -24,13 +24,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
+#include "devs/DynamicsDbg.hpp"
+#include "devs/DynamicsInit.hpp"
+#include "utils/ContextPrivate.hpp"
+#include "utils/i18n.hpp"
+
 #include <limits>
 #include <sstream>
-#include <vle/devs/DynamicsDbg.hpp>
-#include <vle/devs/DynamicsInit.hpp>
-#include <vle/utils/ContextPrivate.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include <cassert>
 
 namespace {
 

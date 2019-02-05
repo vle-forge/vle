@@ -30,12 +30,13 @@
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/InternalEvent.hpp>
 #include <vle/devs/ObservationEvent.hpp>
-#include <vle/devs/Scheduler.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/devs/View.hpp>
 #include <vle/vpz/AtomicModel.hpp>
+
+#include "devs/InternalEvent.hpp"
+#include "devs/Scheduler.hpp"
+#include "devs/View.hpp"
 
 namespace vle {
 namespace devs {
@@ -47,7 +48,7 @@ class Dynamics;
  * represent the DEVS simulator.
  *
  */
-class VLE_LOCAL Simulator
+class Simulator
 {
 public:
     typedef std::pair<Simulator*, std::string> TargetSimulator;

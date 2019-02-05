@@ -24,23 +24,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Thread.hpp"
-#include <boost/bind.hpp>
-#include <functional>
-#include <memory>
-#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/devs/ExternalEventList.hpp>
-#include <vle/devs/InternalEvent.hpp>
-#include <vle/devs/Simulator.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
+
+#include "devs/Coordinator.hpp"
+#include "devs/InternalEvent.hpp"
+#include "devs/Simulator.hpp"
+#include "devs/Thread.hpp"
+#include "utils/ContextPrivate.hpp"
+#include "utils/i18n.hpp"
+
+#include <boost/bind.hpp>
+
+#include <functional>
+#include <memory>
 
 using std::map;
 using std::pair;

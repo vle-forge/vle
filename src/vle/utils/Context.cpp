@@ -24,18 +24,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
 
+#include "utils/ContextPrivate.hpp"
+#include "utils/i18n.hpp"
+
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+
 #ifdef _WIN32
-#include <vle/utils/details/UtilsWin.hpp>
+#include "utils/details/UtilsWin.hpp"
 
 #include <Windows.h>
 #endif
@@ -210,8 +212,8 @@ Context::Context(const Path& /* prefix */)
 #endif
 
 #if defined(VLE_HAVE_NLS)
-    bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
-    textdomain(VLE_LOCALE_NAME);
+    bindtextdomain(E_NAME, getLocaleDir().string().c_str());
+    textdomain(E_NAME);
 #endif
 }
 
@@ -317,8 +319,8 @@ Context::Context(std::string locale, const Path& /* prefix */)
 #endif
 
 #if defined(VLE_HAVE_NLS)
-    bindtextdomain(VLE_LOCALE_NAME, getLocaleDir().string().c_str());
-    textdomain(VLE_LOCALE_NAME);
+    bindtextdomain(E_NAME, getLocaleDir().string().c_str());
+    textdomain(E_NAME);
 #endif
 }
 

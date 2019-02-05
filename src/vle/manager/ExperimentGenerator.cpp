@@ -27,7 +27,6 @@
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -42,6 +41,8 @@
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/Condition.hpp>
 #include <vle/vpz/Vpz.hpp>
+
+#include "utils/i18n.hpp"
 
 namespace vle {
 namespace manager {

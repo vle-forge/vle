@@ -24,11 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <utility>
 #include <vle/translator/MatrixTranslator.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include "utils/i18n.hpp"
+
+#include <utility>
 
 namespace vle {
 namespace translator {

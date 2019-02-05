@@ -24,19 +24,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/cast.hpp>
-#include <boost/spirit/include/qi.hpp>
-
-#include <fstream>
-#include <sstream>
-#include <utility>
-
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -50,8 +39,20 @@
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
-#include <vle/vpz/SaxParser.hpp>
 #include <vle/vpz/Vpz.hpp>
+
+#include "utils/i18n.hpp"
+#include "vpz/SaxParser.hpp"
+
+#include <fstream>
+#include <sstream>
+#include <utility>
+
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/cast.hpp>
+#include <boost/spirit/include/qi.hpp>
 
 #include <cerrno>
 #include <cstdlib>

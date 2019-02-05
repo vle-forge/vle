@@ -25,12 +25,13 @@
  */
 
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/value/Map.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
-#include <vle/vpz/SaxStackValue.hpp>
+
+#include "utils/i18n.hpp"
+#include "vpz/SaxStackValue.hpp"
 
 namespace vle {
 namespace vpz {

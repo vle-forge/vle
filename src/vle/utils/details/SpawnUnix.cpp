@@ -24,11 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/details/ShellUtils.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include "utils/ContextPrivate.hpp"
+#include "utils/details/ShellUtils.hpp"
+#include "utils/i18n.hpp"
 
 #include <algorithm>
 #include <iostream>

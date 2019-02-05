@@ -25,12 +25,13 @@
  */
 
 #include <vle/utils/Context.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/RemoteManager.hpp>
-#include <vle/utils/details/PackageManager.hpp>
-#include <vle/utils/details/PackageParser.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include "utils/ContextPrivate.hpp"
+#include "utils/details/PackageManager.hpp"
+#include "utils/details/PackageParser.hpp"
+#include "utils/i18n.hpp"
 
 namespace {
 

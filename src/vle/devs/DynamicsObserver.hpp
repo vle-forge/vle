@@ -27,9 +27,11 @@
 #ifndef VLE_DEVS_DYNAMICSOBSERVER_HPP
 #define VLE_DEVS_DYNAMICSOBSERVER_HPP
 
-#include <cassert>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/View.hpp>
+
+#include "devs/View.hpp"
+
+#include <cassert>
 
 namespace vle {
 namespace devs {

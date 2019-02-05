@@ -50,11 +50,11 @@ set(CPACK_RPM_PACKAGE_DESCRIPTION "VLE, a framework for multi-modeling, simulati
 
 # CPack NSIS configuration
 
-set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${VLE_VERSION_SHORT}.0")
+set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${VLE_ABI}.0")
 set(CPACK_CREATE_DESKTOP_LINKS gvle)
 set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
 set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/share/pixmaps\\\\vle.ico")
-set(CPACK_NSIS_MENU_LINKS "${VLE_SHARE_DIRS}/doc/vle.chm" "VLE API" "https://www.vle-project.org" "VLE Web Site")
+set(CPACK_NSIS_MENU_LINKS "${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/doc/vle.chm" "VLE API" "https://www.vle-project.org" "VLE Web Site")
 set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\vle.exe")
 set(CPACK_NSIS_DISPLAY_NAME "VLE - Virtual Laboratory Environment")
 set(CPACK_NSIS_HELP_LINK "https://www.vle-project.org")

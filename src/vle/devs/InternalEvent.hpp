@@ -27,9 +27,10 @@
 #ifndef DEVS_INTERNALEVENT_HPP
 #define DEVS_INTERNALEVENT_HPP
 
-#include <vector>
 #include <vle/DllDefines.hpp>
 #include <vle/devs/Time.hpp>
+
+#include <vector>
 
 namespace vle {
 namespace devs {
@@ -42,7 +43,7 @@ class Simulator;
  * scheduler of VLE. To speed-up the simulation an \e InternalEvent can be
  * invalidate.
  */
-class VLE_LOCAL InternalEvent
+class InternalEvent
 {
 public:
     /**

@@ -27,14 +27,15 @@
 #ifndef VLE_DEVS_COORDINATOR_HPP
 #define VLE_DEVS_COORDINATOR_HPP 1
 
-#include "Thread.hpp"
 #include <vle/DllDefines.hpp>
-#include <vle/devs/ModelFactory.hpp>
-#include <vle/devs/Scheduler.hpp>
-#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Time.hpp>
-#include <vle/devs/View.hpp>
 #include <vle/utils/Context.hpp>
+
+#include "devs/ModelFactory.hpp"
+#include "devs/Scheduler.hpp"
+#include "devs/Simulator.hpp"
+#include "devs/Thread.hpp"
+#include "devs/View.hpp"
 
 namespace vle {
 namespace devs {
@@ -47,7 +48,7 @@ class Executive;
  * model.
  *
  */
-class VLE_LOCAL Coordinator
+class Coordinator
 {
 public:
     Coordinator(utils::ContextPtr context,

@@ -25,16 +25,18 @@
  */
 
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/DynamicsInit.hpp>
 #include <vle/devs/ExternalEvent.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
+
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
 #include <vle/value/String.hpp>
+
+#include "devs/DynamicsInit.hpp"
+#include "utils/i18n.hpp"
 
 #include <cstdarg>
 

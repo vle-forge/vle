@@ -27,7 +27,6 @@
 #ifndef VLE_SAX_STACK_VALUE_HPP
 #define VLE_SAX_STACK_VALUE_HPP
 
-#include <stack>
 #include <vle/DllDefines.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
@@ -41,6 +40,8 @@
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
 
+#include <stack>
+
 namespace vle {
 namespace vpz {
 
@@ -49,7 +50,7 @@ namespace vpz {
  * more particulary, the complex value::Value like value::Set, value::Map,
  * value::Matrix.
  */
-class VLE_LOCAL ValueStackSax
+class ValueStackSax
 {
 public:
     /**

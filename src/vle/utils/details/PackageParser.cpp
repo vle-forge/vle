@@ -24,13 +24,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/algorithm/string/trim.hpp>
-#include <cassert>
-#include <fstream>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/details/Package.hpp>
-#include <vle/utils/details/PackageParser.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include "utils/details/Package.hpp"
+#include "utils/details/PackageParser.hpp"
+#include "utils/i18n.hpp"
+
+#include <boost/algorithm/string/trim.hpp>
+
+#include <fstream>
+
+#include <cassert>
 
 namespace vle {
 namespace utils {

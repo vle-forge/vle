@@ -27,9 +27,11 @@
 #ifndef VLE_DEVS_VIEWEVENT_HPP
 #define VLE_DEVS_VIEWEVENT_HPP 1
 
-#include <cassert>
 #include <vle/DllDefines.hpp>
-#include <vle/devs/View.hpp>
+
+#include "devs/View.hpp"
+
+#include <cassert>
 
 namespace vle {
 namespace devs {
@@ -38,7 +40,7 @@ namespace devs {
  * ViewEvent is used in scheduller to store the date to launch observation of
  * atomic models.
  */
-struct VLE_LOCAL ViewEvent
+struct ViewEvent
 {
     ViewEvent(View* view, Time currenttime, Time timestep)
       : mView(view)

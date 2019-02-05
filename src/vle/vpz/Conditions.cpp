@@ -24,14 +24,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
-#include <iterator>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/vpz/Conditions.hpp>
 #include <vle/vpz/Experiment.hpp>
+
+#include "utils/i18n.hpp"
+
+#include <algorithm>
+#include <iterator>
 
 namespace vle {
 namespace vpz {

@@ -24,10 +24,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <utility>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vpz/View.hpp>
+
+#include "utils/i18n.hpp"
+
+#include <utility>
 
 namespace vle {
 namespace vpz {

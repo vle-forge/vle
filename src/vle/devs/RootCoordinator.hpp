@@ -27,13 +27,15 @@
 #ifndef DEVS_ROOTCOORDINATOR_HPP
 #define DEVS_ROOTCOORDINATOR_HPP
 
-#include <memory>
 #include <vle/DllDefines.hpp>
-#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/utils/Context.hpp>
 #include <vle/utils/Rand.hpp>
 #include <vle/vpz/Vpz.hpp>
+
+#include "devs/Coordinator.hpp"
+
+#include <memory>
 
 namespace vle {
 namespace vpz {
@@ -63,7 +65,7 @@ class Dynamics;
  * @endexample
  *
  */
-class VLE_LOCAL RootCoordinator
+class RootCoordinator
 {
 public:
     RootCoordinator(utils::ContextPtr context);

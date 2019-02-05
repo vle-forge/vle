@@ -24,15 +24,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <fstream>
-#include <iostream>
-#include <ostream>
-#include <regex>
-#include <string>
-#include <thread>
-#include <utility>
 #include <vle/utils/Algo.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Filesystem.hpp>
@@ -40,16 +32,26 @@
 #include <vle/utils/RemoteManager.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/details/Package.hpp>
-#include <vle/utils/details/PackageManager.hpp>
-#include <vle/utils/details/PackageParser.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include "utils/ContextPrivate.hpp"
+#include "utils/details/Package.hpp"
+#include "utils/details/PackageManager.hpp"
+#include "utils/details/PackageParser.hpp"
+#include "utils/i18n.hpp"
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/cast.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
+
+#include <fstream>
+#include <iostream>
+#include <ostream>
+#include <regex>
+#include <string>
+#include <thread>
+#include <utility>
 
 #define PACKAGESID_VECTOR_RESERVED_SIZE 100u
 

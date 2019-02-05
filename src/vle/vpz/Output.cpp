@@ -25,9 +25,10 @@
  */
 
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Output.hpp>
+
+#include "utils/i18n.hpp"
 
 namespace vle {
 namespace vpz {

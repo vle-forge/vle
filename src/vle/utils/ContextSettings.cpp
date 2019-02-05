@@ -24,13 +24,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <fstream>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/ContextPrivate.hpp>
+
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vle.hpp>
+
+#include "utils/ContextPrivate.hpp"
+#include "utils/i18n.hpp"
+
+#include <fstream>
 
 #ifdef _WIN32
 #define VLE_PACKAGE_COMMAND_CONFIGURE                                         \

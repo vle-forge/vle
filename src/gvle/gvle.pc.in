@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_FULL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_FULL_PREFIX@
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: gvle
+Version: @VERSION@
+Description: gvle the other gui for VLE the multimodelling and Simulation tools
+
+Requires: Qt5Core Qt5Xml Qt5Help Qt5Gui Qt5Widgets vle-@VLE_ABI@
+Libs:	-L${libdir} -lgvle-@VLE_ABI@
+Cflags: -I${includedir}/vle-@VLE_ABI@

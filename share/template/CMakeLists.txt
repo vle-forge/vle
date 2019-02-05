@@ -1,3 +1,5 @@
-INSTALL(DIRECTORY package DESTINATION "${VLE_SHARE_DIRS}/template")
+install(DIRECTORY package
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/template)
 
-INSTALL(FILES unittest.vpz DESTINATION "${VLE_SHARE_DIRS}/template")
+install(FILES unittest.vpz
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/template)

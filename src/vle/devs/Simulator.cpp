@@ -25,11 +25,12 @@
  */
 
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/Simulator.hpp>
 #include <vle/devs/Time.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vpz/AtomicModel.hpp>
+
+#include "devs/Simulator.hpp"
+#include "utils/i18n.hpp"
 
 namespace vle {
 namespace devs {

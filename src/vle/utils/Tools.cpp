@@ -24,13 +24,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdarg>
-#include <iomanip>
-#include <sstream>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/utils/Types.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include "utils/i18n.hpp"
+
+#include <iomanip>
+#include <sstream>
+
+#include <cstdarg>
 
 #ifdef _WIN32
 #include <io.h>

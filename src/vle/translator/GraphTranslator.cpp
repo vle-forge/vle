@@ -24,18 +24,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vle/translator/GraphTranslator.hpp>
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
+
+#include "utils/i18n.hpp"
+#include <random>
+#include <utility>
+
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/bandwidth.hpp>
 #include <boost/graph/erdos_renyi_generator.hpp>
 #include <boost/graph/grid_graph.hpp>
 #include <boost/graph/plod_generator.hpp>
 #include <boost/graph/small_world_generator.hpp>
-#include <random>
-#include <utility>
-#include <vle/translator/GraphTranslator.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
 
 namespace vle {
 namespace translator {

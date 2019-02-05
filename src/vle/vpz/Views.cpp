@@ -24,13 +24,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/lexical_cast.hpp>
-#include <iterator>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/value/Value.hpp>
 #include <vle/vpz/Views.hpp>
+
+#include "utils/i18n.hpp"
+
+#include <boost/lexical_cast.hpp>
+#include <iterator>
 
 namespace vle {
 namespace vpz {

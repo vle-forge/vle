@@ -24,16 +24,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vle/utils/Exception.hpp>
+#include <vle/value/Double.hpp>
+#include <vle/vle.hpp>
+#include <vle/vpz/Vpz.hpp>
+
+#include "utils/i18n.hpp"
+#include "vpz/SaxParser.hpp"
+
 #include <fstream>
 #include <iomanip>
 #include <limits>
 #include <sstream>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/value/Double.hpp>
-#include <vle/vle.hpp>
-#include <vle/vpz/SaxParser.hpp>
-#include <vle/vpz/Vpz.hpp>
 
 namespace vle {
 namespace vpz {

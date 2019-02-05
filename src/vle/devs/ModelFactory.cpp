@@ -24,23 +24,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <utility>
-#include <vle/devs/Coordinator.hpp>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/DynamicsDbg.hpp>
-#include <vle/devs/DynamicsInit.hpp>
-#include <vle/devs/DynamicsObserver.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
 #include <vle/devs/Executive.hpp>
-#include <vle/devs/ModelFactory.hpp>
-#include <vle/devs/RootCoordinator.hpp>
-#include <vle/devs/Simulator.hpp>
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Package.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
+
+#include "devs/Coordinator.hpp"
+#include "devs/DynamicsDbg.hpp"
+#include "devs/DynamicsInit.hpp"
+#include "devs/DynamicsObserver.hpp"
+#include "devs/ModelFactory.hpp"
+#include "devs/RootCoordinator.hpp"
+#include "devs/Simulator.hpp"
+#include "utils/i18n.hpp"
+
+#include <utility>
 
 namespace vle {
 namespace devs {

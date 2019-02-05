@@ -27,13 +27,15 @@
 #ifndef VLE_DEVS_THREAD_HPP
 #define VLE_DEVS_THREAD_HPP
 
+#include <vle/utils/Context.hpp>
+
+#include "devs/Simulator.hpp"
+#include "utils/ContextPrivate.hpp"
+#include "utils/i18n.hpp"
+
 #include <atomic>
 #include <chrono>
 #include <thread>
-#include <vle/devs/Simulator.hpp>
-#include <vle/utils/Context.hpp>
-#include <vle/utils/ContextPrivate.hpp>
-#include <vle/utils/i18n.hpp>
 
 namespace vle {
 namespace devs {

@@ -20,13 +20,14 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include <vle/utils/Exception.hpp>
+
+#include "utils/i18n.hpp"
+
 #include <vector>
 
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
-
-#include <cstring>
 #include <ciso646>
+#include <cstring>
 
 /**
  * SECTION:shell
@@ -66,8 +67,10 @@ namespace details {
 class ShellUtils
 {
 public:
-    ShellUtils()= default;;
-    ~ShellUtils()= default;;
+    ShellUtils() = default;
+    ;
+    ~ShellUtils() = default;
+    ;
 
     /* Single quotes preserve the literal string exactly. escape
      * sequences are not allowed; not even \' - if you want a '
@@ -135,9 +138,9 @@ public:
 
         /* If we reach here this means the close quote was never
          * encountered */
-        throw vle::utils::CastError(
-            "Unmatched quotation mark in command line "
-            "or other shell-quoted text: %s", retval.c_str());
+        throw vle::utils::CastError("Unmatched quotation mark in command line "
+                                    "or other shell-quoted text: %s",
+                                    retval.c_str());
     }
 
     /**

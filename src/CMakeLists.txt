@@ -1,3 +1,5 @@
 add_subdirectory(vle)
-add_subdirectory(pkgs)
-add_subdirectory(apps)
+
+if (WITH_GVLE)
+  add_subdirectory(gvle)
+endif ()

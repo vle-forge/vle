@@ -25,12 +25,13 @@
  */
 
 #include <vle/DllDefines.hpp>
-#include <vle/devs/RootCoordinator.hpp>
 #include <vle/manager/Simulation.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include "devs/RootCoordinator.hpp"
+#include "utils/ContextPrivate.hpp"
+#include "utils/i18n.hpp"
 
 #include <boost/format.hpp>
 #include <boost/progress.hpp>

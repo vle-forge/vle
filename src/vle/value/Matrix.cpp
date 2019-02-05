@@ -25,7 +25,6 @@
  */
 
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -37,6 +36,8 @@
 #include <vle/value/Table.hpp>
 #include <vle/value/Tuple.hpp>
 #include <vle/value/XML.hpp>
+
+#include "utils/i18n.hpp"
 
 #include <algorithm>
 

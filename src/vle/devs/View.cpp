@@ -24,12 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
 #include <vle/devs/Dynamics.hpp>
-#include <vle/devs/View.hpp>
 #include <vle/utils/Algo.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vpz/CoupledModel.hpp>
+
+#include "devs/View.hpp"
+#include "utils/i18n.hpp"
+
+#include <cassert>
 
 namespace vle {
 namespace devs {

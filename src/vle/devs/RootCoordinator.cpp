@@ -24,9 +24,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
+#include "devs/RootCoordinator.hpp"
 #include <utility>
-#include <vle/devs/RootCoordinator.hpp>
+
+#include <cassert>
 
 namespace vle {
 namespace devs {

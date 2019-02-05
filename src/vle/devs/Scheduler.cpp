@@ -24,11 +24,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
+#include "devs/Scheduler.hpp"
+#include "devs/Simulator.hpp"
+
 #include <memory>
 #include <vector>
-#include <vle/devs/Scheduler.hpp>
-#include <vle/devs/Simulator.hpp>
+
+#include <cassert>
 
 namespace vle {
 namespace devs {

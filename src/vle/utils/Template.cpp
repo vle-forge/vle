@@ -24,12 +24,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Template.hpp>
+
+#include "utils/i18n.hpp"
+
 #include <fstream>
 #include <regex>
 #include <sstream>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Template.hpp>
-#include <vle/utils/i18n.hpp>
 
 namespace vle {
 namespace utils {

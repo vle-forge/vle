@@ -24,8 +24,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <vle/devs/DynamicsInit.hpp>
 #include <vle/devs/DynamicsWrapper.hpp>
+
+#include "DynamicsInit.hpp"
 
 namespace vle {
 namespace devs {

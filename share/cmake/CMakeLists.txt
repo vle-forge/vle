@@ -1,3 +1,5 @@
-install(FILES VleUtilsConfig.cmake DESTINATION ${VLE_SHARE_DIRS}/cmake)
-install(FILES FindGVLE.cmake DESTINATION ${VLE_SHARE_DIRS}/cmake)
-install(FILES FindQwt.cmake DESTINATION ${VLE_SHARE_DIRS}/cmake)
+install(FILES
+    VleUtilsConfig.cmake
+    FindGVLE.cmake
+    FindQwt.cmake
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/cmake)

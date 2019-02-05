@@ -24,16 +24,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Tools.hpp>
+
+#include <vle/vpz/AtomicModel.hpp>
+#include <vle/vpz/CoupledModel.hpp>
+
+#include "utils/i18n.hpp"
+
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <set>
 #include <stack>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/vpz/AtomicModel.hpp>
-#include <vle/vpz/CoupledModel.hpp>
+
+#include <cassert>
 
 namespace vle {
 namespace vpz {

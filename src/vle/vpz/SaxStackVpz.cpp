@@ -26,14 +26,15 @@
 
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vpz/AtomicModel.hpp>
 #include <vle/vpz/CoupledModel.hpp>
 #include <vle/vpz/Port.hpp>
-#include <vle/vpz/SaxParser.hpp>
-#include <vle/vpz/SaxStackVpz.hpp>
 #include <vle/vpz/Structures.hpp>
 #include <vle/vpz/Vpz.hpp>
+
+#include "utils/i18n.hpp"
+#include "vpz/SaxParser.hpp"
+#include "vpz/SaxStackVpz.hpp"
 
 #include <algorithm>
 

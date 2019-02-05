@@ -24,13 +24,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vle/utils/Exception.hpp>
+#include <vle/value/Table.hpp>
+
+#include "utils/i18n.hpp"
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/value/Table.hpp>
 
 namespace {
 

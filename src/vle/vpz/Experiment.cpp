@@ -25,10 +25,11 @@
  */
 
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Set.hpp>
 #include <vle/vpz/Experiment.hpp>
+
+#include "utils/i18n.hpp"
 
 namespace vle {
 namespace vpz {

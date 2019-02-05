@@ -25,13 +25,14 @@
  */
 
 #include <vle/utils/Context.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/DownloadManager.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include "utils/ContextPrivate.hpp"
+#include "utils/i18n.hpp"
 
 #include <mutex>
 #include <thread>

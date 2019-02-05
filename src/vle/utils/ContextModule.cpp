@@ -24,26 +24,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/version.hpp>
+#include <vle/utils/Algo.hpp>
+
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Filesystem.hpp>
+#include <vle/vle.hpp>
+
+#include "utils/ContextPrivate.hpp"
+#include "utils/i18n.hpp"
+
+#include <algorithm>
+#include <unordered_map>
+
 #ifdef _WIN32
 #include <tchar.h>
 
-#include <vle/utils/details/UtilsWin.hpp>
+#include "utils/details/UtilsWin.hpp"
 
 #include <Windows.h>
 #else
 #include <dlfcn.h>
 #endif
-
-#include <boost/version.hpp>
-#include <vle/utils/Algo.hpp>
-#include <vle/utils/ContextPrivate.hpp>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Filesystem.hpp>
-#include <vle/utils/i18n.hpp>
-#include <vle/vle.hpp>
-
-#include <algorithm>
-#include <unordered_map>
 
 namespace vle {
 namespace utils {

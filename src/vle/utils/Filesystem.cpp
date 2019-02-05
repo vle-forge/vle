@@ -12,22 +12,24 @@
     - Add DirectoryEntry and DirectoryIterator to pass trough repertory.
 */
 
+#include <vle/utils/Exception.hpp>
+#include <vle/utils/Filesystem.hpp>
+#include <vle/utils/Tools.hpp>
+
+#include "utils/i18n.hpp"
+
 #ifdef _WIN32
 #include <tchar.h>
 
 #define NOMINMAX
 #include <Windows.h>
 
+#include "utils/details/UtilsWin.hpp"
 #include <ctime>
-#include <vle/utils/details/UtilsWin.hpp>
 #endif
 
 #include <array>
 #include <cassert>
-#include <cctype>
-#include <cerrno>
-#include <cstdlib>
-#include <cstring>
 #include <fstream>
 #include <numeric>
 #include <random>
@@ -35,10 +37,11 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <vle/utils/Exception.hpp>
-#include <vle/utils/Filesystem.hpp>
-#include <vle/utils/Tools.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include <cctype>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
 
 #ifndef _WIN32
 #include <dirent.h>

@@ -56,7 +56,7 @@ struct Observation
  * @brief Represent a View on a devs::Dynamics and a port name.
  *
  */
-class VLE_LOCAL View
+class View
 {
 public:
     View() = default;

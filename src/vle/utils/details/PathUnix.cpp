@@ -24,15 +24,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-#include <fstream>
-#include <list>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Tools.hpp>
 #include <vle/vle.hpp>
+
+#include "utils/ContextPrivate.hpp"
+
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
+#include <fstream>
+#include <list>
 
 namespace vle {
 namespace utils {

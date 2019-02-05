@@ -26,8 +26,9 @@
 
 #include <vle/utils/Algo.hpp>
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/i18n.hpp>
 #include <vle/vpz/Dynamics.hpp>
+
+#include "utils/i18n.hpp"
 
 #include <algorithm>
 #include <iterator>
