@@ -156,12 +156,6 @@ endif ()
 
 message (" dbg Root ${Qt5Widgets_INCLUDES} ${Qt5Widgets_INCLUDE_DIRS}")
 
-if (WIN32)
-  SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/share/cmake ${CMAKE_MODULE_PATH})
-  set(VLEDEPS_DEBUG 1)
-  find_package(VLEDEPS REQUIRED)
-endif ()
-
 # Propagates -std=C++11 CC option from pkg-config but VLEDEPS_CFLAGS_OTHER
 # #seems to be a CMake'list. So we replace ';' with ' '.
 string(REPLACE ";" " " VLEDEPS_CFLAGS_OTHER_STRING "${VLEDEPS_CFLAGS_OTHER}")

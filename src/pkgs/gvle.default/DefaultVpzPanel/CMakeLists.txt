@@ -10,7 +10,7 @@ include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Xml_INCLUDE_DIRS}
   ${Qt5PrintSupport_INCLUDE_DIRS} ${Qt5Svg_INCLUDE_DIRS})
 
 include_directories(${VLE_BINARY_DIR}/src/pkgs/gvle.default/DefaultVpzPanel
-  ${VLE_SOURCE_DIR}/src ${VLEDEPS_INCLUDE_DIRS})
+  ${VLE_SOURCE_DIR}/src ${EXPAT_INCLUDE_DIRS})
 
 add_definitions(${Qt5Widgets_DEFINITIONS} ${Qt5Gui_DEFINITIONS}
                 ${Qt5Xml_DEFINITIONS})

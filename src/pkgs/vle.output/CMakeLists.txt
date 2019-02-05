@@ -1,7 +1,5 @@
 include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS})
-
-link_directories(${VLEDEPS_LIBRARY_DIRS})
+  ${Boost_INCLUDE_DIRS} ${EXPAT_INCLUDE_DIRS})
 
 add_library(pkg_dummy MODULE Dummy.cpp)
 add_library(pkg_file MODULE File.cpp FileType.cpp)
@@ -17,21 +15,21 @@ set_target_properties(pkg_dummy PROPERTIES
   OUTPUT_NAME dummy
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
-target_link_libraries(pkg_dummy vlelib ${VLEDEPS_LIBRARIES}
+target_link_libraries(pkg_dummy vlelib ${EXPAT_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 set_target_properties(pkg_file PROPERTIES
   OUTPUT_NAME file
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
-target_link_libraries(pkg_file vlelib ${VLEDEPS_LIBRARIES}
+target_link_libraries(pkg_file vlelib ${EXPAT_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 set_target_properties(pkg_storage PROPERTIES
   OUTPUT_NAME storage
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
-target_link_libraries(pkg_storage vlelib ${VLEDEPS_LIBRARIES}
+target_link_libraries(pkg_storage vlelib ${EXPAT_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 set_target_properties(pkg_console PROPERTIES
@@ -39,7 +37,7 @@ set_target_properties(pkg_console PROPERTIES
   COMPILE_FLAGS "-fvisibility=hidden -fvisibility-inlines-hidden")
 
 
-target_link_libraries(pkg_console vlelib ${VLEDEPS_LIBRARIES}
+target_link_libraries(pkg_console vlelib ${EXPAT_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 install(FILES Authors.txt Description.txt License.txt News.txt Readme.txt

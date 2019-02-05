@@ -11,7 +11,7 @@ else (WIN32)
 endif (WIN32)
 
 include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS} ${gvle_SOURCE_DIR}
+  ${Boost_INCLUDE_DIRS} ${EXPAT_INCLUDE_DIRS} ${gvle_SOURCE_DIR}
   ${VLE_SOURCE_DIR}/src/apps/gvle)
 
 
