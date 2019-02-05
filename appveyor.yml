@@ -86,7 +86,7 @@ build_script:
   - cmd: set PATH=%QtDirTools%\bin;%QtDir%\bin;%CMakePath%\bin;%OLD_PATH%
   - cmd: mkdir %BuildPath%
   - cmd: cd %BuildPath%
-  - cmd: cmake.exe -G "MinGW Makefiles" -DVLEDEPS_PATH=%VleDeps% -DBOOST_ROOT=%BoostPath% -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%InstallPath% -DCMAKE_BUILD_TYPE=RelWithDebInfo %SourcePath%
+  - cmd: cmake.exe -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=%VleDeps% -DBOOST_ROOT=%BoostPath% -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%InstallPath% -DCMAKE_BUILD_TYPE=RelWithDebInfo %SourcePath%
   - cmd: mingw32-make VERBOSE=1 -j4
   - cmd: mingw32-make install
 
