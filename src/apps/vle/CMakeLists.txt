@@ -1,7 +1,7 @@
 include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS})
+  ${Boost_INCLUDE_DIRS} ${EXPAT_INCLUDE_DIRS})
 
-link_directories(${VLEDEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
 
 if (WIN32)
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vle.o
@@ -24,6 +24,6 @@ else (WIN32)
 endif (WIN32)
 
 target_link_libraries(vle vlelib ${CMAKE_THREAD_LIBS_INIT}
-  ${VLEDEPS_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
+  ${EXPAT_LIBRARIES} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vle DESTINATION bin)

@@ -2,10 +2,7 @@ function(DeclareSimulator targetname package name sources)
   include_directories(
     ${VLE_BINARY_DIR}/src
     ${VLE_SOURCE_DIR}/src
-    ${VLEDEPS_INCLUDE_DIRS})
-
-  link_directories(
-    ${VLEDEPS_LIBRARY_DIRS})
+    ${EXPAT_INCLUDE_DIRS})
 
   add_library(${targetname} MODULE ${sources})
 

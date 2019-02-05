@@ -1,13 +1,13 @@
 include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS} ${MPI_INCLUDE_PATH})
+  ${Boost_INCLUDE_DIRS} ${EXPAT_INCLUDE_DIRS} ${MPI_INCLUDE_PATH})
 
-link_directories(${VLEDEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
 
 if (VLE_HAVE_MVLE)
   add_executable(mvle mvle.cpp)
   set_target_properties(mvle PROPERTIES SOVERSION
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
-  target_link_libraries(mvle ${VLEDEPS_LIBRARIES}
+  target_link_libraries(mvle ${EXPAT_LIBRARIES}
     ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} ${MPI_LIBRARY}
     ${MPI_EXTRA_LIBRARY} vlelib)
 
@@ -21,7 +21,7 @@ if (VLE_HAVE_CVLE)
        ${VLE_SOURCE_DIR}/src/vle/vpz/SaxStackVpz.cpp)
   set_target_properties(cvle PROPERTIES SOVERSION
     "${VLE_MAJOR}.${VLE_MINOR}" VERSION "${VLE_MAJOR}.${VLE_MINOR}")
-  target_link_libraries(cvle ${VLEDEPS_LIBRARIES}
+  target_link_libraries(cvle ${EXPAT_LIBRARIES}
     ${OS_SPECIFIC_LIBRARIES} ${Boost_LIBRARIES} ${MPI_LIBRARY}
     ${MPI_EXTRA_LIBRARY} vlelib)
 

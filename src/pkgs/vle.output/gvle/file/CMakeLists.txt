@@ -6,7 +6,7 @@ include_directories(${Qt5Widgets_INCLUDE_DIRS} ${Qt5Xml_INCLUDE_DIRS}
   ${Qt5PrintSupport_INCLUDE_DIRS})
 
 include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS} ${gvle_SOURCE_DIR}
+  ${Boost_INCLUDE_DIRS} ${EXPAT_INCLUDE_DIRS} ${gvle_SOURCE_DIR}
   ${VLE_SOURCE_DIR}/src/apps/gvle)
 
 set(FilePlugin_SOURCES FilePluginGUI.cpp FilePluginGUItab.cpp)
@@ -24,10 +24,10 @@ ADD_LIBRARY(gvleOutputFile MODULE
 
 TARGET_LINK_LIBRARIES(gvleOutputFile
   gvlelib ${Qt5Xml_LIBRARIES} ${Qt5Widgets_LIBRARIES} ${Qt5Gui_LIBRARIES}
-  ${Qt5Help_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} vlelib ${VLEDEPS_LIBRARIES}
+  ${Qt5Help_LIBRARIES} ${Qt5PrintSupport_LIBRARIES} vlelib ${EXPAT_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
-INSTALL(TARGETS gvleOutputFile 
+INSTALL(TARGETS gvleOutputFile
   RUNTIME DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output/plugins/gvle/output
   LIBRARY DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output/plugins/gvle/output
   ARCHIVE DESTINATION lib/vle-${VLE_VERSION_SHORT}/pkgs/vle.output/plugins/gvle/output)

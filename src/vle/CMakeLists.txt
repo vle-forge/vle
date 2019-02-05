@@ -1,7 +1,7 @@
 include_directories(${VLE_BINARY_DIR}/src ${VLE_SOURCE_DIR}/src
-  ${Boost_INCLUDE_DIRS} ${VLEDEPS_INCLUDE_DIRS})
+  ${Boost_INCLUDE_DIRS} ${EXPAT_INCLUDE_DIRS})
 
-link_directories(${VLEDEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
 
 #
 # Explore subfolders to find source code, plug-ins etc.
@@ -63,9 +63,9 @@ target_compile_definitions(vlelib
   VERSION_PATCH=${VLE_PATCH}
   VERSION_EXTRA=${VLE_EXTRA})
 
-target_include_directories(vlelib PUBLIC ${VLEDEPS_INCLUDE_DIRS})
+target_include_directories(vlelib PUBLIC ${EXPAT_INCLUDE_DIRS})
 
-target_link_libraries(vlelib ${VLEDEPS_LIBRARIES} EXPAT::EXPAT
+target_link_libraries(vlelib ${EXPAT_LIBRARIES} EXPAT::EXPAT
   ${CMAKE_THREAD_LIBS_INIT} ${OS_SPECIFIC_LIBRARIES})
 
 install(TARGETS vlelib RUNTIME DESTINATION bin LIBRARY DESTINATION
