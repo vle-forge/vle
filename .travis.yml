@@ -13,7 +13,7 @@ addons:
       - asciidoctor
       - cmake
       - libboost-dev
-      - libmpich-dev
+      - libopenmpi-dev
       - libexpat1-dev
       - qttools5-dev
       - qttools5-dev-tools
