@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(libvle VERSION 2.1.0
-  DESCRIPTION "Library for the Multi-Modeling and Simulation Environment VLE"
   LANGUAGES CXX)
 
 set(libvle_sources

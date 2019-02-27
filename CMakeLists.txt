@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(VLE VERSION 2.1.0
-  DESCRIPTION "A Multi-Modeling and Simulation Environment"
   LANGUAGES CXX)
 
 # Use the GNU standard installation directories. See
