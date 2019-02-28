@@ -44,6 +44,6 @@ add_subdirectory(utils)
 add_subdirectory(value)
 add_subdirectory(vpz)
 
-if (VLE_HAVE_GVLE)
-    add_subdirectory(gvle)
+if (WITH_GVLE)
+  add_subdirectory(gvle)
 endif ()
