@@ -21,7 +21,7 @@ function(Declare plugin targetname package name)
     ${CMAKE_CURRENT_SOURCE_DIR})
 
   target_link_libraries(${targetname}
-    PRIVATE
+    PUBLIC
     libvle)
 
   set_target_properties(${targetname} PROPERTIES
@@ -65,7 +65,9 @@ function(DeclareGvle plugin targetname package name)
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/gvle>)
 
   target_link_libraries(${targetname}
-    PRIVATE
+    PUBLIC
+    libvle
+    libgvle
     Qt5::Widgets
     Qt5::Xml
     Qt5::Gui
