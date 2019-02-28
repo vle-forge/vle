@@ -21,7 +21,9 @@
 #ifdef _WIN32
 #include <tchar.h>
 
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <Windows.h>
 
 #include "utils/details/UtilsWin.hpp"

@@ -25,7 +25,8 @@
  */
 
 #include <vle/utils/Exception.hpp>
-#include <vle/utils/details/UtilsWin.hpp>
+
+#include "utils/details/UtilsWin.hpp"
 
 #include <string>
 

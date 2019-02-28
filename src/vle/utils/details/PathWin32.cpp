@@ -31,11 +31,12 @@
 #include <boost/format.hpp>
 #include <fstream>
 #include <vle/utils/Context.hpp>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/details/UtilsWin.hpp>
 #include <vle/vle.hpp>
+
+#include "utils/ContextPrivate.hpp"
+#include "utils/details/UtilsWin.hpp"
 
 namespace vle {
 namespace utils {
