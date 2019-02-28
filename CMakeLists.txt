@@ -68,19 +68,19 @@ else ()
   message(STATUS "asciidoctor not found.")
 endif ()
 
-if (UNIX)
+if (WIN32)
+  install(FILES README.md
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}
+    RENAME Readme.txt)
+  install(FILES COPYING
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}
+    RENAME CopyRight.txt)
+else ()
   install(FILES README.md
     DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/doc
     RENAME README)
   install(FILES COPYING
     DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/doc)
-else ()
-  install(FILES README.md
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/doc
-    RENAME Readme.txt)
-  install(FILES COPYING
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/doc
-    RENAME CopyRight.txt)
 endif ()
 
 install(FILES
