@@ -1,177 +1,21 @@
-VLE 2.0
-=======
+# VLE 2.1
 
-VLE 2.0.2
----------
+## Changes from VLE 2.0
 
-- VLE:
-  - `curl`: add `-L` option to the curl command line. According to the curl
-    documentation, if the server reports that the requested page has moved to a
-    different location (indicated with a Location: header and a 3XX response
-    code), this option will make curl redo the request on the new place.
-    (Closes: #357).
-  - `vpz` In SAX parser, replace `xmlXPath` functions dependencies with
-    `boost::spirit::qi` function.
+### cmake
 
-- RVLE:
-  - Fix compilation toolchain: use the same rtools compiler for both VLE and
-    VLE’s dependencies.
+- Bump to modern CMake (minimum version 3.5).
 
-- Appveyor
-  - fix compilation scripts to use curl, ssl and certificats.
+- Remove qmake script.
 
-VLE 2.0.1
----------
+### gvle
 
-- VLE:
-  - Windows binary: updating build and runtime dependencies (ssl, certificates)
-    and bump the Qt version to 5.9.6.
-  - Switches default url from http to https.
-  - cvle : fix the use of `more_output_details` option. When using
-    `more_output_details` the comma cannot be used as separator since the comma
-    is already used in the format of output variables (Closes #346)
+- Remove the copy of QCustomplot in GVLE. Please install libqcustomplot-dev to
+  enable the build of the DefaultSimSubpanel plugin.
 
-Release highlights
-------------------
+### vle
 
-### C++11/14
+- Remove the temporary files or directories: Mainly on Windows, the temporary
+  directory must be cleaned (remove all temporary files or directories) to
+  exclude bug with already downloaded file etc. (Closes: #364).
 
-All the source code and API move to the C++11/14. Compiler
-requirements are now gcc 4.9 or clang 3.5 available in Ubuntu LTS
-14.04 or Debian GNU/Linux Wheezy.
-
-Many boost functions or classes are replaced with standard functions
-and classes.
-
-### Remove dependencies:
-
-- The libarchive-dev is remove. We replace the libarchive dependency
-  to build/extract tarball with the cmake sub-process command (`cmake
-  -E tar [cxt][vf][zjJ] file.tar` command).
-
-- All boost binary libraries are removed. `boost::random`,
-  `boost::thread`, `boost::filesystem`, `boost::system`,
-  `boost::date_time`, `boost::unittest_framework`.
-
-### Changes in public API
-
-- Less less and less.
-
-- No singleton nor static variables.
-
-- Only dependency with the standard C++ library.
-
-### Kernel Parallelization
-
-We add a thread pool into the kernel `src/vle/devs/Thread.hpp` to parallelize
-with threads the PDEVS/DSDE immediate bag. It is the more pessimist
-parallelization approach and gains are obtained with big models, big transitions
-sources codes and big bags.
-
-To active the parallelization in VLE, use the following command:
-
-    vle -C vle.simulation.thread 8
-    vle -C vle.simulation.block-size 128
-
-These settings will use 8 threads (for an eight cores processor for example) and
-the PDEVS/DSDE immediate bag will be treat in blocks of 128 simulators.
-
-To disable the use of the parallelization mechanism, uses the following
-commands:
-
-    vle -C vle.simulation.thread 0
-    vle -C vle.simulation.block-size 0
-
-### 'System' binary packages
-
-The Git repository of VLE provides some very useful packages for VLE
-and GVLE (`vle.output`, `vle.aqss`, `gvle.simulation` etc.). These
-packages installed in the `$prefix/lib/vle-2.0/pkgs` (`$prefix` is the
-installation prefix of VLE. A read-only directory) simplify
-installation of VLE: VLE can be use without using the Github packages
-repository.
-
-Default, priority goes to `$VLEHOME/pkgs-2.0` instead of system
-packages `$prefix/lib/vle-2.0/pkgs`. So, if you want to develop
-another `vle.output` package, nothing change.
-
-### Debug
-
-The Debug mode is available at run-time (without the use of
-DECLARE\_DYNAMICS\_DBG macro). In the VPZ, we can provides a
-`debug="yes"` attribute to the `model` element to debug the atomic
-model. Before, we have to use the `DynamicsDbg.hpp` and replace the
-inheritance from `vle::devs::Dynamics` to `vle::devs:DynamicsDbg`.
-
-The `DynamicsDbg.hpp` header is removed from public API.
-
-In private implementation, the debug mode use the
-`vle::devs::DynamicsDbg` class placed between the
-`vle::devs::Simulator` and user's dynamics model.
-
-### Observation
-
-The Observation mechanism use the same behaviors than debug mode. A
-class between `vle::devs::Simulator` and the user's dynamics or debug
-model (of course).
-
-We adjust the VPZ to provide observation for output, internal,
-external, confluent and finish functions by updating the `type`
-attribute in the `View` element of the VPZ. Type can be:
-
-- `event`: View::INTERNAL | View::EXTERNAL | View::CONFLUENT
-- `output`: View::OUTPUT
-- `internal`: View::INTERNAL;
-- `external`: View::EXTERNAL;
-- `confluent`: View::CONFLUENT;
-- `finish`: View::FINISH;
-
-Finally, an observation View can be enable or disable in GVLE and in R, python
-package. This feature can be useful to add debug observation mode without cost
-to simulation kernel. In previous VLE version, the output plug-in Dummy was
-used.
-
-### Model in executable
-
-From now, ModelFactory and StreamWriter can load symbol into the main
-program instead of the shared libraries specified by the package
-information. To use this feature, the package must be empty in the
-vpz::Dynamics or vpz::Output object. Then the library is used to
-define the symbol to load. For example:
-
-- `vpz::Dynamics { Package = "toto", Library = "titi" }` loads the
-  shared library `$VLE_HOME/pkgs-1.x/toto/lib/simulator/libtiti.so`
-  and try to found the `vle_make_dynamics` symbol.
-
-- `vpz::Dynamics { Package = "", library="make_titi" }` loads the
-  symbol `make_titi`.
-
-If the library name starts with `exe_` or `wra_` then symbols
-respectively define a `vle::devs::Executive` or a
-`vle::devs::DynamicsWrapper`.
-
-### Experimental frames
-
-Two new features:
-- Simulations can be start in subprocess so, if a simulation segmentation
-  fault, the master process do not close.
-- The `cvle`, `vle` and `mvle` accept an `--timeout [ms]` parameter to limit
-  the duration of the simulation subprocess to avoid too long simulation
-  process.
-
-### Graph and regular graph generators
-
-Provides a new `vle::translator` public API with:
-- random small-worfireld, random scale-free, random erdos renyi graphs generators.
-- regular 1d and 2d graph generator with wrap and mask neighborhood definition.
-- user defined graph (as in VLE 1.x).
-
-
-### GVLE
-
-GVLE is completely rewritten with QT 5. The old GVLE in Gtkmm [2,3] is removed
-and all plug-ins are disabled or rewritten.
-
-### CMake
-
-The users CMake scripts are updated to simplify the development of packages.
