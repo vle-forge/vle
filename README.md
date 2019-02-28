@@ -1,4 +1,4 @@
-Virtual Laboratory Environment 2.0
+Virtual Laboratory Environment 2.1
 ==================================
 
 | Linux | Windows |
@@ -24,8 +24,8 @@ For the VFL API:
 
 * expat (≥ 2.0)
 * boost (≥ 1.47)
-* cmake (≥ 3.0)
-* c++ compiler (gcc ≥ 4.9, clang ≥ 3.3, intel icc (≥ 11.0)
+* cmake (≥ 3.5)
+T c++ compiler (gcc ≥ 4.9, clang ≥ 3.3, intel icc (≥ 11.0)
 
 For the MPI command line:
 
@@ -34,6 +34,7 @@ For the MPI command line:
 For the GUI:
 
 * Qt5
+* QCustomplot
 
 ## Getting the code
 
@@ -51,7 +52,8 @@ Install dependencies (recent ubuntu/debian). Copy/paste the following lines:
 ```bash
 apt-get install curl libexpat1-dev libboost-dev cmake pkg-config g++ \
         qttools5-dev qttools5-dev-tools qtbase5-dev qtbase5-dev-tools \
-        qtchooser qt5-default asciidoctor ruby-asciidoctor
+        qtchooser qt5-default libqcustomplot-dev \
+        asciidoctor ruby-asciidoctor
 ```
 
 Once you have met requirements, compiling and installing is simple. Copy/paste
@@ -80,12 +82,12 @@ analys them.  To more information, see the VLE website
 
 To build a new package::
 
-    vle-2.0 -P mypackage create
+    vle-2.1 -P mypackage create
 
 To configure, build a package::
 
-    vle-2.0 -P mypackage configure build
+    vle-2.1 -P mypackage configure build
 
 To run vpz in a package::
 
-    vle-2.0 -P mypackage file.vpz
+    vle-2.1 -P mypackage file.vpz
