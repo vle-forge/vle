@@ -27,13 +27,6 @@
 #include <vle/utils/Tools.hpp>
 #include <vle/vle.hpp>
 
-#ifdef _WIN32
-#include <vle/utils/details/UtilsWin.hpp>
-#endif
-
-#define _VLE_STRINGIFY(x) #x
-#define VLE_STRINGIFY(x) _VLE_STRINGIFY(x)
-
 namespace vle {
 
 std::tuple<int, int, int>

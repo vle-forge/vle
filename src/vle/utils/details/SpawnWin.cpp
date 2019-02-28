@@ -28,8 +28,6 @@
 
 #include <Windows.h>
 
-#include <vle/utils/details/UtilsWin.hpp>
-
 #include <algorithm>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -38,13 +36,14 @@
 #include <iostream>
 #include <string>
 #include <strsafe.h>
-#include <vle/utils/ContextPrivate.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Spawn.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/details/ShellUtils.hpp>
-#include <vle/utils/details/UtilsWin.hpp>
-#include <vle/utils/i18n.hpp>
+
+#include "utils/i18n.hpp"
+#include "utils/ContextPrivate.hpp"
+#include "utils/details/ShellUtils.hpp"
+#include "utils/details/UtilsWin.hpp"
 
 namespace vle {
 namespace utils {
