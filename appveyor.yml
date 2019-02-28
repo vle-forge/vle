@@ -30,16 +30,10 @@ before_build:
   - cmd: set BuildPath=%APPVEYOR_BUILD_FOLDER%\build
   - cmd: set CMakePath=%ProgramFiles(x86)%\CMake
   - cmd: set InnoSetupPath="%ProgramFiles(x86)%\Inno Setup 5"
-  - cmd: for /F "tokens=2,* delims= " %%A in ('type %SourcePath%\CMakeLists.txt ^| find /I /N "set(VLE_MAJOR"') do (set tmp_major=%%A)
-  - cmd: for /F "tokens=2,* delims= " %%A in ('type %SourcePath%\CMakeLists.txt ^| find /I /N "set(VLE_MINOR"') do (set tmp_minor=%%A)
-  - cmd: for /F "tokens=2,* delims= " %%A in ('type %SourcePath%\CMakeLists.txt ^| find /I /N "set(VLE_PATCH"') do (set tmp_patch=%%A)
-  - cmd: for /F "tokens=2,* delims= " %%A in ('type %SourcePath%\CMakeLists.txt ^| find /I /N "set(VLE_EXTRA"') do (set tmp_extra=%%A)
-  - cmd: set major=%tmp_major:~0,-1%
-  - cmd: set minor=%tmp_minor:~0,-1%
-  - cmd: set patch=%tmp_patch:~0,-1%
-  - cmd: set extra=%tmp_extra:~1,-2%
-  - cmd: set VLE_ABI=%major%.%minor%
-  - cmd: if "[%extra%]" == "[]" (set VLE_VERSION=%major%.%minor%.%patch%) else (set VLE_VERSION=%major%.%minor%.%patch%-%extra%)
+  - cmd: for /f "tokens=3 delims= " %%a in ('type %SourcePath%\CMakeLists.txt^|find "project(VLE VERSION "') do (set version=%%a)
+  - cmd: for /F "tokens=1,2,3 delims=." %%a in ("%version%") do (set "Major=%%a" & set "Minor=%%b" & set "Patch=%%c")
+  - cmd: set VLE_ABI=%Major%.%Minor%
+  - cmd: set VLE_VERSION=%Major%.%Minor%.%Patch%
   - cmd: md %VleDeps%
   - cmd: md %VleDeps%\bin
   - cmd: md %VleDeps%\lib
