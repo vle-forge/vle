@@ -83,6 +83,14 @@ else ()
     RENAME CopyRight.txt)
 endif ()
 
+install(FILES
+  cmake/FindBoost.cmake
+  cmake/FindEXPAT.cmake
+  cmake/FindGVLE.cmake
+  cmake/FindQwt.cmake
+  cmake/VleUtilsConfig.cmake
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/vle-${VLE_ABI}/cmake)
+
 # Gettext utilities
 # find_package(Gettext)
 # if (GETTEXT_FOUND)
