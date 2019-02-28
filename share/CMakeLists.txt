@@ -2,7 +2,6 @@ add_subdirectory(doc)
 add_subdirectory(pixmaps)
 add_subdirectory(dtd)
 add_subdirectory(template)
-add_subdirectory(cmake)
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/gvle.rc.in
