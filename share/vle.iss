@@ -72,7 +72,7 @@ Source: "{#MingwPath}\bin\libssl-1_1.dll"; DestDir: "{app}\bin"; Flags: ignoreve
 Source: "{#MingwPath}\bin\libcurl-4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libexpat-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libiconv-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#MingwPath}\bin\libidn2-4.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libidn2*.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libintl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\liblzma-5.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libmetalink-3.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
