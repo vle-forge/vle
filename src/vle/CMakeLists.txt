@@ -110,9 +110,10 @@ else ()
     utils/details/SpawnUnix.cpp)
 endif()
 
+option(BUILD_SHARED_LIBS "Build shared library" ON)
+
 add_library(libvle ${libvle_sources})
 
-option(BUILD_SHARED_LIBS "Build shared library" ON)
 include(GenerateExportHeader)
 generate_export_header(libvle
     EXPORT_MACRO_NAME VLE_API
