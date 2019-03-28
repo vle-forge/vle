@@ -40,7 +40,7 @@ namespace gvle {
  * @brief the couple of a source file (either cpp or vpz) with the metadata
  * file
  */
-struct gvle_file
+struct GVLE_API gvle_file
 {
     gvle_file();
     gvle_file(const gvle_file& f);
