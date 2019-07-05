@@ -45,19 +45,6 @@
 #include <chrono>
 #include <numeric>
 
-#define xstringify(a) stringify(a)
-#define stringify(a) #a
-
-#define DECLARE_DYNAMICS_SYMBOL(symbol_, model_)                              \
-    extern "C" {                                                              \
-    VLE_MODULE vle::devs::Dynamics* symbol_(                                  \
-      const vle::devs::DynamicsInit& init,                                    \
-      const vle::devs::InitEventList& events)                                 \
-    {                                                                         \
-        return new model_(init, events);                                      \
-    }                                                                         \
-    }
-
 namespace package {
 
 class Agent : public vle::devs::Dynamics
@@ -457,28 +444,8 @@ using Model = vle::devs::MultiComponent<cell_state, ModelList>;
 
 } // namespace package
 
-DECLARE_DYNAMICS_SYMBOL(dynamics_component_a, package::Model);
-DECLARE_DYNAMICS_SYMBOL(dynamics_agent, package::Agent);
-
-extern "C" {
-
-__attribute__((visibility("default")))
-vle::oov::Plugin*
-oov_plugin(const std::string& location)
-{
-    return new vletest::OutputPlugin(location);
-}
-
-}
-
-extern
-__attribute__((visibility("default")))
-vle::oov::Plugin*
-oov_plugin(const std::string& location);
-
 static auto
-run_simulation(vle::utils::ContextPtr ctx,
-               std::unique_ptr<vle::vpz::Vpz> file)
+run_simulation(vle::utils::ContextPtr ctx, std::unique_ptr<vle::vpz::Vpz> file)
   -> std::unique_ptr<vle::value::Map>
 {
     using namespace std::chrono_literals;
@@ -493,8 +460,8 @@ run_simulation(vle::utils::ContextPtr ctx,
     auto ret = simulator.run(std::move(file), &error);
 
     if (error.code)
-        std::cerr << "Simulation failed with code " << error.code
-                  << " : " << error.message << '\n';
+        std::cerr << "Simulation failed with code " << error.code << " : "
+                  << error.message << '\n';
 
     return ret;
 }
@@ -505,10 +472,27 @@ test_component()
     auto ctx = vle::utils::make_context();
     ctx->set_log_priority(7);
 
+    ctx->add_oov_factory("oov_plugin", [](const std::string& location) {
+        return new vletest::OutputPlugin(location);
+    });
+
+    ctx->add_dynamics_factory("dynamics_component_a",
+                              [](const vle::devs::DynamicsInit& init,
+                                 const vle::devs::InitEventList& events) {
+                                  return new package::Model(init, events);
+                              });
+
+    ctx->add_dynamics_factory("dynamics_agent",
+                              [](const vle::devs::DynamicsInit& init,
+                                 const vle::devs::InitEventList& events) {
+                                  return new package::Agent(init, events);
+                              });
+
     vle::utils::Path p(DEVS_TEST_DIR);
     vle::utils::Path::current_path(p);
 
-    auto file = std::make_unique<vle::vpz::Vpz>(DEVS_TEST_DIR "/component.vpz");
+    auto file =
+      std::make_unique<vle::vpz::Vpz>(DEVS_TEST_DIR "/component.vpz");
 
     try {
         auto out = run_simulation(ctx, std::move(file));
@@ -552,9 +536,7 @@ test_component()
 int
 main()
 {
-    auto x = ::oov_plugin("test");
-    if (x)
-        test_component();
+    test_component();
 
     return unit_test::report_errors();
 }

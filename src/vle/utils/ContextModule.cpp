@@ -24,7 +24,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/container/small_vector.hpp>
 #include <boost/version.hpp>
+
 #include <vle/utils/Algo.hpp>
 
 #include <vle/utils/Exception.hpp>
@@ -349,6 +351,60 @@ public:
     }
 };
 
+struct oov_factory
+{
+    oov_factory(
+      std::string name_,
+      std::function<vle::oov::Plugin*(const std::string& location)> factory_)
+      : name(std::move(name_))
+      , factory(std::move(factory_))
+    {}
+
+    std::string name;
+    std::function<vle::oov::Plugin*(const std::string& location)> factory;
+};
+
+struct dynamics_factory
+{
+    dynamics_factory(std::string name_,
+                     std::function<vle::devs::Dynamics*(
+                       const vle::devs::DynamicsInit& init,
+                       const vle::devs::InitEventList& events)> factory_)
+      : name(std::move(name_))
+      , factory(std::move(factory_))
+    {}
+
+    std::string name;
+    std::function<vle::devs::Dynamics*(const vle::devs::DynamicsInit& init,
+                                       const vle::devs::InitEventList& events)>
+      factory;
+};
+
+struct executive_factory
+{
+    executive_factory(std::string name_,
+                      std::function<vle::devs::Dynamics*(
+                        const vle::devs::ExecutiveInit& init,
+                        const vle::devs::InitEventList& events)> factory_)
+      : name(std::move(name_))
+      , factory(std::move(factory_))
+    {}
+
+    std::string name;
+    std::function<vle::devs::Dynamics*(const vle::devs::ExecutiveInit& init,
+                                       const vle::devs::InitEventList& events)>
+      factory;
+};
+
+template<typename Container>
+typename Container::const_iterator
+factory_find(const Container& c, std::string name)
+{
+    return std::find_if(c.cbegin(), c.cend(), [&name](const auto& factory) {
+        return factory.name == name;
+    });
+}
+
 struct ModuleManager
 {
     using ModuleTable =
@@ -356,6 +412,10 @@ struct ModuleManager
     using value_type = ModuleTable::value_type;
     using const_iterator = ModuleTable::const_iterator;
     using iterator = ModuleTable::iterator;
+
+    boost::container::small_vector<oov_factory, 8> m_oov_factory;
+    boost::container::small_vector<dynamics_factory, 8> m_dynamics_factory;
+    boost::container::small_vector<executive_factory, 8> m_executive_factory;
 
     Context* mContext;
     ModuleTable mTableSimulator;
@@ -722,6 +782,64 @@ struct ModuleManager
         }
     }
 };
+
+bool
+Context::add_oov_factory(
+  std::string name,
+  std::function<vle::oov::Plugin*(const std::string& location)> factory)
+{
+    if (not m_pimpl->modules)
+        m_pimpl->modules = std::make_shared<ModuleManager>(this);
+
+    auto it = factory_find(m_pimpl->modules->m_oov_factory, name);
+    if (it != m_pimpl->modules->m_oov_factory.end()) {
+        warning("Context: can not replace factory `%s'", name.c_str());
+        return false;
+    }
+
+    m_pimpl->modules->m_oov_factory.emplace_back(name, factory);
+    return true;
+}
+
+bool
+Context::add_dynamics_factory(
+  std::string name,
+  std::function<vle::devs::Dynamics*(const vle::devs::DynamicsInit& init,
+                                     const vle::devs::InitEventList& events)>
+    factory)
+{
+    if (not m_pimpl->modules)
+        m_pimpl->modules = std::make_shared<ModuleManager>(this);
+
+    auto it = factory_find(m_pimpl->modules->m_dynamics_factory, name);
+    if (it != m_pimpl->modules->m_dynamics_factory.end()) {
+        warning("Context: can not replace factory `%s'", name.c_str());
+        return false;
+    }
+
+    m_pimpl->modules->m_dynamics_factory.emplace_back(name, factory);
+    return true;
+}
+
+bool
+Context::add_executive_factory(
+  std::string name,
+  std::function<vle::devs::Dynamics*(const vle::devs::ExecutiveInit& init,
+                                     const vle::devs::InitEventList& events)>
+    factory)
+{
+    if (not m_pimpl->modules)
+        m_pimpl->modules = std::make_shared<ModuleManager>(this);
+
+    auto it = factory_find(m_pimpl->modules->m_executive_factory, name);
+    if (it != m_pimpl->modules->m_executive_factory.end()) {
+        warning("Context: can not replace factory `%s'", name.c_str());
+        return false;
+    }
+
+    m_pimpl->modules->m_executive_factory.emplace_back(name, factory);
+    return true;
+}
 
 void*
 Context::get_symbol(const std::string& package,

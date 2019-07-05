@@ -28,6 +28,7 @@
 #define VLE_UTILS_CONTEXT_HPP
 
 #include <cstdarg>
+#include <functional>
 #include <iosfwd>
 #include <memory>
 #include <string>
@@ -36,6 +37,18 @@
 #include <vle/utils/Filesystem.hpp>
 
 namespace vle {
+
+namespace oov {
+class Plugin;
+}
+
+namespace devs {
+class Dynamics;
+class DynamicsInit;
+class InitEventList;
+class ExecutiveInit;
+}
+
 namespace utils {
 
 /**
@@ -318,6 +331,22 @@ public:
         Path path;
         Context::ModuleType type;
     };
+
+    bool add_oov_factory(
+      std::string name,
+      std::function<vle::oov::Plugin*(const std::string& location)> factory);
+
+    bool add_dynamics_factory(
+      std::string name,
+      std::function<
+        vle::devs::Dynamics*(const vle::devs::DynamicsInit& init,
+                             const vle::devs::InitEventList& events)> factory);
+
+    bool add_executive_factory(
+      std::string name,
+      std::function<
+        vle::devs::Dynamics*(const vle::devs::ExecutiveInit& init,
+                             const vle::devs::InitEventList& events)> factory);
 
     /**
      * @brief Get a symbol from a shared library.

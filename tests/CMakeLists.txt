@@ -21,8 +21,8 @@ function(vle_declare_test test_name sources)
 
     set_target_properties(${test_name}
         PROPERTIES
-        CXX_VISIBILITY_PRESET hidden
-        VISIBILITY_INLINES_HIDDEN ON
+        CXX_VISIBILITY_PRESET default
+	VISIBILITY_INLINES_HIDDEN OFF
         CXX_STANDARD 14
         CXX_STANDARD_REQUIRED ON)
 
@@ -36,7 +36,6 @@ function(vle_declare_test test_name sources)
 
     add_test(${test_name} ${test_name})
 endfunction()
-
 
 add_subdirectory(devs)
 add_subdirectory(manager)
