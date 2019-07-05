@@ -65,7 +65,86 @@ struct PrivateContextImpl
     std::unique_ptr<Context::LogFunctor> log_fn;
     int log_priority;
 };
-}
-} // namespace vle utils
+
+/**
+ * @brief Get a symbol from a shared library.
+ *
+ * Check the list of shared libraries already loaded. If the shared
+ * library exists, the symbol @c type is researched into the
+ * library. Otherwise, the ModuleManager try to load the shared
+ * library named from the combination of @c package, @c library and @e
+ * type.
+ *
+ * This function return is @e newtype parameter the type of the module
+ * read. The @e type is MODULE_DYNAMICS, MODULE_DYNAMICS_EXECUTIVE or
+ * MODULE_DYNAMICS_WRAPPER the @e newtype check the type and if it
+ * does not corresponds it check the two other simulators (MODULE_DYNAMICS,
+ * MODULE_DYNAMICS_EXECUTIVE or MODULE_DYNAMICS_EXECUTIVE). If @e type is
+ * not MODULE_DYNAMICS, MODULE_DYNAMICS_WRAPPER,
+ * MODULE_DYNAMICS_EXECUTIVE , the @e newtype will be affected by the
+ * founded type.
+ *
+ * @code
+ * // try to load the shared library
+ * // $VLE_HOME/.vle/pkgs/glue/lib/libcounter.so
+ * auto ctx = utils::make_context();
+ * ModuleType type;
+ * ctx->get_symbol("glue", "counter", MODULE_DYNAMICS, &type);
+ * assert(type == MODULE_DYNAMICS || type == MODULE_DYNAMICS_WRAPPER ||
+ *        type == MODULE_DYNAMICS_WRAPPER);
+ *
+ * ctx->get_symbol("glue", "counter", MODULE_DYNAMICS_WRAPPER, &type);
+ * assert(type == MODULE_DYNAMICS || type == MODULE_DYNAMICS_WRAPPER ||
+ *        type == MODULE_DYNAMICS_WRAPPER);
+ *
+ * ctx->get_symbol("glue", "counter", MODULE_OOV, &type);
+ * assert(type == MODULE_OOV);
+ * @endcode
+ *
+ * @param package The name of the package. If several packages with
+ * the same name appear in paths provided by \c
+ * Context::getBinaryPackagesDir() then the first found is returned
+ * (priority to the begin).
+ *
+ * @param library
+ * @param type
+ * @param[out] newtype If @e newtype is null, newtype will not be affected.
+ *
+ * @throw utils::InternalError if shared library does not exists or if the
+ * symbols wanted does not exist.
+ *
+ * @return A pointer to the founded symbol.
+ */
+void*
+get_symbol(vle::utils::ContextPtr ctx,
+           const std::string& package,
+           const std::string& pluginname,
+           Context::ModuleType type,
+           Context::ModuleType* newtype = nullptr);
+
+/**
+ * @brief Get a symbol directly in the executable.
+ *
+ * Try to get a symbol from the executable if it was never
+ * loaded. This function allows to build executable where we can store
+ * simulators, oov's modules for instance in unit test.
+ *
+ * @code
+ * auto ctx = vle::utils::make_context();
+ * ctx->get_symbol("main");
+ * @endcode
+ *
+ * @param symbol The name of the symbol.
+ *
+ * @throw utils::InternalError if the executable does not have a symbol of
+ * this name.
+ *
+ * @return A pointer to the founded symbol.
+ */
+void*
+get_symbol(vle::utils::ContextPtr ctx, const std::string& pluginname);
+
+} // namespace vle
+} // namespace utils
 
 #endif

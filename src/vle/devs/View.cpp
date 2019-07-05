@@ -29,6 +29,7 @@
 #include <vle/vpz/CoupledModel.hpp>
 
 #include "devs/View.hpp"
+#include "utils/ContextPrivate.hpp"
 #include "utils/i18n.hpp"
 
 #include <cassert>
@@ -58,12 +59,14 @@ View::open(utils::ContextPtr ctx,
          * build executable with plugins.
          */
         if (not package.empty())
-            symbol = ctx->get_symbol(package,
+            symbol =
+              vle::utils::get_symbol(ctx,
+                                     package,
                                      pluginname,
                                      utils::Context::ModuleType::MODULE_OOV,
                                      nullptr);
         else
-            symbol = ctx->get_symbol(pluginname);
+            symbol = vle::utils::get_symbol(ctx, pluginname);
 
         auto fct(utils::functionCast<oov::OovPluginSlot>(symbol));
         m_plugin = std::unique_ptr<oov::Plugin>(fct(location));

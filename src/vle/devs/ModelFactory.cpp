@@ -413,13 +413,13 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
          * executable with dynamics.
          */
         if (not dyn.package().empty()) {
-            symbol =
-              mContext->get_symbol(dyn.package(),
-                                   dyn.library(),
-                                   utils::Context::ModuleType::MODULE_DYNAMICS,
-                                   &type);
+            symbol = get_symbol(mContext,
+                                dyn.package(),
+                                dyn.library(),
+                                utils::Context::ModuleType::MODULE_DYNAMICS,
+                                &type);
         } else {
-            symbol = mContext->get_symbol(dyn.library());
+            symbol = get_symbol(mContext, dyn.library());
 
             if (dyn.library().length() >= 4) {
                 if (dyn.library().compare(0, 4, "exe_") == 0)

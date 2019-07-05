@@ -842,18 +842,22 @@ Context::add_executive_factory(
 }
 
 void*
-Context::get_symbol(const std::string& package,
-                    const std::string& library,
-                    Context::ModuleType type,
-                    Context::ModuleType* newtype)
+get_symbol(vle::utils::ContextPtr ctx,
+           const std::string& package,
+           const std::string& library,
+           Context::ModuleType type,
+           Context::ModuleType* newtype)
 {
-    if (not m_pimpl->modules)
-        m_pimpl->modules = std::make_shared<ModuleManager>(this);
+    if (not ctx->get_impl()->modules)
+        ctx->get_impl()->modules = std::make_shared<ModuleManager>(ctx.get());
 
     if (not newtype)
-        return m_pimpl->modules->getModule(package, library, type)->get();
+        return ctx->get_impl()
+          ->modules->getModule(package, library, type)
+          ->get();
 
-    const auto& module = m_pimpl->modules->getModule(package, library, type);
+    const auto& module =
+      ctx->get_impl()->modules->getModule(package, library, type);
     auto* result = module->get();
     *newtype = module->mType;
 
@@ -861,12 +865,12 @@ Context::get_symbol(const std::string& package,
 }
 
 void*
-Context::get_symbol(const std::string& pluginname)
+get_symbol(vle::utils::ContextPtr ctx, const std::string& pluginname)
 {
-    if (not m_pimpl->modules)
-        m_pimpl->modules = std::make_shared<ModuleManager>(this);
+    if (not ctx->get_impl()->modules)
+        ctx->get_impl()->modules = std::make_shared<ModuleManager>(ctx.get());
 
-    return m_pimpl->modules->getSymbol(pluginname);
+    return ctx->get_impl()->modules->getSymbol(pluginname);
 }
 
 void
