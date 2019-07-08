@@ -56,6 +56,17 @@ namespace utils {
  */
 using PathList = std::vector<vle::utils::Path>;
 
+using oov_factory_fct =
+  std::function<vle::oov::Plugin*(const std::string& location)>;
+
+using dynamics_factory_fct =
+  std::function<vle::devs::Dynamics*(const vle::devs::DynamicsInit& init,
+                                     const vle::devs::InitEventList& events)>;
+
+using executive_factory_fct =
+  std::function<vle::devs::Dynamics*(const vle::devs::ExecutiveInit& init,
+                                     const vle::devs::InitEventList& events)>;
+
 struct PrivateContextImpl;
 class Context;
 /**
@@ -332,21 +343,12 @@ public:
         Context::ModuleType type;
     };
 
-    bool add_oov_factory(
-      std::string name,
-      std::function<vle::oov::Plugin*(const std::string& location)> factory);
+    bool add_oov_factory(std::string name, oov_factory_fct factory);
 
-    bool add_dynamics_factory(
-      std::string name,
-      std::function<
-        vle::devs::Dynamics*(const vle::devs::DynamicsInit& init,
-                             const vle::devs::InitEventList& events)> factory);
+    bool add_dynamics_factory(std::string name, dynamics_factory_fct factory);
 
-    bool add_executive_factory(
-      std::string name,
-      std::function<
-        vle::devs::Dynamics*(const vle::devs::ExecutiveInit& init,
-                             const vle::devs::InitEventList& events)> factory);
+    bool add_executive_factory(std::string name,
+                               executive_factory_fct factory);
 
     /**
      * \e Brief Unload of loaded shared libraries.

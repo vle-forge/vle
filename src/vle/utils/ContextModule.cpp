@@ -25,6 +25,7 @@
  */
 
 #include <boost/container/small_vector.hpp>
+#include <boost/variant.hpp>
 #include <boost/version.hpp>
 
 #include <vle/utils/Algo.hpp>
@@ -301,108 +302,49 @@ struct Module
     }
 };
 
-struct SymbolTable
-{
-public:
-    using container = std::unordered_map<std::string, void*>;
-    using const_iterator = container::const_iterator;
-    using iterator = container::iterator;
-    using size_type = container::size_type;
-
-    container mLst;
-
-    SymbolTable() = default;
-    ~SymbolTable() = default;
-
-    SymbolTable(const SymbolTable&) = delete;
-    SymbolTable& operator=(const SymbolTable&) = delete;
-
-    void* get(const std::string& symbol)
-    {
-        const_iterator it = mLst.find(symbol);
-
-        // Already in cache, returns the symbol.
-        if (it != mLst.end())
-            return it->second;
-
-        // Otherwise, try to found symbol into the current process symbol
-        // table.
-
-        void* result = nullptr;
-
-#ifdef _WIN32
-        FARPROC ptr =
-          ::GetProcAddress(::GetModuleHandleW(NULL), symbol.c_str());
-        result = (void*)ptr;
-#else
-        result = ::dlsym(nullptr, symbol.c_str());
-#endif
-
-        if (not result)
-            throw utils::InternalError(
-              _("Module: `%s' not found in global space"), symbol.c_str());
-
-        auto ret = mLst.emplace(symbol, result);
-
-        if (not ret.second)
-            assert(false && "emplace failure but find returns true");
-
-        return result;
-    }
-};
-
-struct oov_factory
-{
-    oov_factory(
-      std::string name_,
-      std::function<vle::oov::Plugin*(const std::string& location)> factory_)
-      : name(std::move(name_))
-      , factory(std::move(factory_))
-    {}
-
-    std::string name;
-    std::function<vle::oov::Plugin*(const std::string& location)> factory;
-};
-
-struct dynamics_factory
-{
-    dynamics_factory(std::string name_,
-                     std::function<vle::devs::Dynamics*(
-                       const vle::devs::DynamicsInit& init,
-                       const vle::devs::InitEventList& events)> factory_)
-      : name(std::move(name_))
-      , factory(std::move(factory_))
-    {}
-
-    std::string name;
-    std::function<vle::devs::Dynamics*(const vle::devs::DynamicsInit& init,
-                                       const vle::devs::InitEventList& events)>
-      factory;
-};
-
 struct executive_factory
 {
-    executive_factory(std::string name_,
-                      std::function<vle::devs::Dynamics*(
-                        const vle::devs::ExecutiveInit& init,
-                        const vle::devs::InitEventList& events)> factory_)
+    executive_factory(std::string name_, executive_factory_fct factory_)
       : name(std::move(name_))
       , factory(std::move(factory_))
     {}
 
     std::string name;
-    std::function<vle::devs::Dynamics*(const vle::devs::ExecutiveInit& init,
-                                       const vle::devs::InitEventList& events)>
-      factory;
+    executive_factory_fct factory;
+};
+
+struct factory
+{
+
+    factory(std::string name_, oov_factory_fct fn_)
+      : name(name_)
+      , fn(fn_)
+    {}
+
+    factory(std::string name_, dynamics_factory_fct fn_)
+      : name(name_)
+      , fn(fn_)
+    {}
+
+    factory(std::string name_, executive_factory_fct fn_)
+      : name(name_)
+      , fn(fn_)
+    {}
+
+    std::string name;
+    boost::
+      variant<oov_factory_fct, dynamics_factory_fct, executive_factory_fct>
+        fn;
 };
 
 template<typename Container>
-typename Container::const_iterator
-factory_find(const Container& c, std::string name)
+typename Container::iterator
+factory_find(Container& c, std::string name)
 {
-    return std::find_if(c.cbegin(), c.cend(), [&name](const auto& factory) {
-        return factory.name == name;
-    });
+    return std::find_if(
+      std::begin(c), std::end(c), [&name](const auto& factory) {
+          return factory.name == name;
+      });
 }
 
 struct ModuleManager
@@ -413,20 +355,36 @@ struct ModuleManager
     using const_iterator = ModuleTable::const_iterator;
     using iterator = ModuleTable::iterator;
 
-    boost::container::small_vector<oov_factory, 8> m_oov_factory;
-    boost::container::small_vector<dynamics_factory, 8> m_dynamics_factory;
-    boost::container::small_vector<executive_factory, 8> m_executive_factory;
+    boost::container::small_vector<factory, 16> mFactory;
+
+    template<typename T>
+    bool add_factory(std::string name, T fn)
+    {
+        auto it = factory_find(mFactory, name);
+        if (it != mFactory.end())
+            return false;
+
+        mFactory.emplace_back(name, fn);
+        return true;
+    }
+
+    factory& get_factory(std::string name)
+    {
+        auto it = factory_find(mFactory, name);
+        if (it == mFactory.end())
+            throw utils::InternalError(
+              _("ModuleManager: factory `%s' is unknown"), name.c_str());
+
+        return *it;
+    }
 
     Context* mContext;
     ModuleTable mTableSimulator;
     ModuleTable mTableOov;
-    SymbolTable mTableSymbols;
 
     ModuleManager(Context* ctx)
       : mContext(ctx)
-    {
-        assert(ctx);
-    }
+    {}
 
     ~ModuleManager() noexcept
     {
@@ -539,11 +497,6 @@ struct ModuleManager
         }
 
         throw utils::InternalError(_("Missing type"));
-    }
-
-    void* getSymbol(const std::string& symbol)
-    {
-        return mTableSymbols.get(symbol);
     }
 
     /**
@@ -784,61 +737,30 @@ struct ModuleManager
 };
 
 bool
-Context::add_oov_factory(
-  std::string name,
-  std::function<vle::oov::Plugin*(const std::string& location)> factory)
+Context::add_oov_factory(std::string name, oov_factory_fct factory)
 {
     if (not m_pimpl->modules)
         m_pimpl->modules = std::make_shared<ModuleManager>(this);
 
-    auto it = factory_find(m_pimpl->modules->m_oov_factory, name);
-    if (it != m_pimpl->modules->m_oov_factory.end()) {
-        warning("Context: can not replace factory `%s'", name.c_str());
-        return false;
-    }
-
-    m_pimpl->modules->m_oov_factory.emplace_back(name, factory);
-    return true;
+    return m_pimpl->modules->add_factory(name, factory);
 }
 
 bool
-Context::add_dynamics_factory(
-  std::string name,
-  std::function<vle::devs::Dynamics*(const vle::devs::DynamicsInit& init,
-                                     const vle::devs::InitEventList& events)>
-    factory)
+Context::add_dynamics_factory(std::string name, dynamics_factory_fct factory)
 {
     if (not m_pimpl->modules)
         m_pimpl->modules = std::make_shared<ModuleManager>(this);
 
-    auto it = factory_find(m_pimpl->modules->m_dynamics_factory, name);
-    if (it != m_pimpl->modules->m_dynamics_factory.end()) {
-        warning("Context: can not replace factory `%s'", name.c_str());
-        return false;
-    }
-
-    m_pimpl->modules->m_dynamics_factory.emplace_back(name, factory);
-    return true;
+    return m_pimpl->modules->add_factory(name, factory);
 }
 
 bool
-Context::add_executive_factory(
-  std::string name,
-  std::function<vle::devs::Dynamics*(const vle::devs::ExecutiveInit& init,
-                                     const vle::devs::InitEventList& events)>
-    factory)
+Context::add_executive_factory(std::string name, executive_factory_fct factory)
 {
     if (not m_pimpl->modules)
         m_pimpl->modules = std::make_shared<ModuleManager>(this);
 
-    auto it = factory_find(m_pimpl->modules->m_executive_factory, name);
-    if (it != m_pimpl->modules->m_executive_factory.end()) {
-        warning("Context: can not replace factory `%s'", name.c_str());
-        return false;
-    }
-
-    m_pimpl->modules->m_executive_factory.emplace_back(name, factory);
-    return true;
+    return m_pimpl->modules->add_factory(name, factory);
 }
 
 void*
@@ -864,13 +786,58 @@ get_symbol(vle::utils::ContextPtr ctx,
     return result;
 }
 
-void*
-get_symbol(vle::utils::ContextPtr ctx, const std::string& pluginname)
+oov_factory_fct&
+get_oov_factory(vle::utils::ContextPtr ctx, std::string name)
 {
-    if (not ctx->get_impl()->modules)
-        ctx->get_impl()->modules = std::make_shared<ModuleManager>(ctx.get());
+    if (!ctx || !ctx->get_impl()->modules)
+        throw utils::InternalError(_("ModuleManager: not initialized"));
 
-    return ctx->get_impl()->modules->getSymbol(pluginname);
+    auto& factory = ctx->get_impl()->modules->get_factory(name);
+    if (factory.fn.which() != 0)
+        throw utils::InternalError(
+          _("ModuleManager: factory `%s' is not an oov factory"),
+          name.c_str());
+
+    return boost::get<oov_factory_fct>(factory.fn);
+}
+
+dynamics_factory_fct&
+get_dynamics_factory(vle::utils::ContextPtr ctx, std::string name)
+{
+    if (!ctx || !ctx->get_impl()->modules)
+        throw utils::InternalError(_("ModuleManager: not initialized"));
+
+    auto& factory = ctx->get_impl()->modules->get_factory(name);
+    if (factory.fn.which() != 1)
+        throw utils::InternalError(
+          _("ModuleManager: factory `%s' is a dynamics factory"),
+          name.c_str());
+
+    return boost::get<dynamics_factory_fct>(factory.fn);
+}
+
+executive_factory_fct&
+get_executive_factory(vle::utils::ContextPtr ctx, std::string name)
+{
+    if (!ctx || !ctx->get_impl()->modules)
+        throw utils::InternalError(_("ModuleManager: not initialized"));
+
+    auto& factory = ctx->get_impl()->modules->get_factory(name);
+    if (factory.fn.which() != 2)
+        throw utils::InternalError(
+          _("ModuleManager: factory `%s' is not an executive factory"),
+          name.c_str());
+
+    return boost::get<executive_factory_fct>(factory.fn);
+}
+
+boost::variant<oov_factory_fct, dynamics_factory_fct, executive_factory_fct>&
+get_factory(vle::utils::ContextPtr ctx, std::string name)
+{
+    if (!ctx || !ctx->get_impl()->modules)
+        throw utils::InternalError(_("ModuleManager: not initialized"));
+
+    return ctx->get_impl()->modules->get_factory(name).fn;
 }
 
 void

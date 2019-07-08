@@ -472,21 +472,33 @@ test_component()
     auto ctx = vle::utils::make_context();
     ctx->set_log_priority(7);
 
-    ctx->add_oov_factory("oov_plugin", [](const std::string& location) {
-        return new vletest::OutputPlugin(location);
-    });
+    {
+        auto ret =
+          ctx->add_oov_factory("oov_plugin", [](const std::string& location) {
+              return new vletest::OutputPlugin(location);
+          });
+        Ensures(ret);
+    }
 
-    ctx->add_dynamics_factory("dynamics_component_a",
-                              [](const vle::devs::DynamicsInit& init,
-                                 const vle::devs::InitEventList& events) {
-                                  return new package::Model(init, events);
-                              });
+    {
+        auto ret = ctx->add_dynamics_factory(
+          "dynamics_component_a",
+          [](const vle::devs::DynamicsInit& init,
+             const vle::devs::InitEventList& events) {
+              return new package::Model(init, events);
+          });
+        Ensures(ret);
+    }
 
-    ctx->add_dynamics_factory("dynamics_agent",
-                              [](const vle::devs::DynamicsInit& init,
-                                 const vle::devs::InitEventList& events) {
-                                  return new package::Agent(init, events);
-                              });
+    {
+        auto ret = ctx->add_dynamics_factory(
+          "dynamics_agent",
+          [](const vle::devs::DynamicsInit& init,
+             const vle::devs::InitEventList& events) {
+              return new package::Agent(init, events);
+          });
+        Ensures(ret);
+    }
 
     vle::utils::Path p(DEVS_TEST_DIR);
     vle::utils::Path::current_path(p);

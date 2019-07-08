@@ -123,26 +123,70 @@ get_symbol(vle::utils::ContextPtr ctx,
            Context::ModuleType* newtype = nullptr);
 
 /**
- * @brief Get a symbol directly in the executable.
- *
- * Try to get a symbol from the executable if it was never
- * loaded. This function allows to build executable where we can store
- * simulators, oov's modules for instance in unit test.
+ * @brief Get a factory.
  *
  * @code
  * auto ctx = vle::utils::make_context();
- * ctx->get_symbol("main");
+ * ctx->add_oov_factory("test",
+ *                      [](const std::string& loc)
+ *                      {
+ *                          return new my_plugin(loc);
+ *                      }));
+ *
+ * auto *fct = get_oov_factory(ctx, "test");
  * @endcode
  *
- * @param symbol The name of the symbol.
+ * @param symbol The name of the factory.
  *
- * @throw utils::InternalError if the executable does not have a symbol of
- * this name.
- *
- * @return A pointer to the founded symbol.
+ * @return A pointer to the founded factory, nullptr otherwise.
  */
-void*
-get_symbol(vle::utils::ContextPtr ctx, const std::string& pluginname);
+oov_factory_fct&
+get_oov_factory(vle::utils::ContextPtr ctx, std::string pluginname);
+
+/**
+ * @brief Get a factory.
+ *
+ * @code
+ * auto ctx = vle::utils::make_context();
+ * ctx->get_dynamics_factory("test",
+ *                      [](const std::string& loc)
+ *                      {
+ *                          return new my_plugin(loc);
+ *                      }));
+ *
+ * auto *fct = get_dynamics_factory(ctx, "test");
+ * @endcode
+ *
+ * @param symbol The name of the factory.
+ *
+ * @return A pointer to the founded factory, nullptr otherwise.
+ */
+dynamics_factory_fct&
+get_dynamics_factory(vle::utils::ContextPtr ctx, std::string name);
+
+/**
+ * @brief Get a factory.
+ *
+ * @code
+ * auto ctx = vle::utils::make_context();
+ * ctx->get_executive_factory("test",
+ *                      [](const std::string& loc)
+ *                      {
+ *                          return new my_plugin(loc);
+ *                      }));
+ *
+ * auto *fct = get_executive_factory(ctx, "test");
+ * @endcode
+ *
+ * @param symbol The name of the factory.
+ *
+ * @return A pointer to the founded factory, nullptr otherwise.
+ */
+executive_factory_fct&
+get_executive_factory(vle::utils::ContextPtr ctx, std::string name);
+
+boost::variant<oov_factory_fct, dynamics_factory_fct, executive_factory_fct>&
+get_factory(vle::utils::ContextPtr ctx, std::string name);
 
 } // namespace vle
 } // namespace utils

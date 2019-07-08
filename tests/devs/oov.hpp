@@ -166,16 +166,16 @@ public:
                  const double& time,
                  std::unique_ptr<vle::value::Value> value) override
     {
-        if (simulator.empty()) /** TODO this is a strange
-                                   behaviour. Sending value withtout
-                                   simulator ?!?. */
-            return;
-
         std::string id = make_id(view, parent, simulator, port);
 
         assert(ppD.find(id) != ppD.cend());
 
         ppD[id].emplace_back(time, std::move(value));
+    }
+
+    std::unique_ptr<vle::value::Matrix> finish(const double& /*time*/) override
+    {
+        return matrix();
     }
 };
 

@@ -308,8 +308,6 @@ public:
     {
         m_current = time;
 
-        printf("internalTransition: %f\n", time);
-
         // m_scheduler.imminent is filled by the previous call to the output
         // function that fills the imminent list.
 
@@ -334,8 +332,6 @@ public:
     {
         m_current = time;
 
-        printf("MC externalTransition: %f\n", time);
-
         // Get the perturbed component from the @c ModelList.
 
         auto map = details::getModelExternalEventList(m_components, events);
@@ -356,7 +352,6 @@ public:
         }
 
         process_changes();
-        printf("MC externalTransition finished\n");
     }
 
     /**
@@ -376,8 +371,6 @@ public:
                               const vle::devs::ExternalEventList& events) final
     {
         m_current = time;
-
-        printf("confluentTransitions: %f\n", time);
 
         // m_scheduler.imminent is filled by the previous call to the output
         // function that fills the imminent list. Get the perturbed component

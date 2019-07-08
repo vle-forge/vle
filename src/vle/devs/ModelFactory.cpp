@@ -164,19 +164,14 @@ ModelFactory::createModelFromClass(Coordinator& coordinator,
     return mdl;
 }
 
+template<typename Factory>
 std::unique_ptr<Dynamics>
 buildNewDynamicsWrapper(utils::ContextPtr context,
                         devs::Simulator* atom,
                         const vpz::Dynamic& dyn,
                         const InitEventList& events,
-                        void* symbol)
+                        Factory fct)
 {
-    using fctdw =
-      vle::devs::Dynamics* (*)(const vle::devs::DynamicsWrapperInit&,
-                               const vle::devs::InitEventList&);
-
-    auto fct = utils::functionCast<fctdw>(symbol);
-
     try {
         utils::PackageTable pkg_table;
 
@@ -266,6 +261,7 @@ assignEventView(std::map<std::string, View>& views,
     }
 }
 
+template<typename Factory>
 std::unique_ptr<Dynamics>
 buildNewDynamics(utils::ContextPtr context,
                  std::map<std::string, View>& views,
@@ -274,13 +270,8 @@ buildNewDynamics(utils::ContextPtr context,
                  devs::Simulator* atom,
                  const vpz::Dynamic& dyn,
                  const InitEventList& events,
-                 void* symbol)
+                 Factory fct)
 {
-    using fctdyn = vle::devs::Dynamics* (*)(const vle::devs::DynamicsInit&,
-                                            const vle::devs::InitEventList&);
-
-    auto fct = utils::functionCast<fctdyn>(symbol);
-
     try {
         utils::PackageTable pkg_table;
 
@@ -327,6 +318,7 @@ buildNewDynamics(utils::ContextPtr context,
     }
 }
 
+template<typename Factory>
 std::unique_ptr<Dynamics>
 buildNewExecutive(utils::ContextPtr context,
                   std::map<std::string, View>& views,
@@ -336,13 +328,8 @@ buildNewExecutive(utils::ContextPtr context,
                   devs::Simulator* atom,
                   const vpz::Dynamic& dyn,
                   const InitEventList& events,
-                  void* symbol)
+                  Factory fct)
 {
-    using fctexe = vle::devs::Dynamics* (*)(const vle::devs::ExecutiveInit&,
-                                            const vle::devs::InitEventList&);
-
-    auto fct = utils::functionCast<fctexe>(symbol);
-
     try {
         utils::PackageTable pkg_table;
 
@@ -402,32 +389,89 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
                              const InitEventList& events,
                              const std::string& observable)
 {
-    void* symbol = nullptr;
-    auto type = utils::Context::ModuleType::MODULE_DYNAMICS;
+    // If @e package is not empty we assume that library is the shared library.
+    // Otherwise, we load the global symbol stores in @e library/executable and
+    // we cast it into a @e vle::devs::Dynamics... Only useful for unit test or
+    // to build executable with dynamics.
 
     try {
-        /* If \e package is not empty we assume that library is the shared
-         * library. Otherwise, we load the global symbol stores in \e
-         * library/executable and we cast it into a \e
-         * vle::devs::Dynamics... Only useful for unit test or to build
-         * executable with dynamics.
-         */
-        if (not dyn.package().empty()) {
-            symbol = get_symbol(mContext,
-                                dyn.package(),
-                                dyn.library(),
-                                utils::Context::ModuleType::MODULE_DYNAMICS,
-                                &type);
-        } else {
-            symbol = get_symbol(mContext, dyn.library());
+        if (!dyn.package().empty()) {
+            auto type = utils::Context::ModuleType::MODULE_DYNAMICS;
+            void* symbol =
+              get_symbol(mContext,
+                         dyn.package(),
+                         dyn.library(),
+                         utils::Context::ModuleType::MODULE_DYNAMICS,
+                         &type);
 
-            if (dyn.library().length() >= 4) {
-                if (dyn.library().compare(0, 4, "exe_") == 0)
-                    type =
-                      utils::Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE;
-                else if (dyn.library().compare(0, 4, "wra_") == 0)
-                    type = utils::Context::ModuleType::MODULE_DYNAMICS_WRAPPER;
+            switch (type) {
+            case utils::Context::ModuleType::MODULE_DYNAMICS:
+                using fctdyn =
+                  vle::devs::Dynamics* (*)(const vle::devs::DynamicsInit&,
+                                           const vle::devs::InitEventList&);
+
+                return buildNewDynamics(mContext,
+                                        mEventViews,
+                                        mExperiment.views(),
+                                        observable,
+                                        atom,
+                                        dyn,
+                                        events,
+                                        utils::functionCast<fctdyn>(symbol));
+            case utils::Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE:
+                using fctexe =
+                  vle::devs::Dynamics* (*)(const vle::devs::ExecutiveInit&,
+                                           const vle::devs::InitEventList&);
+
+                return buildNewExecutive(mContext,
+                                         mEventViews,
+                                         mExperiment.views(),
+                                         observable,
+                                         coordinator,
+                                         atom,
+                                         dyn,
+                                         events,
+                                         utils::functionCast<fctexe>(symbol));
+            case utils::Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
+                using fctdw = vle::devs::
+                  Dynamics* (*)(const vle::devs::DynamicsWrapperInit&,
+                                const vle::devs::InitEventList&);
+
+                return buildNewDynamicsWrapper(
+                  mContext,
+                  atom,
+                  dyn,
+                  events,
+                  utils::functionCast<fctdw>(symbol));
+            default:
+                throw utils::InternalError("Missing type");
             }
+        } else {
+            auto& fn = get_factory(mContext, dyn.library());
+
+            if (fn.which() == 1)
+                return buildNewDynamics(
+                  mContext,
+                  mEventViews,
+                  mExperiment.views(),
+                  observable,
+                  atom,
+                  dyn,
+                  events,
+                  boost::get<vle::utils::dynamics_factory_fct>(fn));
+            else if (fn.which() == 2)
+                return buildNewExecutive(
+                  mContext,
+                  mEventViews,
+                  mExperiment.views(),
+                  observable,
+                  coordinator,
+                  atom,
+                  dyn,
+                  events,
+                  boost::get<vle::utils::executive_factory_fct>(fn));
+            else
+                throw utils::InternalError("Missing type");
         }
     } catch (const std::exception& e) {
         throw utils::ModellingError(
@@ -438,32 +482,6 @@ ModelFactory::attachDynamics(Coordinator& coordinator,
           dyn.library().c_str(),
           dyn.package().c_str(),
           e.what());
-    }
-
-    switch (type) {
-    case utils::Context::ModuleType::MODULE_DYNAMICS:
-        return buildNewDynamics(mContext,
-                                mEventViews,
-                                mExperiment.views(),
-                                observable,
-                                atom,
-                                dyn,
-                                events,
-                                symbol);
-    case utils::Context::ModuleType::MODULE_DYNAMICS_EXECUTIVE:
-        return buildNewExecutive(mContext,
-                                 mEventViews,
-                                 mExperiment.views(),
-                                 observable,
-                                 coordinator,
-                                 atom,
-                                 dyn,
-                                 events,
-                                 symbol);
-    case utils::Context::ModuleType::MODULE_DYNAMICS_WRAPPER:
-        return buildNewDynamicsWrapper(mContext, atom, dyn, events, symbol);
-    default:
-        throw utils::InternalError("Missing type");
     }
 }
 }

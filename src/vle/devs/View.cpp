@@ -49,35 +49,44 @@ View::open(utils::ContextPtr ctx,
 {
     m_name = name;
 
-    try {
-        void* symbol = nullptr;
+    auto* symbol =
+      vle::utils::get_symbol(ctx,
+                             package,
+                             pluginname,
+                             utils::Context::ModuleType::MODULE_OOV,
+                             nullptr);
 
-        /* If \e package is not empty we assume that library is the shared
-         * library. Otherwise, we load the global symbol stores in \e
-         * library/executable and we cast it into a \e
-         * vle::oov::OovPluginSlot... Only useful for unit test or to
-         * build executable with plugins.
-         */
-        if (not package.empty())
-            symbol =
-              vle::utils::get_symbol(ctx,
-                                     package,
-                                     pluginname,
-                                     utils::Context::ModuleType::MODULE_OOV,
-                                     nullptr);
-        else
-            symbol = vle::utils::get_symbol(ctx, pluginname);
+    auto fct(utils::functionCast<oov::OovPluginSlot>(symbol));
+    m_plugin = std::unique_ptr<oov::Plugin>(fct(location));
 
-        auto fct(utils::functionCast<oov::OovPluginSlot>(symbol));
-        m_plugin = std::unique_ptr<oov::Plugin>(fct(location));
-    } catch (const std::exception& e) {
+    if (!m_plugin)
         throw utils::FileError(
-          _("View: Can not open the plug-in `%s' in package `%s'"
-            ": %s"),
+          _("View: Can not open the plug-in `%s' in package `%s'"),
           pluginname.c_str(),
-          package.c_str(),
-          e.what());
-    }
+          package.c_str());
+
+    m_plugin->onParameter(
+      pluginname, location, file, std::move(parameters), time);
+}
+
+void
+View::open(utils::ContextPtr ctx,
+           const std::string& name,
+           const std::string& pluginname,
+           const std::string& location,
+           const std::string& file,
+           Time time,
+           std::unique_ptr<value::Value> parameters)
+{
+    m_name = name;
+
+    auto& fn = vle::utils::get_oov_factory(ctx, pluginname);
+    m_plugin = std::unique_ptr<oov::Plugin>(fn(location));
+
+    if (!m_plugin)
+        throw utils::FileError(
+          _("View: Can not open the plug-in in factory `%s'"),
+          pluginname.c_str());
 
     m_plugin->onParameter(
       pluginname, location, file, std::move(parameters), time);

@@ -515,28 +515,46 @@ Coordinator::buildViews(long instance)
             if (elem.second.type() == vpz::View::TIMED) {
                 View& v = m_timedViewList[elem.second.name()];
 
-                v.open(m_context,
-                       elem.second.name(),
-                       output.plugin(),
-                       output.package(),
-                       output.location(),
-                       file,
-                       m_currentTime,
-                       (output.data()) ? output.data()->clone() : nullptr);
+                if (output.package().empty())
+                    v.open(m_context,
+                           elem.second.name(),
+                           output.plugin(),
+                           output.location(),
+                           file,
+                           m_currentTime,
+                           (output.data()) ? output.data()->clone() : nullptr);
+                else
+                    v.open(m_context,
+                           elem.second.name(),
+                           output.plugin(),
+                           output.package(),
+                           output.location(),
+                           file,
+                           m_currentTime,
+                           (output.data()) ? output.data()->clone() : nullptr);
 
                 m_timed_observation_scheduler.add(
                   &v, m_currentTime, elem.second.timestep());
             } else {
                 auto& v = m_eventViewList[elem.second.name()];
 
-                v.open(m_context,
-                       elem.second.name(),
-                       output.plugin(),
-                       output.package(),
-                       output.location(),
-                       file,
-                       m_currentTime,
-                       (output.data()) ? output.data()->clone() : nullptr);
+                if (output.package().empty())
+                    v.open(m_context,
+                           elem.second.name(),
+                           output.plugin(),
+                           output.location(),
+                           file,
+                           m_currentTime,
+                           (output.data()) ? output.data()->clone() : nullptr);
+                else
+                    v.open(m_context,
+                           elem.second.name(),
+                           output.plugin(),
+                           output.package(),
+                           output.location(),
+                           file,
+                           m_currentTime,
+                           (output.data()) ? output.data()->clone() : nullptr);
             }
         }
     }

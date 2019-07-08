@@ -66,6 +66,23 @@ public:
      * Initialize plugin with specified information.
      *
      * @param plugin the plugin's name.
+     * @param location where the plugin write data.
+     * @param file name of the file.
+     * @param parameters the value attached to the plug-in.
+     * @param time the date when the plug-in was opened.
+     */
+    void open(utils::ContextPtr ctx,
+              const std::string& name,
+              const std::string& pluginname,
+              const std::string& location,
+              const std::string& file,
+              Time time,
+              std::unique_ptr<value::Value> parameters);
+
+    /**
+     * Initialize plugin with specified information.
+     *
+     * @param plugin the plugin's name.
      * @param package the plugin's package.
      * @param location where the plugin write data.
      * @param file name of the file.
