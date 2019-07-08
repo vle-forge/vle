@@ -498,10 +498,6 @@ test_tokenize()
 int
 main()
 {
-    Ensures(true == true);
-    EnsuresEqual(10, 10);
-    EnsuresNotEqual(10, 11);
-
     test_format();
     test_algo();
     test_generator();
