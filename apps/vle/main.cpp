@@ -390,55 +390,57 @@ convert_log_mode(vle::utils::ContextPtr ctx)
 }
 
 static int
-run_manager(vle::utils::ContextPtr ctx,
-            std::chrono::milliseconds timeout,
-            const std::string& name,
-            const vle::ConditionUpdater& conds,
-            CmdArgs::const_iterator it,
-            CmdArgs::const_iterator end,
-            int processor,
-            std::shared_ptr<vle::utils::Package> pkg)
+run_manager(vle::utils::ContextPtr /*ctx*/,
+            std::chrono::milliseconds /*timeout*/,
+            const std::string& /*name*/,
+            const vle::ConditionUpdater& /*conds*/,
+            CmdArgs::const_iterator /*it*/,
+            CmdArgs::const_iterator /*end*/,
+            int /*processor*/,
+            std::shared_ptr<vle::utils::Package> /*pkg*/)
 {
-    vle::manager::Manager man(ctx,
-                              convert_log_mode(ctx),
-                              vle::manager::SIMULATION_NONE |
-                                vle::manager::SIMULATION_NO_RETURN,
-                              timeout,
-                              &std::cout);
-    int success = EXIT_SUCCESS;
-
-    for (; (it != end) and (success == EXIT_SUCCESS); ++it) {
-        std::string vpzAbsolutePath = search_vpz(*it, pkg);
-        if (vpzAbsolutePath.empty()) {
-            success = EXIT_FAILURE;
-        } else {
-            vle::manager::Error error;
-
-            auto file = std::make_unique<vle::vpz::Vpz>(vpzAbsolutePath);
-            if (file and not conds.empty())
-                conds.update(*file);
-
-            if (not name.empty())
-                file->project().experiment().setName(name);
-
-            std::unique_ptr<vle::value::Matrix> res =
-              man.run(std::move(file),
-                      static_cast<std::uint32_t>(processor),
-                      0,
-                      1,
-                      &error);
-
-            if (error.code) {
-                fprintf(stderr,
-                        _("Experimental frames `%s' throws error %s"),
-                        it->c_str(),
-                        error.message.c_str());
-                success = EXIT_FAILURE;
-            }
-        }
-    }
-
-    return success;
+//    vle::manager::Manager man(ctx,
+//                              convert_log_mode(ctx),
+//                              vle::manager::SIMULATION_NONE |
+//                                vle::manager::SIMULATION_NO_RETURN,
+//                              timeout,
+//                              &std::cout);
+//    int success = EXIT_SUCCESS;
+//
+//    for (; (it != end) and (success == EXIT_SUCCESS); ++it) {
+//        std::string vpzAbsolutePath = search_vpz(*it, pkg);
+//        if (vpzAbsolutePath.empty()) {
+//            success = EXIT_FAILURE;
+//        } else {
+//            vle::manager::Error error;
+//
+//            auto file = std::make_unique<vle::vpz::Vpz>(vpzAbsolutePath);
+//            if (file and not conds.empty())
+//                conds.update(*file);
+//
+//            if (not name.empty())
+//                file->project().experiment().setName(name);
+//
+//            std::unique_ptr<vle::value::Matrix> res =
+//              man.run(std::move(file),
+//                      static_cast<std::uint32_t>(processor),
+//                      0,
+//                      1,
+//                      &error);
+//
+//            if (error.code) {
+//                fprintf(stderr,
+//                        _("Experimental frames `%s' throws error %s"),
+//                        it->c_str(),
+//                        error.message.c_str());
+//                success = EXIT_FAILURE;
+//            }
+//        }
+//    }
+//
+//    return success;
+    //TODO a réecrire avec un fichier en entrée ? Ou a laisser tomber ?
+    return EXIT_FAILURE;
 }
 
 static int

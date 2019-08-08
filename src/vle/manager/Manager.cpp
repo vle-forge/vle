@@ -27,8 +27,13 @@
 #include <vle/manager/ExperimentGenerator.hpp>
 #include <vle/manager/Manager.hpp>
 #include <vle/manager/Simulation.hpp>
+#include <vle/utils/Package.hpp>
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Spawn.hpp>
+#include <vle/value/Null.hpp>
+#include <vle/value/Set.hpp>
+#include <vle/value/Tuple.hpp>
 #include <vle/value/Matrix.hpp>
 #include <vle/vpz/BaseModel.hpp>
 #include <vle/vpz/Vpz.hpp>
@@ -39,381 +44,953 @@
 #include <sstream>
 #include <thread>
 #include <utility>
+#include <mutex>
+
+#include "utils/ContextPrivate.hpp"
+#include "manager/details/wrapper_init.hpp"
+#include "manager/details/manager_concepts.hpp"
+#include "manager/details/manager_initializations.hpp"
+#include "manager/details/thread_specific.hpp"
+#include "manager/details/cvle_specific.hpp"
 
 namespace vle {
 namespace manager {
 
-struct vle_log_manager_thread : vle::utils::Context::LogFunctor
+//static functions
+
+utils::Path
+make_temp(const char* format, const std::string& dir)
 {
-    FILE* fp;
-    unsigned int th;
-
-    vle_log_manager_thread(unsigned int _th)
-      : fp(nullptr)
-      , th(_th)
-    {}
-
-    ~vle_log_manager_thread() override
-    {
-        if (fp)
-            fclose(fp);
-    }
-
-    void write(const vle::utils::Context& /*ctx*/,
-               int priority,
-               const std::string& str) noexcept override
-    {
-        if (not fp) {
-            std::stringstream s;
-            s.imbue(std::locale::classic());
-            s << "vle_manager_thread_" << th << ".log";
-            fp = fopen(s.str().c_str(), "w");
-        }
-
-        if (fp) {
-            if (priority == 7)
-                fprintf(fp, "debug: %s", str.c_str());
-            else if (priority == 4)
-                fprintf(fp, "warning: %s", str.c_str());
-            else if (priority == 3)
-                fprintf(fp, "error: %s", str.c_str());
-            else if (priority == 2)
-                fprintf(fp, "critical: %s", str.c_str());
-            else if (priority == 1)
-                fprintf(fp, "alert: %s", str.c_str());
-            else if (priority == 0)
-                fprintf(fp, "emergency: %s", str.c_str());
-            else
-                fprintf(fp, "%s", str.c_str());
-        }
-    }
-
-    void write(const vle::utils::Context& /*ctx*/,
-               int priority,
-               const char* format,
-               va_list args) noexcept override
-    {
-        if (not fp) {
-            std::stringstream s;
-            s.imbue(std::locale::classic());
-            s << "vle_manager_thread_" << th << ".log";
-            fp = fopen(s.str().c_str(), "w");
-        }
-
-        if (fp) {
-            if (priority == 7)
-                fprintf(fp, "debug: ");
-            else if (priority == 4)
-                fprintf(fp, "warning: ");
-            else if (priority == 3)
-                fprintf(fp, "error: ");
-            else if (priority == 2)
-                fprintf(fp, "critical: ");
-            else if (priority == 1)
-                fprintf(fp, "alert: ");
-            else if (priority == 0)
-                fprintf(fp, "emergency: ");
-
-            vfprintf(fp, format, args);
-        }
-    }
-};
-
-/**
- * Assign an new name to the experiment.
- *
- * This function assign a new name to the experiment file.
- *
- * @param destination The experiment where change the name.
- * @param name The base name of the experiment.
- * @param number The combination number.
- */
-static void
-setExperimentName(const std::unique_ptr<vpz::Vpz>& destination,
-                  const std::string& name,
-                  uint32_t number)
-{
-    std::string result(name.size() + 12, '-');
-
-    result.replace(0, name.size(), name);
-    result.replace(
-      name.size() + 1, std::string::npos, utils::to<uint32_t>(number));
-
-    destination->project().setInstance(number);
-    destination->project().experiment().setName(result);
+    //utils::Path tmp = utils::Path::temp_directory_path();
+    utils::Path tmp(dir);
+    tmp /= utils::Path::unique_path(format);
+    return tmp;
 }
+
 
 class Manager::Pimpl
 {
 public:
+    utils::ContextPtr mContext;
+    utils::Rand mRand;
+    ParallelOptions mParalleloption;      // type of parallelisation
+    unsigned int mNbslots;                // nbslots for parallelization
+    SimulationOptions mSimulationoption;  // for 1 simulation
+    std::chrono::milliseconds mTimeout;   // for 1 simulation
+    bool mRemoveMPIfiles;                 // for cvle
+    bool mGenerateMPIhost;                // for cvle
+    std::string mWorkingDir;             // for cvle (only ?)
+
+    void
+    checkSimulationOption()
+    {
+        if (mSimulationoption == SIMULATION_NO_RETURN) {
+            mContext->log(VLE_LOG_WARNING, "[Manager] simulation otpion "
+                    "NO_RETURN is not compatible\n");
+            mSimulationoption = vle::manager::SIMULATION_SPAWN_PROCESS;
+        }
+        if (mTimeout != std::chrono::milliseconds::zero()) {
+            mSimulationoption |= vle::manager::SIMULATION_SPAWN_PROCESS;
+            mContext->log(VLE_LOG_WARNING, "[Manager] using a timeout requires"
+                    " to spawn simulation\n");
+        }
+    }
+
+    void
+    checkParallelOption()
+    {
+        if (mParalleloption == PARALLEL_MONO and mNbslots != 1) {
+            mNbslots = 1;
+            mContext->log(VLE_LOG_WARNING, "[Manager] nb slots is set to 1"
+                    "since no parallelization will be used\n");
+        }
+        if (mParalleloption != PARALLEL_MONO and mNbslots < 2) {
+            mNbslots = 1;
+            mParalleloption = PARALLEL_MONO;
+            mContext->log(VLE_LOG_WARNING, "[Manager] parallelization is "
+                    "disabled since nb slots is 1\n");
+        }
+    }
+
+public:
     Pimpl(utils::ContextPtr context,
-          LogOptions logoptions,
-          SimulationOptions simulationoptions,
-          std::chrono::milliseconds timeout,
-          std::ostream* output)
-      : mContext(std::move(context))
+          ParallelOptions paralleloption,      // type of parallelisation
+          unsigned int nbslots,                // nbslots for parallelization
+          SimulationOptions simulationoption,  // for 1 simulation
+          std::chrono::milliseconds timeout,   // for 1 simulation
+          bool removeMPIfiles,                 // for cvle
+          bool generateMPIhost,                // for cvle
+          const std::string& workingDir)       // for cvle
+      : mContext(context)
+      , mRand()
+      , mParalleloption(paralleloption)
+      , mNbslots(nbslots)
+      , mSimulationoption(simulationoption)
       , mTimeout(timeout)
-      , mOutputStream(output)
-      , mLogOption(logoptions)
-      , mSimulationOption(simulationoptions)
+      , mRemoveMPIfiles(removeMPIfiles)
+      , mGenerateMPIhost(generateMPIhost)
+      , mWorkingDir(workingDir)
     {
-        if (timeout != std::chrono::milliseconds::zero())
-            mSimulationOption |= vle::manager::SIMULATION_SPAWN_PROCESS;
+        checkSimulationOption();
+        checkParallelOption();
     }
 
-    template<typename T>
-    void writeSummaryLog(const T& fmt)
+
+    void
+    set_log_priority(unsigned int logLevel)
     {
-        if (mLogOption & manager::LOG_SUMMARY and mOutputStream)
-            *mOutputStream << fmt;
+        mContext->set_log_priority(logLevel);
     }
 
-    template<typename T>
-    void writeRunLog(const T& fmt)
+    void
+    set_seed(unsigned int seed)
     {
-        if (mLogOption & manager::LOG_RUN and mOutputStream)
-            *mOutputStream << fmt;
+        mRand.seed(seed);
     }
 
-    /**
-     * The @c worker is a boost thread functor to execute threaded
-     * source code.
-     *
-     */
-    struct worker
+    utils::Rand&
+    random_number_generator()
     {
-        utils::ContextPtr context;
-        const std::unique_ptr<vpz::Vpz>& vpz;
-        std::chrono::milliseconds mTimeout;
-        ExperimentGenerator& expgen;
-        LogOptions mLogOption;
-        SimulationOptions mSimulationOption;
-        uint32_t index;
-        uint32_t threads;
-        value::Matrix* result;
-        Error* error;
+        return mRand;
+    }
 
-        worker(utils::ContextPtr context,
-               const std::unique_ptr<vpz::Vpz>& vpz,
-               std::chrono::milliseconds timeout,
-               ExperimentGenerator& expgen,
-               LogOptions logoptions,
-               SimulationOptions simulationoptions,
-               uint32_t index,
-               uint32_t threads,
-               value::Matrix* result,
-               Error* error)
-          : context(std::move(context))
-          , vpz(vpz)
-          , mTimeout(timeout)
-          , expgen(expgen)
-          , mLogOption(logoptions)
-          , mSimulationOption(simulationoptions)
-          , index(index)
-          , threads(threads)
-          , result(result)
-          , error(error)
-        {}
+    void
+    parallel_config(ParallelOptions paralleloption, unsigned int nbslots)
+    {
+        mParalleloption = paralleloption;
+        mNbslots = nbslots;
+        checkParallelOption();
+    }
 
-        ~worker() = default;
+    void
+    simulation_config(SimulationOptions simulationoption,
+            std::chrono::milliseconds timeout)
+    {
+        mSimulationoption = simulationoption;
+        mTimeout = timeout;
+        checkSimulationOption();
+    }
 
-        void operator()()
-        {
-            std::string vpzname(vpz->project().experiment().name());
+    void
+    cvle_config(bool removeMPIfiles, bool generateMPIhost, bool workingDir)
+    {
+        mRemoveMPIfiles = removeMPIfiles;
+        mGenerateMPIhost = generateMPIhost;
+        mWorkingDir = workingDir;
+    }
 
-            for (uint32_t i = expgen.min() + index; i < expgen.max();
-                 i += threads) {
-                Simulation sim(
-                  context, mLogOption, mSimulationOption, mTimeout, nullptr);
-                Error err;
-
-                auto file = std::make_unique<vpz::Vpz>(*vpz);
-                setExperimentName(file, vpzname, i);
-                expgen.get(i, &file->project().experiment().conditions());
-
-                auto simresult = sim.run(std::move(file), &err);
-
-                if (err.code) {
-                    if (not error->code) {
-                        error->code = -1;
-                        error->message = err.message;
-                    }
-                } else {
-                    result->add(i, 0, std::move(simresult));
-                }
+    void
+    configure(wrapper_init& init)
+    {
+        bool status = true;
+        if (init.exist("log_level", status)) {
+            set_log_priority(init.getInt("log_level", status));
+        }
+        if (init.exist("seed", status)) {
+            set_seed(init.getInt("seed", status));
+        }
+        if (init.exist("parallel_option", status)) {
+            std::string tmp;
+            tmp.assign(init.getString("parallel_option", status));
+            if (tmp == "threads") {
+                mParalleloption = PARALLEL_THREADS;
+            } else if (tmp == "mpi") {
+                mParalleloption = PARALLEL_MPI;
+            } else if (tmp == "mono") {
+                mParalleloption = PARALLEL_MONO;
+            } else {
+                mContext->log(VLE_LOG_WARNING, "[Manager] unrecognised "
+                        "parallel option : 'mono' is used");
+                mParalleloption = PARALLEL_MONO;
+                return;
             }
         }
-    };
+        if (init.exist("nb_slots", status)) {
+            mNbslots = init.getInt("nb_slots", status);
+        }
 
-    std::unique_ptr<value::Matrix> runManagerThread(
-      std::unique_ptr<vpz::Vpz> vpz,
-      uint32_t threads,
-      uint32_t rank,
-      uint32_t world,
-      Error* error)
+        if (init.exist("simulation_spawn", status)) {
+            if (init.getBoolean("simulation_spawn", status)) {
+                mSimulationoption = SIMULATION_SPAWN_PROCESS;
+            } else {
+                mSimulationoption = SIMULATION_NONE;
+            }
+        }
+
+        if (init.exist("simulation_timeout", status)) {
+            mTimeout = std::chrono::milliseconds(
+                    init.getInt("simulation_timeout", status));
+        }
+
+        if (init.exist("rm_MPI_files", status)) {
+            mRemoveMPIfiles = init.getBoolean("rm_MPI_files", status);
+        }
+        if (init.exist("generate_MPI_host", status)) {
+            mGenerateMPIhost = init.getBoolean("generate_MPI_host", status);
+        }
+        if (init.exist("working_dir", status)) {
+            mWorkingDir = init.getString("working_dir", status);
+        }
+        checkSimulationOption();
+        checkParallelOption();
+    }
+
+
+    /********************************************************/
+    ///run plan without parallelization
+    std::unique_ptr<value::Map>
+    run_without_parallelization(
+            std::unique_ptr<vpz::Vpz> model,
+            std::unique_ptr<ManagerObjects> manObj,
+            const wrapper_init& init,
+            manager::Error& err)
     {
-        ExperimentGenerator expgen(*vpz, rank, world);
-        std::string vpzname(vpz->project().experiment().name());
+        init_embedded_model(*model, *manObj, init, err);
+        if (err.code) {
+            return nullptr;
+        }
+        std::unique_ptr<value::Map> results =
+                init_results(manObj->mOutputs, err);
+        if (err.code) {
+            return nullptr;
+        }
 
-        auto result =
-          std::make_unique<value::Matrix>(expgen.size(), 1, expgen.size(), 1);
+        unsigned int inputSize = manObj->inputsSize();
+        unsigned int repSize = manObj->replicasSize();
+
+        mContext->log(VLE_LOG_NOTICE, "[Manager] simulation mono nb simus:"
+                " %u \n", (repSize*inputSize));
 
         std::vector<std::thread> gp;
-        for (uint32_t i = 0; i < threads; ++i) {
+        std::mutex results_mutex;
+
+        thread_worker worker = thread_worker(mContext, *model, init,
+                *manObj, manObj->mOutputs, *results, results_mutex,
+                mTimeout, mSimulationoption, 0, 1, err);
+        worker();
+        if (err.code) {
+            return nullptr;
+        }
+
+        mContext->log(VLE_LOG_NOTICE, "[Manager] end simulation"
+                " and aggregation without parallelization\n");
+        return results;
+    }
+    /********************************************************/
+    ///run plan with threads
+    std::unique_ptr<value::Map>
+    run_with_threads(
+            std::unique_ptr<vpz::Vpz> model,
+            std::unique_ptr<ManagerObjects> manObj,
+            const wrapper_init& init,
+            manager::Error& err)
+    {
+        init_embedded_model(*model, *manObj, init, err);
+        if (err.code) {
+            return nullptr;
+        }
+        std::unique_ptr<value::Map> results =
+                init_results(manObj->mOutputs, err);
+        if (err.code) {
+            return nullptr;
+        }
+
+        unsigned int inputSize = manObj->inputsSize();
+        unsigned int repSize = manObj->replicasSize();
+
+        mContext->log(VLE_LOG_NOTICE, "[Manager] simulation threads"
+                " (%d threads) nb simus: %u \n", mNbslots,
+                (repSize*inputSize));
+
+        std::vector<std::thread> gp;
+        std::mutex results_mutex;
+        for (uint32_t i = 0; i < mNbslots; ++i) {
             utils::ContextPtr ctx = mContext->clone();
             ctx->set_log_function(std::unique_ptr<utils::Context::LogFunctor>(
-              new vle_log_manager_thread(i)));
-            gp.emplace_back(worker(ctx,
-                                   vpz,
-                                   mTimeout,
-                                   expgen,
-                                   mLogOption,
-                                   mSimulationOption,
-                                   i,
-                                   threads,
-                                   result.get(),
-                                   error));
+                    new thread_log(i)));
+            gp.emplace_back(thread_worker(ctx, *model, init,
+                    *manObj, manObj->mOutputs, *results, results_mutex,
+                    mTimeout, mSimulationoption, i, mNbslots, err));
         }
 
-        for (uint32_t i = 0; i < threads; ++i)
+        for (uint32_t i = 0; i < mNbslots; ++i)
             gp[i].join();
 
-        return result;
+        if (err.code) {
+            return nullptr;
+        }
+
+        mContext->log(VLE_LOG_NOTICE, "[Manager] end simulation and"
+                " aggregation using threads\n");
+        return results;
     }
 
-    std::unique_ptr<value::Matrix> runManagerMono(
-      std::unique_ptr<vpz::Vpz> vpz,
-      uint32_t rank,
-      uint32_t world,
-      Error* error)
+    /********************************************************/
+    /// run Plan with cvle
+    std::unique_ptr<value::Map>
+    run_with_cvle(
+            std::unique_ptr<vpz::Vpz> model,
+            std::unique_ptr<ManagerObjects> manObj,
+            const wrapper_init& init,
+            manager::Error& err)
     {
-        Simulation sim(
-          mContext, mLogOption, mSimulationOption, mTimeout, nullptr);
-        ExperimentGenerator expgen(*vpz, rank, world);
-        std::string vpzname(vpz->project().experiment().name());
-        std::unique_ptr<value::Matrix> result;
+        init_embedded_model(*model, *manObj, init, err);
+        if (err.code) {
+            return nullptr;
+        }
 
-        error->code = 0;
-        error->message.clear();
+        unsigned int inputSize = manObj->inputsSize();
+        unsigned int repSize = manObj->replicasSize();
 
-        if (mSimulationOption == manager::SIMULATION_NO_RETURN) {
-            for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
-                Error err;
-                auto file = std::make_unique<vpz::Vpz>(*vpz);
-                setExperimentName(file, vpzname, i);
-                expgen.get(i, &file->project().experiment().conditions());
+        mContext->log(VLE_LOG_NOTICE, "[Manager] simulation with mpi"
+                " (%d slots) nb simus: %u \n", mNbslots,
+                (repSize*inputSize));
 
-                sim.run(std::move(file), &err);
+        //save vpz
+        utils::Path tempVpzPath = make_temp(
+                "vle-rec-%%%%-%%%%-%%%%-%%%%.vpz", mWorkingDir);
+        model->write(tempVpzPath.string());
 
-                if (err.code) {
-                    writeRunLog(err.message);
+        //write content in in.csv file
+        utils::Path tempInCsv = make_temp(
+                "vle-rec-%%%%-%%%%-%%%%-%%%%-in.csv", mWorkingDir);
+        cvle_write(*manObj, init, tempInCsv.string(), err);
+        if (err.code == -1) {
+            return nullptr;
+        }
 
-                    if (not error->code) {
-                        error->code = -1;
-                        error->message = err.message;
+        //define output file
+        utils::Path  tempOutCsv = make_temp(
+                "vle-rec-%%%%-%%%%-%%%%-%%%%-out.csv", mWorkingDir);
+
+        //launch mpirun
+        utils::Spawn mspawn(mContext);
+        std::string exe = mContext->findProgram("mpirun").string();
+
+        std::vector < std::string > argv;
+        argv.push_back("-np");
+        argv.push_back(vle::utils::to(mNbslots));
+        utils::Path  tempHostFile;
+        if (mGenerateMPIhost) {
+            tempHostFile = make_temp("vle-rec-%%%%-%%%%-%%%%-%%%%-host.txt",
+                    mWorkingDir);
+            cvle_write_hostfile(mNbslots, tempHostFile.string());
+            argv.push_back("--hostfile");
+            argv.push_back(tempHostFile.string());
+        }
+
+        argv.push_back("cvle");
+        argv.push_back("--block-size");
+        argv.push_back(vle::utils::to(
+                (int(inputSize*repSize/int(mNbslots-1)+1))));
+        if (not mSimulationoption != SIMULATION_SPAWN_PROCESS) {
+            argv.push_back("--withoutspawn");
+        }
+        argv.push_back("--more-output-details");
+        ////use mpi_warn_nf_forgk since cvle launches simulation with fork
+        //// if withspawn (?)
+        //argv.push_back("--mca");
+        //argv.push_back("mpi_warn_on_fork");
+        //argv.push_back("0");
+        ////set more log for mpirun
+        //argv.push_back("--mca");
+        //argv.push_back("ras_gridengine_verbose");
+        //argv.push_back("1");
+        //argv.push_back("--mca");
+        //argv.push_back("plm_gridengine_verbose");
+        //argv.push_back("1");
+        //argv.push_back("--mca");
+        //argv.push_back("ras_gridengine_show_jobid");
+        //argv.push_back("1");
+        //argv.push_back("--mca");
+        //argv.push_back("plm_gridengine_debug");
+        //argv.push_back("1");
+        argv.push_back(tempVpzPath.string());
+        argv.push_back("-i");
+        argv.push_back(tempInCsv.string());
+        argv.push_back("-o");
+        argv.push_back(tempOutCsv.string());
+
+        if (mContext->get_log_priority() >= VLE_LOG_INFO) {
+            std::string messageDbg ="";
+            for (const auto& s : argv ) {
+                messageDbg += " ";
+                messageDbg += s;
+            }
+            messageDbg += "\n";
+            mContext->log(VLE_LOG_INFO, "[Manager] launching in dir %s: %s %s",
+                    mWorkingDir.c_str(), exe.c_str(), messageDbg.c_str());
+        }
+
+        bool started = mspawn.start(exe, mWorkingDir, argv);
+        if (not started) {
+            err.code = -1;
+            err.message = vle::utils::format(
+                    "[Manager] Failed to start `%s'", exe.c_str());
+            return nullptr;
+        }
+        bool is_success = true;
+        std::string output, error;
+        while (not mspawn.isfinish()) {
+            if (mspawn.get(&output, &error)) {
+                mContext->log(VLE_LOG_INFO, output);
+                output.clear();
+                mContext->log(VLE_LOG_INFO, error);
+                error.clear();
+                std::this_thread::sleep_for(std::chrono::microseconds(200));
+            } else {
+                break;
+            }
+        }
+        mspawn.wait();
+        mspawn.status(&error, &is_success);
+        if (! is_success) {
+            err.code = -1;
+            err.message = "[Manager] ";
+            err.message += vle::utils::format("Error launching `%s' : %s ",
+                    exe.c_str(), error.c_str());
+            return nullptr;
+        }
+        mContext->log(VLE_LOG_NOTICE,
+                "[Manager] simulation with mpi performed\n");
+        //read output file
+        std::unique_ptr<value::Map> results = cvle_read(tempOutCsv,
+                inputSize, repSize, manObj->mOutputs, err);
+        if (err.code) {
+            return nullptr;
+        }
+        mContext->log(VLE_LOG_NOTICE,
+                "[Manager] results aggregation performed\n");
+        if (mRemoveMPIfiles) {
+            tempOutCsv.remove();
+            tempInCsv.remove();
+            tempVpzPath.remove();
+            if (mGenerateMPIhost) {
+                tempHostFile.remove();
+            }
+        }
+        return results;
+    }
+
+    /*********************************************/
+    //init manager structures from wrapper init
+    std::unique_ptr<ManagerObjects>
+    init_from_plan(wrapper_init& init, manager::Error& err)
+    {
+
+        std::unique_ptr<ManagerObjects> manObj(new ManagerObjects());
+        std::string in_cond;
+        std::string in_port;
+        std::string out_id;
+        configure(init);
+        bool status;
+        try {
+            std::string conf = "";
+            for (init.begin(); not init.isEnded(); init.next()) {
+                const value::Value& val = init.current(conf, status);
+                if (parseInput(conf, in_cond, in_port, "define_")) {
+                    manObj->mDefine.emplace_back(
+                            new ManDefine(in_cond, in_port, val));
+                } else if (parseInput(conf, in_cond, in_port, "propagate_")) {
+                    manObj->mPropagate.emplace_back(
+                            new ManPropagate(in_cond, in_port));
+                } else if (parseInput(conf, in_cond, in_port)) {
+                    manObj->mInputs.emplace_back(
+                            new ManInput(in_cond, in_port, val, mRand));
+                    //TODO handle composite
+                } else if (parseInput(conf, in_cond, in_port, "replicate_")){
+                    manObj->mReplicates.emplace_back(
+                            new ManReplicate(in_cond, in_port, val, mRand));
+                    //TODO handle composite
+                } else if (parseOutput(conf, out_id)){
+                    manObj->mOutputs.emplace_back(
+                            new ManOutput(out_id, val));
+                }
+            }
+            std::sort(manObj->mDefine.begin(), manObj->mDefine.end(),
+                    ManDefineSorter());
+            std::sort(manObj->mPropagate.begin(), manObj->mPropagate.end(),
+                    ManPropagateSorter());
+            std::sort(manObj->mInputs.begin(), manObj->mInputs.end(),
+                    ManInputSorter());
+            std::sort(manObj->mOutputs.begin(), manObj->mOutputs.end(),
+                    ManOutputSorter());
+        } catch (const std::exception& e){
+            err.code = -1;
+            err.message = "[Manager] ";
+            err.message += e.what();
+            return nullptr;
+        }
+        return manObj;
+    }
+
+    /********************************************************/
+    void
+    check(const ManagerObjects& manObj, manager::Error& err)
+    {
+        //check Define
+        for (auto& vleDef : manObj.mDefine) {
+            //check if exist in Input
+            bool found = false;
+            for (auto& vleIn : manObj.mInputs) {
+                if (vleDef->getName() == vleIn->getName()) {
+                    if (vleDef->to_add) {
+                        found = true;
+                    } else {
+                        err.code = -1;
+                        err.message = utils::format(
+                                "[Manager]: error in define_X '%s': it cannot "
+                                "be removed and declared as input at the same time",
+                                vleDef->getName().c_str());
+                        return ;
                     }
                 }
             }
-        } else {
-            result = std::make_unique<value::Matrix>(
-              expgen.size(), 1, expgen.size(), 1);
-
-            for (uint32_t i = expgen.min(); i < expgen.max(); ++i) {
-                Error err;
-                auto file = std::make_unique<vpz::Vpz>(*vpz);
-                setExperimentName(file, vpzname, i);
-                expgen.get(i, &file->project().experiment().conditions());
-
-                auto simresult = sim.run(std::move(file), &err);
-
-                if (err.code) {
-                    writeRunLog(err.message);
-
-                    if (not error->code) {
-                        error->code = -1;
-                        error->message = err.message;
+            //check if exist in Propagate
+            for (auto& vleProp : manObj.mPropagate) {
+                if (vleDef->getName() == vleProp->getName()) {
+                    if (vleDef->to_add) {
+                        found = true;
+                    } else {
+                        err.code = -1;
+                        err.message = utils::format(
+                                "[Manager]: error in define_X '%s': it cannot "
+                                "be removed and declared as propagate at the same "
+                                "time", vleDef->getName().c_str());
+                        return ;
                     }
-                } else {
-                    result->add(i, 0, std::move(simresult));
                 }
+            }
+            //check if initialized
+            if (vleDef->to_add and not found) {
+                err.code = -1;
+                err.message = utils::format(
+                        "[Manager]: error in define_X '%s': it cannot "
+                        "be added without initialization",
+                        vleDef->getName().c_str());
+                return ;
             }
         }
 
-        return result;
+        //check Inputs
+        unsigned int inputSize = 0;
+        for (auto&  vleIn : manObj.mInputs) {
+            //check input size which has to be consistent
+            if (inputSize == 0 and vleIn->nbValues > 1) {
+                inputSize = vleIn->nbValues;
+            } else {
+                if (vleIn->nbValues > 1 and inputSize > 0
+                        and inputSize != vleIn->nbValues) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error in input values: wrong number"
+                            " of values 1st input has %u values,  input %s has %u "
+                            "values", inputSize, vleIn->getName().c_str(),
+                            vleIn->nbValues);
+                    return ;
+                }
+            }
+            //check if already exist in replicate or propagate
+            for (auto& vleRepl : manObj.mReplicates) {
+                if (vleRepl->getName() == vleIn->getName()) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error input '%s' is also a replicate",
+                            vleIn->getName().c_str());
+                    return ;
+                }
+            }
+            for (auto& vleProp : manObj.mPropagate) {
+                if (vleProp->getName() == vleIn->getName()) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error input '%s' is also a propagate",
+                            vleIn->getName().c_str());
+                    return ;
+                }
+            }
+        }
+        //check Replicates
+        unsigned int replSize = 0;
+        for (auto& vleRepl : manObj.mReplicates) {
+            //check repl size which has to be consistent
+            if (replSize == 0 and vleRepl->nbValues > 1) {
+                replSize = vleRepl->nbValues;
+            } else {
+                if (vleRepl->nbValues > 1 and replSize > 0
+                        and replSize != vleRepl->nbValues) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error in replicate values: wrong number"
+                            " of values 1st replicate has %u values, replicate %s "
+                            "has %u values", replSize, vleRepl->getName().c_str(),
+                            vleRepl->nbValues);
+                    return ;
+                }
+            }
+            //check if already exist in replicate or propagate
+            for (auto& vleProp : manObj.mPropagate) {
+                if (vleProp->getName() == vleRepl->getName()) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error replicate '%s' is also a "
+                            "propagate", vleRepl->getName().c_str());
+                    return ;
+                }
+            }
+        }
     }
 
-    utils::ContextPtr mContext;
-    std::chrono::milliseconds mTimeout;
-    std::ostream* mOutputStream;
-    LogOptions mLogOption;
-    SimulationOptions mSimulationOption;
+    /********************************************************/
+    void
+    configEmbedded(vpz::Vpz& model, wrapper_init& init, manager::Error& err,
+            unsigned int input_index, unsigned int replicate_index)
+    {
+        std::unique_ptr<ManagerObjects> manObj = init_from_plan(init, err);
+        if (err.code) return;
+        check(*manObj, err);
+        if (err.code) return;
+        //update conditions
+        post_define(model, manObj->mDefine, err);
+        if (err.code) return;
+        post_propagates(model, manObj->mPropagate, init, err);
+        if (err.code) return;
+        config_views(model, manObj->mOutputs, err);
+        if (err.code) return;
+        //check indices
+        if (input_index >= manObj->inputsSize()) {
+            err.code = -1;
+            err.message = "[Manager] error in 'getEmbedded' config : ";
+            err.message += " 'input_index' too big";
+            return;
+        }
+        if (replicate_index >= manObj->replicasSize()) {
+            err.code = -1;
+            err.message = "[Manager] error in 'getEmbedded' config : ";
+            err.message += " 'replicate_index' too big";
+            return;
+        }
+        try {
+            vpz::Conditions& conds = model.project().experiment().conditions();
+            //post replica
+            for (unsigned int i=0; i < manObj->mReplicates.size(); i++) {
+                ManReplicate& tmp_repl = *manObj->mReplicates[i];
+                vpz::Condition& condRep = conds.get(tmp_repl.cond);
+                condRep.clearValueOfPort(tmp_repl.port);
+                const value::Value& exp = tmp_repl.values(init);
+                switch(exp.getType()) {
+                case value::Value::SET:
+                    condRep.addValueToPort(tmp_repl.port,
+                            exp.toSet().get(replicate_index)->clone());
+                    break;
+                case value::Value::TUPLE:
+                    condRep.addValueToPort(tmp_repl.port, value::Double::create(
+                            exp.toTuple().at(replicate_index)));
+                    break;
+                default:
+                    //error already detected
+                    break;
+                }
+            }
+            //post input
+            for (unsigned int i=0; i < manObj->mInputs.size(); i++) {
+                ManInput& tmp_input = *manObj->mInputs[i];
+                vpz::Condition& condIn = conds.get(tmp_input.cond);
+                condIn.clearValueOfPort(tmp_input.port);
+                const value::Value& exp = tmp_input.values(init);
+                switch (exp.getType()) {
+                case value::Value::SET: {
+                    condIn.addValueToPort(tmp_input.port,
+                            exp.toSet().get(input_index)->clone());
+                    break;
+                } case value::Value::TUPLE: {
+                    condIn.addValueToPort(tmp_input.port, value::Double::create(
+                            exp.toTuple().at(input_index)));
+                    break;
+                } default: {
+                    //error already detected
+                    break;
+                }}
+            }
+        } catch (const std::exception& e){
+            err.code = -1;
+            err.message = "[Manager] error in 'getEmbedded' config : ";
+            err.message += e.what();
+        }
+    }
+
+
+    /********************************************************/
+    // run wrapper
+    std::unique_ptr<value::Map>
+    runPlan(std::unique_ptr<vpz::Vpz> model, wrapper_init& init,
+            manager::Error& err)
+    {
+        std::unique_ptr<ManagerObjects> manObj = init_from_plan(init, err);
+        if (err.code) {
+            return nullptr;
+        }
+        check(*manObj, err);
+        if (err.code) {
+            return nullptr;
+        }
+        //launch simulations
+        switch(mParalleloption) {
+        case PARALLEL_MONO: {
+            return run_without_parallelization(std::move(model),
+                    std::move(manObj), init, err);
+            break;
+        } case PARALLEL_THREADS: {
+            return run_with_threads(std::move(model),
+                    std::move(manObj), init, err);
+            break;
+        } case PARALLEL_MPI: {
+            return run_with_cvle(std::move(model),
+                    std::move(manObj), init, err);
+            break;
+        }}
+        return nullptr;
+    }
+
+
+
 };
 
 Manager::Manager(utils::ContextPtr context,
-                 LogOptions logoptions,
-                 SimulationOptions simulationoptions,
-                 std::ostream* output)
-  : mPimpl(std::make_unique<Manager::Pimpl>(context,
-                                            logoptions,
-                                            simulationoptions,
-                                            std::chrono::milliseconds(0),
-                                            output))
+        ParallelOptions paralleloption,      // type of parallelisation
+        unsigned int nbslots,                // nbslots for parallelization
+        SimulationOptions simulationoption,  // for 1 simulation
+        std::chrono::milliseconds timeout,   // for 1 simulation
+        bool removeMPIfiles,                 // for cvle
+        bool generateMPIhost,                // for cvle
+        const std::string& workingDir)       // for cvle
+  : mPimpl(std::make_unique<Manager::Pimpl>(
+          context, paralleloption, nbslots, simulationoption,
+          timeout, removeMPIfiles, generateMPIhost, workingDir))
 {}
 
-Manager::Manager(utils::ContextPtr context,
-                 LogOptions logoptions,
-                 SimulationOptions simulationoptions,
-                 std::chrono::milliseconds timeout,
-                 std::ostream* output)
+Manager::Manager(utils::ContextPtr context)
   : mPimpl(std::make_unique<Manager::Pimpl>(context,
-                                            logoptions,
-                                            simulationoptions,
-                                            timeout,
-                                            output))
+          PARALLEL_MONO,                                //paralleloption
+          1,                                            //nbslots
+          SIMULATION_SPAWN_PROCESS,                     //simulationoption,
+          std::chrono::milliseconds(0),                 //timeout,
+          true,                                         //removeMPIfiles,
+          false,                                        //generateMPIhost,
+          utils::Path::temp_directory_path().string())) //workingDir
 {}
 
 Manager::~Manager() = default;
 
 std::unique_ptr<value::Matrix>
-Manager::run(std::unique_ptr<vpz::Vpz> exp,
-             uint32_t thread,
-             uint32_t rank,
-             uint32_t world,
-             Error* error)
+Manager::run(std::unique_ptr<vpz::Vpz> /*exp*/,
+             uint32_t /*thread*/,
+             uint32_t /*rank*/,
+             uint32_t /*world*/,
+             Error*/*error*/)
 {
     std::unique_ptr<value::Matrix> result;
 
-    if (thread <= 0) {
-        throw vle::utils::ArgError(
-          _("Manager error: thread must be superior to 0 (%u)"),
-          static_cast<unsigned>(thread));
-    }
-
-    if (world <= rank) {
-        throw vle::utils::ArgError(
-          _("Manager error: rank (%u) must be inferior to world (%u)"),
-          static_cast<unsigned>(rank),
-          static_cast<unsigned>(world));
-    }
-
-    if (world <= 0) {
-        throw vle::utils::ArgError(
-          _("Manager error: world (%u) must be superior to 0"),
-          static_cast<unsigned>(world));
-    }
-
-    mPimpl->writeSummaryLog(_("Manager started"));
-
-    if (thread > 1) {
-        result =
-          mPimpl->runManagerThread(std::move(exp), thread, rank, world, error);
-    } else {
-        result = mPimpl->runManagerMono(std::move(exp), rank, world, error);
-    }
-
-    mPimpl->writeSummaryLog(_("Manager ended"));
+    //TODO not available anymore
 
     return result;
 }
+
+utils::Rand&
+Manager::random_number_generator()
+{
+    return mPimpl->random_number_generator();
+}
+
+//specific runPlan signatures
+std::unique_ptr<value::Map>
+Manager::runPlan(std::shared_ptr<vle::value::Map> init
+        , manager::Error& err)
+{
+    wrapper_init init_rec(init.get());
+    std::unique_ptr<vpz::Vpz> model = build_embedded_model(
+            init_rec, mPimpl->mContext, err);
+    return mPimpl->runPlan(std::move(model), init_rec, err);
+}
+
+std::unique_ptr<value::Map>
+Manager::runPlan(const vle::value::Map& init
+        , manager::Error& err)
+{
+    wrapper_init init_rec(&init);
+    std::unique_ptr<vpz::Vpz> model = build_embedded_model(
+            init_rec, mPimpl->mContext, err);
+    return mPimpl->runPlan(std::move(model), init_rec, err);
+}
+
+std::unique_ptr<value::Map>
+Manager::runPlan(const vd::InitEventList& events
+        , manager::Error& err)
+{
+    wrapper_init init_rec(&events);
+    std::unique_ptr<vpz::Vpz> model = build_embedded_model(
+            init_rec, mPimpl->mContext, err);
+    return mPimpl->runPlan(std::move(model), init_rec, err);
+}
+
+std::unique_ptr<value::Map>
+Manager::runPlan(std::unique_ptr<vpz::Vpz> model
+        , std::shared_ptr<vle::value::Map> init
+        , manager::Error& err)
+{
+    wrapper_init init_rec(init.get());
+    return mPimpl->runPlan(std::move(model), init_rec, err);
+}
+
+std::unique_ptr<value::Map>
+Manager::runPlan(std::unique_ptr<vpz::Vpz> model
+        , const vle::value::Map& init
+        , manager::Error& err)
+{
+    wrapper_init init_rec(&init);
+    return mPimpl->runPlan(std::move(model), init_rec, err);
+}
+
+std::unique_ptr<value::Map>
+Manager::runPlan(std::unique_ptr<vpz::Vpz> model
+        , const vd::InitEventList& events
+        , manager::Error& err)
+{
+    wrapper_init init_rec(&events);
+    return mPimpl->runPlan(std::move(model), init_rec, err);
+}
+
+std::unique_ptr<vpz::Vpz>
+Manager::getEmbedded(std::shared_ptr<vle::value::Map> init, Error& err,
+        unsigned int input_index, unsigned int replicate_index)
+{
+    wrapper_init init_rec(init.get());
+    std::unique_ptr<vpz::Vpz> model =
+            build_embedded_model(init_rec, mPimpl->mContext, err);
+    mPimpl->configEmbedded(*model, init_rec, err,
+                           input_index, replicate_index);
+    if (err.code) {
+        return nullptr;
+    } else {
+        return model;
+    }
+
+}
+
+std::unique_ptr<vpz::Vpz>
+Manager::getEmbedded(const vle::value::Map& init, Error& err,
+        unsigned int input_index, unsigned int replicate_index)
+{
+    wrapper_init init_rec(&init);
+    std::unique_ptr<vpz::Vpz> model =
+            build_embedded_model(init_rec, mPimpl->mContext, err);
+    mPimpl->configEmbedded(*model, init_rec, err,
+            input_index, replicate_index);
+    if (err.code) {
+        return nullptr;
+    } else {
+        return model;
+    }
+}
+
+std::unique_ptr<vpz::Vpz>
+Manager::getEmbedded(const devs::InitEventList& events, Error& err,
+        unsigned int input_index, unsigned int replicate_index)
+{
+    wrapper_init init_rec(&events);
+    std::unique_ptr<vpz::Vpz> model =
+            build_embedded_model(init_rec, mPimpl->mContext, err);
+    mPimpl->configEmbedded(*model, init_rec, err,
+            input_index, replicate_index);
+    if (err.code) {
+        return nullptr;
+    } else {
+        return model;
+    }
+}
+
+std::unique_ptr<vpz::Vpz>
+Manager::getEmbedded(std::unique_ptr<vpz::Vpz> exp,
+        std::shared_ptr<vle::value::Map> init, Error& err,
+        unsigned int input_index, unsigned int replicate_index)
+{
+    wrapper_init init_rec(init.get());
+    mPimpl->configEmbedded(*exp, init_rec, err,
+            input_index, replicate_index);
+    if (err.code) {
+        return nullptr;
+    } else {
+        return std::move(exp);
+    }
+}
+
+std::unique_ptr<vpz::Vpz>
+Manager::getEmbedded(std::unique_ptr<vpz::Vpz> exp, const vle::value::Map& init,
+        Error& err, unsigned int input_index, unsigned int replicate_index)
+{
+    wrapper_init init_rec(&init);
+    mPimpl->configEmbedded(*exp, init_rec, err,
+            input_index, replicate_index);
+    if (err.code) {
+        return nullptr;
+    } else {
+        return std::move(exp);
+    }
+}
+
+std::unique_ptr<vpz::Vpz>
+Manager::getEmbedded(std::unique_ptr<vpz::Vpz> exp,
+        const devs::InitEventList& events, Error& err,
+        unsigned int input_index, unsigned int replicate_index)
+{
+    wrapper_init init_rec(&events);
+    mPimpl->configEmbedded(*exp, init_rec, err,
+            input_index, replicate_index);
+    if (err.code) {
+        return nullptr;
+    } else {
+        return std::move(exp);
+    }
+}
+
+//Manager utils
+bool
+Manager::parseInput(const std::string& conf,
+        std::string& cond, std::string& port,
+        const std::string& prefix)
+{
+    std::string varname;
+    cond.clear();
+    port.clear();
+    if (prefix.size() > 0) {
+        if (conf.compare(0, prefix.size(), prefix) != 0) {
+            return false;
+        }
+        varname.assign(conf.substr(prefix.size(), conf.size()));
+    } else {
+        varname.assign(conf);
+    }
+    std::vector <std::string> tokens;
+    utils::tokenize(varname, tokens, ".", false);
+    if (tokens.size() != 2) {
+        return false;
+    }
+    cond.assign(tokens[0]);
+    port.assign(tokens[1]);
+    return not cond.empty() and not port.empty();
+}
+bool
+Manager::parseOutput(const std::string& conf, std::string& idout)
+{
+    idout.clear();
+    std::string prefix = "output_";
+    if (conf.compare(0, prefix.size(), prefix) != 0) {
+        return false;
+    }
+    idout.assign(conf.substr(prefix.size(), conf.size()));
+    return not idout.empty();
+}
+
+
 }
 } // namespace vle manager
