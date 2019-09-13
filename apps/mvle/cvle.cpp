@@ -269,25 +269,21 @@ generate_template_line(std::ostream& header,
     }
 }
 
-void
+int
 generate_template(std::string file,
-                  std::string package,
                   std::string exp) noexcept
 {
     std::ofstream ofs(file);
     if (not ofs.is_open()) {
         fprintf(
           stderr, "Failed to open `%s' to generate template\n", file.c_str());
-        return;
+        return EXIT_FAILURE;
     }
 
     std::ostringstream oss;
 
     try {
-        auto ctx = vle::utils::make_context();
-        vle::utils::Package pack(ctx);
-        pack.select(package);
-        vle::vpz::Vpz vpz(pack.getExpFile(exp, vle::utils::PKG_BINARY));
+        vle::vpz::Vpz vpz(exp);
 
         auto it = vpz.project().experiment().conditions().begin();
         auto end = vpz.project().experiment().conditions().end();
@@ -323,7 +319,9 @@ generate_template(std::string file,
         ofs << oss.str() << '\n';
     } catch (const std::exception& e) {
         fprintf(stderr, "Failed to generate template file: %s\n", e.what());
+        return EXIT_FAILURE;
     }
+    return EXIT_SUCCESS;
 }
 
 /** @e Accessor stores an access to a VPZ or an undefined string.
@@ -790,8 +788,6 @@ private:
 
     vle::utils::ContextPtr m_context;
     std::chrono::milliseconds m_timeout;
-    std::string m_packagename;
-    std::string m_vpzfilename;
     std::unique_ptr<vle::manager::Simulation> m_simulator;
     VpzPtr m_vpz;
     std::unique_ptr<Columns> m_columns;             // used for simple values
@@ -847,15 +843,13 @@ private:
     }
 
 public:
-    Worker(std::string package,
-           std::chrono::milliseconds timeout,
+    Worker(std::chrono::milliseconds timeout,
            const std::string& vpz,
            bool withoutspawn,
            bool warnings,
            bool more_output_details)
       : m_context(vle::utils::make_context())
       , m_timeout(timeout)
-      , m_packagename(std::move(package))
       , m_simulator(nullptr)
       , m_warnings(warnings)
       , m_more_output_details(more_output_details)
@@ -877,10 +871,7 @@ public:
               nullptr);
         }
         m_context->set_log_priority(3);
-        vle::utils::Package pack(m_context);
-        pack.select(m_packagename);
-        m_vpz = std::make_unique<vle::vpz::Vpz>(
-          pack.getExpFile(vpz, vle::utils::PKG_BINARY));
+        m_vpz = std::make_unique<vle::vpz::Vpz>(vpz);
     }
 
     void init(const std::string& header)
@@ -1109,16 +1100,14 @@ run_as_master(const std::string& inputfile,
 }
 
 int
-run_as_worker(const std::string& package,
-              const std::string& vpz,
+run_as_worker(const std::string& vpz,
               std::chrono::milliseconds timeout,
               bool withoutspawn,
               bool warnings,
               bool more_output_details)
 {
     try {
-        Worker w(
-          package, timeout, vpz, withoutspawn, warnings, more_output_details);
+        Worker w(timeout, vpz, withoutspawn, warnings, more_output_details);
         std::string block;
         int from;
         int first, last;
@@ -1242,7 +1231,7 @@ main(int argc, char* argv[])
             break;
         case 'h':
             show_help();
-            break;
+            return ret;
         case 'P':
             package_name = ::optarg;
             break;
@@ -1274,28 +1263,35 @@ main(int argc, char* argv[])
         };
     }
 
-    if (package_name.empty()) {
-        printf(
-          _("Usage: cvle --package test tutu.vpz -i in.csv -o out.csv\n"));
-        return ret;
+    std::vector<std::string> vpz(argv + ::optind, argv + argc);
+    if (vpz.size() > 1) {
+        fprintf( stderr,
+                _("Use only the first vpz: %s\n"), vpz.front().c_str());
+    } else if (vpz.size() ==0) {
+        fprintf(stderr, _("Require 1 vpz \n"));
+        return EXIT_FAILURE;
     }
 
-    std::vector<std::string> vpz(argv + ::optind, argv + argc);
-    if (vpz.size() > 1)
-        fprintf(
-          stderr, _("Use only the first vpz: %s\n"), vpz.front().c_str());
+    auto ctx = vle::utils::make_context();
+
+    //handle package mode
+    std::string vpz_abs = vpz.front();
+    if (not package_name.empty()) {
+        vle::utils::Package pack(ctx, package_name);
+        vpz_abs = pack.getExpFile(vpz_abs, vle::utils::PKG_BINARY);
+    }
 
     MPI_Init(&argc, &argv);
     int rank = 0, world_size = 0;
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    if (rank == 0 and not template_file.empty())
-        generate_template(template_file, package_name, vpz.front());
+    if (rank == 0 and not template_file.empty()) {
+        generate_template(template_file, vpz_abs);
+    }
 
     if (world_size == 1) {
         fprintf(stderr, _("cvle needs two processors.\n"));
-        return EXIT_FAILURE;
     }
 
     int status;
@@ -1305,21 +1301,17 @@ main(int argc, char* argv[])
                  "timeout   : %ld\n"
                  "input csv : %s\n"
                  "output csv: %s\n"
-                 "vpz       :"),
+                 "vpz       : %s\n"),
                block_size,
                package_name.c_str(),
                timeout.count(),
                (input_file.empty()) ? "stdin" : input_file.c_str(),
-               (output_file.empty()) ? "stdout" : output_file.c_str());
-
-        for (const auto& elem : vpz)
-            printf("%s ", elem.c_str());
-        printf("\n");
+               (output_file.empty()) ? "stdout" : output_file.c_str(),
+               vpz.front().c_str());
 
         status = run_as_master(input_file, output_file, block_size);
     } else {
-        status = run_as_worker(package_name,
-                               vpz.front(),
+        status = run_as_worker(vpz_abs,
                                timeout,
                                withoutspawn,
                                warnings,
