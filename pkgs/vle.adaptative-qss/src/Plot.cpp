@@ -45,6 +45,8 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
         const auto adr = reinterpret_cast<std::uintptr_t>(&ctx);
         std::string filename("gnuplot-");
         filename += std::to_string(adr);
+        
+        home /= filename;
 
 #ifdef _WIN32
         if (fopen_s(&fp, home.string().c_str(), "w"))
