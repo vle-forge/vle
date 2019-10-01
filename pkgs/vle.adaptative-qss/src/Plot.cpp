@@ -434,6 +434,8 @@ public:
             }
         }
 
+        m_data_os.flush();
+
         return m_data.size();
     }
 
