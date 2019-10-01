@@ -15,6 +15,7 @@
  */
 
 #include <algorithm>
+#include <atomic>
 #include <cassert>
 #include <chrono>
 #include <cstddef>
@@ -22,6 +23,7 @@
 #include <deque>
 #include <fstream>
 #include <thread>
+
 #include <vle/devs/Dynamics.hpp>
 #include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Spawn.hpp>
@@ -45,7 +47,7 @@ struct gnuplot_log : vle::utils::Context::LogFunctor
         const auto adr = reinterpret_cast<std::uintptr_t>(&ctx);
         std::string filename("gnuplot-");
         filename += std::to_string(adr);
-        
+
         home /= filename;
 
 #ifdef _WIN32
@@ -137,7 +139,9 @@ get_index(const std::vector<std::string>& labels,
 }
 
 void
-start_plot(vle::utils::Path command, vle::utils::Path gnuplot_script)
+start_plot(vle::utils::Path command,
+           vle::utils::Path gnuplot_script,
+           bool& is_started)
 {
     auto ctx = vle::utils::make_context();
     ctx->set_log_priority(3);
@@ -169,6 +173,7 @@ start_plot(vle::utils::Path command, vle::utils::Path gnuplot_script)
           gnuplot_script.string().c_str());
     }
 
+    is_started = true;
     std::string output;
     std::string error;
 
@@ -230,9 +235,9 @@ class Plot : public vle::devs::Dynamics
     std::chrono::time_point<std::chrono::steady_clock> m_time;
     std::thread m_runner;
 
-    vle::utils::UnlinkPath m_data_file;
-    vle::utils::UnlinkPath m_gp_file;
-    vle::utils::UnlinkPath m_config_file;
+    vle::utils::Path m_data_file;
+    vle::utils::Path m_gp_file;
+    vle::utils::Path m_config_file;
     vle::utils::Path m_command;
 
     std::ofstream m_data_os;
@@ -243,21 +248,29 @@ class Plot : public vle::devs::Dynamics
     vle::devs::Time m_begin;
     std::size_t m_current_row;
     double m_duration;
-    bool m_gnuplot_started;
+    std::atomic_bool m_gnuplot_started;
 
 public:
     Plot(const vle::devs::DynamicsInit& init,
          const vle::devs::InitEventList& events)
       : vle::devs::Dynamics(init, events)
-      , m_data_file(vle::utils::Path::unique_path("data-%%%%%%%%%%%%.dat"))
-      , m_gp_file(vle::utils::Path::unique_path("plot-%%%%%%%%%%%%.gp"))
-      , m_config_file(vle::utils::Path::unique_path("conf-%%%%%%%%%%%%"))
-      , m_data_os(m_data_file.string())
       , m_current_row{ 0 }
       , m_duration(0.3)
       , m_gnuplot_started(false)
     {
-        if (not m_data_os.is_open()) {
+        auto temp = vle::utils::Path::temp_directory_path();
+
+        m_data_file = temp;
+        m_data_file /= vle::utils::Path::unique_path("data-%%%%%%%%%%%%.dat");
+
+        m_gp_file = temp;
+        m_gp_file /= vle::utils::Path::unique_path("plot-%%%%%%%%%%%%.gp");
+
+        m_config_file = temp;
+        m_config_file /= vle::utils::Path::unique_path("conf-%%%%%%%%%%%%");
+
+        m_data_os.open(m_data_file.string());
+        if (!m_data_os.is_open()) {
             Trace(3,
                   "Plot error: fail to open file `%s' to store data\n",
                   m_data_file.string().c_str());
@@ -319,8 +332,10 @@ public:
                     m_data.emplace_back(idx, t, m.getDouble("d_val"));
                 else if (m.exist("up"))
                     m_data.emplace_back(idx, t, m.getDouble("up"));
+                else if (m.exist("value"))
+                    m_data.emplace_back(idx, t, m.getDouble("value"));
                 else
-                    Trace(4, "Plot warning: fail to convert data\n");
+                    Trace(4, "Plot warning: fail to convert data from map\n");
             } else
                 Trace(4, "Plot warning: fail to convert data\n");
         }
@@ -334,9 +349,14 @@ public:
             write(m_current_row, true);
 
             if (not m_gnuplot_started) {
+                bool is_started = false;
                 m_gnuplot_started = true;
-                m_runner =
-                  std::thread(start_plot, m_command, m_gp_file.path());
+                m_runner = std::thread(
+                  start_plot, m_command, m_gp_file, std::ref(is_started));
+
+                while (!is_started)
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
                 m_runner.detach();
             }
 
@@ -365,21 +385,16 @@ public:
 
     std::size_t write_data(std::size_t row)
     {
-        //
         // Write header: for each input port, the string is used as column
         // label into gnuplot file.
-        //
 
+        assert(m_data_os.good());
         m_data_os << "# time ";
 
         for (auto& elem : m_labels)
             m_data_os << '"' << elem << '"' << '\t';
 
-        m_data_os << '\n';
-
-        //
         // Write data: started from the @c row.
-        //
 
         std::vector<std::pair<bool, double>> to_write(m_labels.size());
         for (auto& elem : to_write)
@@ -460,9 +475,7 @@ public:
             return;
         }
 
-        //
         // Force to rewrite the entire data file to be sure all data if write.
-        //
 
         if (m_data_os.is_open()) {
             m_data_os.close();
@@ -480,7 +493,14 @@ public:
         write(0, false);
 
         if (not m_gnuplot_started) {
-            m_runner = std::thread(start_plot, m_command, m_gp_file.path());
+            bool is_started = false;
+            m_gnuplot_started = true;
+            m_runner = std::thread(
+              start_plot, m_command, m_gp_file, std::ref(is_started));
+
+            while (!is_started)
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
             m_runner.detach();
         }
     }
