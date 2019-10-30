@@ -30,7 +30,6 @@ set(libvle_sources
   devs/ViewEvent.cpp
   devs/ViewEvent.hpp
   devs/View.hpp
-  manager/ExperimentGenerator.cpp
   manager/Manager.cpp
   manager/Simulation.cpp
   oov/Plugin.cpp

@@ -38,18 +38,11 @@ namespace vle {
 namespace manager {
 
 /**
- * TODO
- * @c manager::Manager permits to run experimental frames.
+ * @c manager::Manager permits to run experimental plans.
  *
- * The @c manager::Manager returns a @c value::Matrix. The lines are
- * replicas and the columns are combination index from the @c
- * manager::ExperimentGenerator. A cell of the @c value::Matrix is a
- * @c value::Map.  The key is the name of the @c devs::View and the
- * value is a @c value::Matrix or NULL if the @c value::Matrix is
- * empty.
+ * The @c manager::Manager returns one @c value::Matrix by registered output
+ * The lines are the time index, and the column is the input value
  *
- * @attention You are in charge to freed the manager result @c
- * value::Matrix.
  */
 
 enum ParallelOptions {PARALLEL_MONO, PARALLEL_THREADS, PARALLEL_MPI};
