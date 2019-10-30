@@ -162,5 +162,17 @@ Model::getAtomicModelList(std::vector<AtomicModel*>& list) const
     list.clear();
     m_graph->getAtomicModelList(m_graph.get(), list);
 }
+
+BaseModel*
+Model::findModelFromPath(const std::string& pathname) const
+{
+    std::string prefix = m_node->getName()+",";
+    if (prefix != pathname.substr(0,prefix.size())) {
+        return nullptr;
+    }
+    std::string suffix = pathname.substr(prefix.size(), pathname.size()-1);
+    return m_node->findModelFromPath(suffix);
+}
+
 }
 } // namespace vle vpz

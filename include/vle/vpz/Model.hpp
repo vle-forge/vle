@@ -180,6 +180,8 @@ public:
 
     void getAtomicModelList(std::vector<AtomicModel*>& list) const;
 
+    BaseModel* findModelFromPath(const std::string& pathname) const;
+
 private:
     std::unique_ptr<BaseModel> m_graph;
     BaseModel* m_node{ nullptr };
