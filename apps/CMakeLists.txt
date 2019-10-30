@@ -1,7 +1,7 @@
 add_subdirectory(vle)
 
 if (WITH_CVLE)
-  add_subdirectory(mvle)
+  add_subdirectory(cvle)
 endif ()
 
 if (WITH_GVLE)
