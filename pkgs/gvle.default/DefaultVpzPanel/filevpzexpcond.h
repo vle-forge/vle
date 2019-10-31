@@ -116,7 +116,7 @@ public slots:
     void onSelected(const QString& id);
 
 private:
-    QMenu* buildAddValueMenu(QMenu& menu, const QString& setOrAdd);
+    QMenu* buildSetValueMenu(QMenu& menu);
     vle::value::Value* buildDefaultValue(QString type);
     void insertNullWidget(int row, int col);
     bool hasWidget(int row, int col);
@@ -134,7 +134,6 @@ private:
     vleVpz* mVpz;
     QString mCurrCondName;
     QString mCurrPortName;
-    int mCurrValIndex;
     PluginExpCond* mPlugin;
     gvle_plugins* mGvlePlugins;
 };

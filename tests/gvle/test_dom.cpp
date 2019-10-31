@@ -75,7 +75,6 @@ const char* vpz_content =
   "  <string>cond/init_value_x</string>\n"
   " </port>\n"
   " <port name=\"myport\">\n"
-  "  <tuple></tuple>\n"
   "  <tuple>1.5 2 4.6</tuple>\n"
   " </port>\n"
   " <port name=\"id_output_y\">\n"
@@ -143,9 +142,7 @@ test_build_value()
 
     // test tuple
     std::unique_ptr<vle::value::Value> t =
-      vpz.buildValueFromDoc("cond", "myport", 0);
-    EnsuresEqual(t->toTuple().size(), 0);
-    t = vpz.buildValueFromDoc("cond", "myport", 1);
+            vpz.buildValueFromDoc("cond", "myport");
     EnsuresEqual(t->toTuple().size(), 3);
     EnsuresApproximatelyEqual(t->toTuple().at(0), 1.5, 1e-5);
     EnsuresApproximatelyEqual(t->toTuple().at(1), 2, 1e-5);

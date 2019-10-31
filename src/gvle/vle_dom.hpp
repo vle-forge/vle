@@ -212,10 +212,21 @@ public:
      *      ...
      *    </condition>
      * @param portName, the name of the port to search for
-     * @return true if the condition port exists
+     * @return the new created vle Value
      */
     static std::unique_ptr<value::Value>
-    getValueFromPortCond(QDomNode atom, const QString& portName, int index);
+    getPortValueFromCond(QDomNode atom, const QString& portName);
+
+    /**
+     * @brief Build a value from a condition port
+     * @param atom, is expected to be of the form
+     *      <port name="someport">
+     *        ...
+     *      </port>
+     * @return the new created vle Value
+     */
+    static std::unique_ptr<value::Value>
+    getValueFromCondport(QDomNode atom);
 
     /**
      * @brief Remove the port form a condition

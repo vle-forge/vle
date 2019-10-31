@@ -708,10 +708,14 @@ public:
      * which attribute 'name' is portName
      */
     void rmCondPortToDoc(const QString& condName, const QString& portName);
+
     /**
-     * @brief add a value to a tag <port> tag from a condition into a Vpz doc
+     * @brief set a value to a condition port
+     * @param condName, name of the condition
+     * @param portName, name of the condition port
+     * @param val, the value to set
      */
-    void addValuePortCondToDoc(const QString& condName,
+    void setValuePortCondToDoc(const QString& condName,
                                const QString& portName,
                                const vle::value::Value& val);
     /**
@@ -1007,57 +1011,34 @@ public:
     QString getOutputPlugin(QDomNode node);
     /**
      * @brief gives the type of a value of
-     */
-    vle::value::Value::type valueType(const QString& condName,
-                                      const QString& portName,
-                                      int index) const;
-
-    /**
-     * @brief build a vle value at a given index from a port
      * @param condName, the condition name: tag <condition>
      * @param portName, the port name: tag <port>
-     * @param valIndex, index of the value to build from
-     * the set of values attached to the port
+     * @return the vle Value type
+     */
+    vle::value::Value::type valueType(const QString& condName,
+                                      const QString& portName) const;
+
+    /**
+     * @brief build a vle value from a condition port
+     * @param condName, the condition name: tag <condition>
+     * @param portName, the port name: tag <port>
+     * @return the new created vle Value.
      */
     std::unique_ptr<vle::value::Value> buildValueFromDoc(
-      const QString& condName,
-      const QString& portName,
-      int valIndex) const;
+            const QString& condName,
+            const QString& portName) const;
 
-    unsigned int nbValuesInPortFromDoc(const QString& condName,
-                                       const QString& portName);
 
     /**
-     * @brief Fill a vector of vle values with the multipl values contained by
-     * a condition port
-     * @param condName, the name of the cond: tag <condtion>
-     * @param portName, the name of the port of condName: tag <port>
-     * @param values, the vector of values to fill
-     * @note: values is first cleared
-     */
-    bool fillWithMultipleValueFromDoc(
-      const QString& condName,
-      const QString& portName,
-      std::vector<std::unique_ptr<value::Value>>& values) const;
-
-    /**
-     * @brief Fill a vector of vle values with the multipl values contained by
-     * a condition port
-     * @param port, containing the multiple values: tag <port>
-     * @param values, the vector of values to fill
-     * @note: values is first cleared
-     */
-    bool fillWithMultipleValue(
-      QDomNode portNode,
-      std::vector<std::unique_ptr<value::Value>>& values) const;
-
-    /**
-     * @brief Fill a value at index of <port> portName of <condtion> condName
+     * @brief Fill a value of condition port
+     * @param condName, the condition name: tag <condition>
+     * @param portName, the port name: tag <port>
+     * @param val the val to fill
+     * @return true if ok
      * @note: the map is first cleared
      */
     bool fillWithValue(const QString& condName,
                        const QString& portName,
-                       int index,
                        const vle::value::Value& val);
 
     /**

@@ -904,12 +904,9 @@ vleVpz::setExpName(const QString name)
 QString
 vleVpz::getExpDuration() const
 {
-    QDomNode xDuration = portFromDoc("simulation_engine", "duration");
-    std::vector<std::unique_ptr<value::Value>> valuesToFill;
-    fillWithMultipleValue(xDuration, valuesToFill);
-    std::unique_ptr<value::Value> durationValue = std::move(valuesToFill[0]);
-    return QLocale().toString(
-      durationValue->toDouble().value(), 'g', maxPrecision);
+    std::unique_ptr<value::Value> dur = buildValueFromDoc(
+            "simulation_engine", "duration");
+    return QLocale().toString(dur->toDouble().value(), 'g', maxPrecision);
 }
 
 void
@@ -924,7 +921,7 @@ vleVpz::setExpDuration(const QString duration)
     double durationNum = QLocale().toDouble(duration, &ok);
     if (ok) {
         vle::value::Value* durationValue = new vle::value::Double(durationNum);
-        fillWithValue("simulation_engine", "duration", 0, *durationValue);
+        fillWithValue("simulation_engine", "duration", *durationValue);
         delete durationValue;
 
         emit experimentUpdated();
@@ -934,12 +931,9 @@ vleVpz::setExpDuration(const QString duration)
 QString
 vleVpz::getExpBegin() const
 {
-    QDomNode xBegin = portFromDoc("simulation_engine", "begin");
-    std::vector<std::unique_ptr<value::Value>> valuesToFill;
-    fillWithMultipleValue(xBegin, valuesToFill);
-    std::unique_ptr<value::Value> beginValue = std::move(valuesToFill[0]);
-    return QLocale().toString(
-      beginValue->toDouble().value(), 'g', maxPrecision);
+    std::unique_ptr<value::Value> dur = buildValueFromDoc(
+                "simulation_engine", "begin");
+    return QLocale().toString(dur->toDouble().value(), 'g', maxPrecision);
 }
 
 void
@@ -954,7 +948,7 @@ vleVpz::setExpBegin(const QString begin)
     double beginNum = QLocale().toDouble(begin, &ok);
     if (ok) {
         vle::value::Value* beginValue = new vle::value::Double(beginNum);
-        fillWithValue("simulation_engine", "begin", 0, *beginValue);
+        fillWithValue("simulation_engine", "begin", *beginValue);
         delete beginValue;
 
         emit experimentUpdated();
@@ -1742,13 +1736,14 @@ vleVpz::rmCondPortToDoc(const QString& condName, const QString& portName)
 }
 
 void
-vleVpz::addValuePortCondToDoc(const QString& condName,
+vleVpz::setValuePortCondToDoc(const QString& condName,
                               const QString& portName,
                               const vle::value::Value& val)
 {
     QDomNode port = portFromDoc(condName, portName);
     undoStack->snapshot(port);
     synchronizeUndoStack();
+    DomFunctions::removeAllChilds(port);
     QString tagName = "";
     switch (val.getType()) {
     case vle::value::Value::BOOLEAN:
@@ -3459,18 +3454,14 @@ vleVpz::getOutputPlugin(QDomNode node)
     return plug;
 }
 
-// enum type { BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
-//    XMLTYPE, NIL, MATRIX, USER };
-
 vle::value::Value::type
 vleVpz::valueType(const QString& condName,
-                  const QString& portName,
-                  int index) const
+                  const QString& portName) const
 {
     //    BOOLEAN, INTEGER, DOUBLE, STRING, SET, MAP, TUPLE, TABLE,
-    //                XMLTYPE, NIL, MATRIX, USER
+    //    XMLTYPE, NIL, MATRIX, USER
     QDomNode port = portFromDoc(condName, portName);
-    QDomNode valNode = port.childNodes().at(index);
+    QDomNode valNode = port.childNodes().at(0);
     if (valNode.nodeName() == "boolean") {
         return vle::value::Value::BOOLEAN;
     } else if (valNode.nodeName() == "integer") {
@@ -3499,45 +3490,10 @@ vleVpz::valueType(const QString& condName,
 
 std::unique_ptr<vle::value::Value>
 vleVpz::buildValueFromDoc(const QString& condName,
-                          const QString& portName,
-                          int valIndex) const
+                          const QString& portName) const
 {
-    return vleDomStatic::getValueFromPortCond(
-      condFromConds(condsFromDoc(), condName), portName, valIndex);
-}
-
-unsigned int
-vleVpz::nbValuesInPortFromDoc(const QString& condName, const QString& portName)
-{
-    QDomNode port = portFromDoc(condName, portName);
-    return DomFunctions::childNodesWithoutText(port).size();
-}
-
-bool
-vleVpz::fillWithMultipleValueFromDoc(
-  const QString& condName,
-  const QString& portName,
-  std::vector<std::unique_ptr<value::Value>>& values) const
-{
-    QDomNode port = portFromDoc(condName, portName);
-    return fillWithMultipleValue(port, values);
-}
-
-bool
-vleVpz::fillWithMultipleValue(
-  QDomNode portNode,
-  std::vector<std::unique_ptr<value::Value>>& values) const
-{
-    values.clear();
-    QDomNodeList valueList = portNode.childNodes();
-    std::unique_ptr<value::Value> val;
-    for (int k = 0; k < valueList.length(); k++) {
-        val = vleDomStatic::buildValue(valueList.at(k), false);
-        if (val) {
-            values.push_back(std::move(val));
-        }
-    }
-    return true;
+    return vleDomStatic::getPortValueFromCond(
+      condFromConds(condsFromDoc(), condName), portName);
 }
 
 void
@@ -3555,19 +3511,18 @@ vleVpz::fillWithClassesFromDoc(std::vector<std::string>& toFill)
 bool
 vleVpz::fillWithValue(const QString& condName,
                       const QString& portName,
-                      int index,
                       const vle::value::Value& val)
 {
     QDomNode port = portFromDoc(condName, portName);
     undoStack->snapshot(port);
     synchronizeUndoStack();
     QList<QDomNode> chs = DomFunctions::childNodesWithoutText(port);
-    QDomNode valNode = chs[index];
-    if (val.getType() != valueType(condName, portName, index)) {
+    QDomNode valNode = chs[0];
+    if (val.getType() != valueType(condName, portName)) {
         QDomNode parent = valNode.parentNode();
         parent.replaceChild(buildEmptyValueFromDoc(val.getType()), valNode);
         chs = DomFunctions::childNodesWithoutText(port);
-        valNode = chs[index];
+        valNode = chs[0];
     }
     fillWithValue(valNode, val);
     emit conditionsUpdated();

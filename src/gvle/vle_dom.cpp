@@ -775,30 +775,39 @@ vleDomStatic::existPortFromCond(QDomNode atom, const QString& portName)
 }
 
 std::unique_ptr<value::Value>
-vleDomStatic::getValueFromPortCond(QDomNode atom,
-                                   const QString& portName,
-                                   int index)
+vleDomStatic::getPortValueFromCond(QDomNode atom,
+                                   const QString& portName)
 {
     std::unique_ptr<vle::value::Value> val;
     if (atom.nodeName() != "condition") {
-        qDebug() << "Internal error in getValueFromPortCond "
+        qDebug() << "Internal error in getPortValueFromCond "
                  << atom.nodeName();
         return val;
     }
     QDomNode port = DomFunctions::childWhithNameAttr(atom, "port", portName);
-    QDomNodeList valueList = port.childNodes();
-    int ii = 0;
-    val.reset(nullptr);
-    // note: how to detecte the number of values. For the moment each time one
-    // succeeds in buildding a vle value.
+    if (port.nodeName() != "port") {
+        return val;
+    }
+    val = getValueFromCondport(port);
+    return val;
+
+}
+
+std::unique_ptr<value::Value>
+vleDomStatic::getValueFromCondport(QDomNode atom)
+{
+    std::unique_ptr<vle::value::Value> val;
+    if (atom.nodeName() != "port") {
+        qDebug() << "Internal error in getValueFromCondport "
+                << atom.nodeName();
+        return val;
+    }
+    QDomNodeList valueList = atom.childNodes();
+    // return the first value we succeed to build
     for (int k = 0; k < valueList.length(); k++) {
         val = buildValue(valueList.at(k), false);
         if (val) {
-            if (index == ii) {
-                return val;
-            } else {
-                ii += 1;
-            }
+            return val;
         }
     }
     val.reset(nullptr);

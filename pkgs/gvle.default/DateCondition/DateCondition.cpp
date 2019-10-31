@@ -131,10 +131,10 @@ DateCondition::init(vleVpz* vpz, const QString& cond)
     QDomNodeList portList = mVpz->portsListFromDoc(mExpCond);
     if (portList.size() == 1) {
         datePort = DomFunctions::attributeValue(portList.at(0), "name");
-        std::vector<std::unique_ptr<value::Value>> values;
-        mVpz->fillWithMultipleValue(portList.at(0), values);
-        if (values.size() == 1) {
-            if (values[0]->isString()) {
+        std::unique_ptr<value::Value> value =
+                vleDomStatic::getValueFromCondport(portList.at(0));
+        if (value.get()) {
+            if (value->isString()) {
                 mComboBox->setCurrentText("character");
             } else {
                 mComboBox->setCurrentText("real");
@@ -149,7 +149,7 @@ DateCondition::init(vleVpz* vpz, const QString& cond)
         mComboBox->setCurrentText("character");
     }
     std::unique_ptr<value::Value> dateV =
-      mVpz->buildValueFromDoc(cond, datePort, 0);
+            mVpz->buildValueFromDoc(cond, datePort);
     double dateI = 0;
     if (dateV->isString()) {
         dateI = utils::DateTime::toJulianDay(dateV->toString().value());
@@ -211,10 +211,10 @@ DateCondition::onTextUpdated(const QString& /*id*/,
     value::Map portValues;
 
     QDomNode portNode = mVpz->portFromDoc(mExpCond, old);
-    std::vector<std::unique_ptr<value::Value>> values;
-    mVpz->fillWithMultipleValue(portNode, values);
-    if (values.size() > 0) {
-        portValues.set(neW.toStdString(), std::move(values[0]));
+    std::unique_ptr<value::Value> value = vleDomStatic::getValueFromCondport(
+            portNode);
+    if (value.get()) {
+        portValues.set(neW.toStdString(), std::move(value));
         mVpz->fillConditionWithMapToDoc(mExpCond, portValues, true);
     }
 }
@@ -225,16 +225,17 @@ DateCondition::onTypeChanged(const QString& type)
 
     QDomNode portNode = mVpz->portFromDoc(mExpCond, mNamePortField->text());
     std::vector<std::unique_ptr<value::Value>> values;
-    mVpz->fillWithMultipleValue(portNode, values);
+    std::unique_ptr<value::Value> value = vleDomStatic::getValueFromCondport(
+            portNode);
     value::Map portValues;
     if (type == "real") {
         portValues.addDouble(
           mNamePortField->text().toStdString(),
-          utils::DateTime::toJulianDay(values[0]->toString().value()));
+          utils::DateTime::toJulianDay(value->toString().value()));
     } else if (type == "character") {
         portValues.addString(
           mNamePortField->text().toStdString(),
-          utils::DateTime::toJulianDay(values[0]->toDouble().value()));
+          utils::DateTime::toJulianDay(value->toDouble().value()));
     }
     mVpz->fillConditionWithMapToDoc(mExpCond, portValues, true);
 }
