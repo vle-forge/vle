@@ -141,7 +141,7 @@ gvle_file::newInstanceMainPanel(gvle_plugins& plugins)
         }
         break;
     case gvleplug::GVLE_PLUG_NONE:
-        if (relPath == "Description.txt") {
+        if (suffix() == "txt" or suffix() == "hpp" or suffix() == "cpp") {
             return plugins.newInstanceMainPanelPlugin("Default");
         } else {
             return 0;
