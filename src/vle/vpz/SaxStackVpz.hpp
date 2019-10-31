@@ -292,9 +292,9 @@ public:
 
     /**
      * @brief Pop the ConditionPort.
-     * @return The value::Set read.
+     * @return The value::Value read.
      */
-    std::vector<std::shared_ptr<value::Value>>& popConditionPort();
+    std::shared_ptr<value::Value>& popConditionPort();
 
     /**
      * @brief Pop the Output.

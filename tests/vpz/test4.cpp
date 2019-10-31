@@ -312,31 +312,31 @@ check_experiment_unittest_vpz(const vpz::Experiment& exp)
         {
             const vpz::Condition& c(exp.conditions().get("ca"));
 
-            const auto& x(c.getSetValues("x"));
-            Ensures(not x.empty());
-            Ensures(x[0]->isDouble());
-            EnsuresApproximatelyEqual(value::toDouble(x[0]), 1.2, 0.1);
+            const auto& x(c.valueOfPort("x"));
+            Ensures(x.get());
+            Ensures(x->isDouble());
+            EnsuresApproximatelyEqual(value::toDouble(x), 1.2, 0.1);
         }
         {
             const vpz::Condition& c(exp.conditions().get("cb"));
-            const auto& x(c.getSetValues("x"));
-            Ensures(not x.empty());
-            Ensures(x[0]->isDouble());
-            EnsuresApproximatelyEqual(value::toDouble(x[0]), 1.3, 0.1);
+            const auto& x(c.valueOfPort("x"));
+            Ensures(x.get());
+            Ensures(x->isDouble());
+            EnsuresApproximatelyEqual(value::toDouble(x), 1.3, 0.1);
         }
         {
             const vpz::Condition& c(exp.conditions().get("cc"));
-            const auto& x(c.getSetValues("x"));
-            Ensures(not x.empty());
-            Ensures(x[0]->isDouble());
-            EnsuresApproximatelyEqual(value::toDouble(x[0]), 1.4, 0.1);
+            const auto& x(c.valueOfPort("x"));
+            Ensures(x.get());
+            Ensures(x->isDouble());
+            EnsuresApproximatelyEqual(value::toDouble(x), 1.4, 0.1);
         }
         {
             const vpz::Condition& c(exp.conditions().get("cd"));
-            const auto& x(c.getSetValues("x"));
-            Ensures(not x.empty());
-            Ensures(x[0]->isDouble());
-            EnsuresApproximatelyEqual(value::toDouble(x[0]), 1.5, 0.1);
+            const auto& x(c.valueOfPort("x"));
+            Ensures(x.get());
+            Ensures(x->isDouble());
+            EnsuresApproximatelyEqual(value::toDouble(x), 1.5, 0.1);
         }
     }
 

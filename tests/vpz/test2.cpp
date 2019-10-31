@@ -211,23 +211,23 @@ experiment_vpz()
       "     <double>123.</double>"
       "    </port>"
       "    <port name=\"duration\" >"
-      "     <double>0.33</double><integer>2</integer>"
+      "     <double>0.33</double>"
       "    </port>"
       "   </condition>"
       "   <condition name=\"cond1\" >"
       "    <port name=\"init1\" >"
-      "     <double>123.</double><integer>1</integer>"
+      "     <integer>1</integer>"
       "    </port>"
       "    <port name=\"init2\" >"
-      "     <double>456.</double><integer>2</integer>"
+      "     <double>456.</double>"
       "    </port>"
       "   </condition>"
       "   <condition name=\"cond2\" >"
       "    <port name=\"init3\" >"
-      "     <double>.123</double><integer>-1</integer>"
+      "     <integer>-1</integer>"
       "    </port>"
       "    <port name=\"init4\" >"
-      "     <double>.456</double><integer>-2</integer>"
+      "     <integer>-2</integer>"
       "    </port>"
       "   </condition>"
       "  </conditions>"
@@ -274,35 +274,23 @@ experiment_vpz()
     const vpz::Condition& cnd2(cnds.get("cond2"));
 
     {
-        const auto& set(cnd1.getSetValues("init1"));
-        const value::Double& real(set[0]->toDouble());
-        EnsuresEqual(real.value(), 123.);
-        const value::Integer& integer(set[1]->toInteger());
-        EnsuresEqual(integer.value(), 1);
+        const auto& intVal(cnd1.valueOfPort("init1"));
+        EnsuresEqual(intVal->toInteger().value(), 1);
     }
 
     {
-        const auto& set(cnd1.getSetValues("init2"));
-        const value::Double& real(set[0]->toDouble());
-        EnsuresEqual(real.value(), 456.);
-        const value::Integer& integer(set[1]->toInteger());
-        EnsuresEqual(integer.value(), 2);
+        const auto& realValue(cnd1.valueOfPort("init2"));
+        EnsuresEqual(realValue->toDouble().value(), 456.);
     }
 
     {
-        const auto& set = cnd2.getSetValues("init3");
-        const value::Double& real(set[0]->toDouble());
-        EnsuresEqual(real.value(), .123);
-        const value::Integer& integer(set[1]->toInteger());
-        EnsuresEqual(integer.value(), -1);
+        const auto& intVal = cnd2.valueOfPort("init3");
+        EnsuresEqual(intVal->toInteger().value(), -1);
     }
 
     {
-        const auto& set = cnd2.getSetValues("init4");
-        const value::Double& real(set[0]->toDouble());
-        EnsuresEqual(real.value(), .456);
-        const value::Integer& integer(set[1]->toInteger());
-        EnsuresEqual(integer.value(), -2);
+        const auto& intVal = cnd2.valueOfPort("init4");
+        EnsuresEqual(intVal->toInteger().value(), -2);
     }
 }
 

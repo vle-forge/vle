@@ -111,24 +111,16 @@ public:
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * @brief Get the content of the SaxStackValue.
-     * @return A constant reference to the vector of value::Value.
+     * @brief Gets a reference to the Value Stack parser
+     * @return A reference to the of value::Value.
      */
-    const std::vector<std::shared_ptr<value::Value>>& getValues() const;
+    std::shared_ptr<value::Value>& getValue();
 
     /**
-     * @brief Get the content of the SaxParserError.
-     * @return A reference to the vector of value::Value.
+     * @brief Gets a const reference to the Value Stack parser
+     * @return A reference to the of value::Value.
      */
-    std::vector<std::shared_ptr<value::Value>>& getValues();
-
-    /**
-     * @brief Get the content of a specific cells of the SaxStackValue.
-     * @param pos The index of the value::Value.
-     * @throw utils::SaxParserError if i is greater that size of the vector.
-     * @return A constant reference to the value.
-     */
-    const std::shared_ptr<value::Value>& getValue(const size_t pos) const;
+    const std::shared_ptr<value::Value>& getValue() const;
 
     /**
      * @brief Get a constant reference to the Vpz.

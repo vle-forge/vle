@@ -329,7 +329,7 @@ SaxParser::parse(std::istream& is, std::size_t buffer_size)
     switch (status) {
     case sax_parser_status::success:
         if (!m_isVPZ)
-            if (!m_valuestack.getResults().empty())
+            if (m_valuestack.getResult().get())
                 m_isValue = true;
         return;
     case sax_parser_status::not_enough_memory:
@@ -668,28 +668,28 @@ SaxParser::onClass(const char** att)
 void
 SaxParser::onEndBoolean()
 {
-    m_valuestack.pushOnVectorValue<value::Boolean>(
+    m_valuestack.pushOnValue<value::Boolean>(
       charToBoolean(((char*)lastCharactersStored().c_str())));
 }
 
 void
 SaxParser::onEndInteger()
 {
-    m_valuestack.pushOnVectorValue<value::Integer>(
+    m_valuestack.pushOnValue<value::Integer>(
       static_cast<int>(charToInt(((char*)lastCharactersStored().c_str()))));
 }
 
 void
 SaxParser::onEndDouble()
 {
-    m_valuestack.pushOnVectorValue<value::Double>(
+    m_valuestack.pushOnValue<value::Double>(
       charToDouble(((char*)lastCharactersStored().c_str())));
 }
 
 void
 SaxParser::onEndString()
 {
-    m_valuestack.pushOnVectorValue<value::String>(lastCharactersStored());
+    m_valuestack.pushOnValue<value::String>(lastCharactersStored());
 }
 
 void
@@ -788,14 +788,14 @@ SaxParser::onEndTable()
 void
 SaxParser::onEndXML()
 {
-    m_valuestack.pushOnVectorValue<value::Xml>(m_cdata);
+    m_valuestack.pushOnValue<value::Xml>(m_cdata);
     m_cdata.clear();
 }
 
 void
 SaxParser::onEndNull()
 {
-    m_valuestack.pushOnVectorValue<value::Null>();
+    m_valuestack.pushOnValue<value::Null>();
 }
 
 void
@@ -803,11 +803,8 @@ SaxParser::onEndPort()
 {
     if (m_vpzstack.top()->isCondition()) {
         auto& vals = m_vpzstack.popConditionPort();
-        auto& lst = getValues();
-
-        for (auto& elem : lst)
-            vals.emplace_back(elem);
-
+        auto& elem = getValue();
+        vals = elem;
         m_valuestack.clear();
     } else if (m_vpzstack.top()->isObservablePort()) {
         m_vpzstack.pop();
@@ -939,17 +936,10 @@ SaxParser::onEndOutput()
 {
     if (m_vpzstack.top()->isOutput()) {
         auto* out = dynamic_cast<Output*>(m_vpzstack.top());
-        auto& lst = getValues();
-        if (not lst.empty()) {
-            if (lst.size() > 1) {
-                throw utils::SaxParserError(
-                  _("VPZ parser: multiples values for output"));
-            }
-
-            if (lst[0].get()) {
-                out->setData(lst[0]);
-                m_valuestack.clear();
-            }
+        auto& elem = getValue();
+        if (elem.get()) {
+            out->setData(elem);
+            m_valuestack.clear();
         }
         m_vpzstack.popOutput();
     }
@@ -993,22 +983,16 @@ SaxParser::error() const
     return m_error;
 }
 
-const std::vector<std::shared_ptr<value::Value>>&
-SaxParser::getValues() const
+std::shared_ptr<value::Value>&
+SaxParser::getValue()
 {
-    return m_valuestack.getResults();
-}
-
-std::vector<std::shared_ptr<value::Value>>&
-SaxParser::getValues()
-{
-    return m_valuestack.getResults();
+    return m_valuestack.getResult();
 }
 
 const std::shared_ptr<value::Value>&
-SaxParser::getValue(const size_t pos) const
+SaxParser::getValue() const
 {
-    return m_valuestack.getResult(pos);
+    return m_valuestack.getResult();
 }
 
 bool

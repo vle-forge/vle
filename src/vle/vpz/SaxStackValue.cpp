@@ -96,7 +96,7 @@ ValueStackSax::pushMap()
         }
     }
 
-    pushOnVectorValue<value::Map>();
+    pushOnValue<value::Map>();
 }
 
 void
@@ -120,7 +120,7 @@ ValueStackSax::pushSet()
         }
     }
 
-    pushOnVectorValue<value::Set>();
+    pushOnValue<value::Set>();
 }
 
 void
@@ -137,7 +137,7 @@ ValueStackSax::pushMatrix(value::Matrix::index col,
         }
     }
 
-    pushOnVectorValue<value::Matrix>(
+    pushOnValue<value::Matrix>(
       col, row, colmax, rowmax, colstep, rowstep);
 }
 
@@ -150,7 +150,7 @@ ValueStackSax::pushTuple()
         }
     }
 
-    pushOnVectorValue<value::Tuple>();
+    pushOnValue<value::Tuple>();
 }
 
 void
@@ -162,7 +162,7 @@ ValueStackSax::pushTable(const size_t width, const size_t height)
         }
     }
 
-    pushOnVectorValue<value::Table>(width, height);
+    pushOnValue<value::Table>(width, height);
 }
 
 void
@@ -210,34 +210,16 @@ ValueStackSax::clear()
     while (not m_valuestack.empty())
         m_valuestack.pop();
 
-    m_result.clear();
+    m_result.reset();
 }
 
 void
 ValueStackSax::pushResult(std::shared_ptr<value::Value> val)
 {
-    m_result.push_back(std::move(val));
+    m_result = val;
 }
 
-const std::shared_ptr<value::Value>&
-ValueStackSax::getResult(size_t i) const
-{
-    if (m_result.size() < i)
-        throw utils::SaxParserError(
-          _("Get result value with to big index %ld."),
-          static_cast<unsigned long>(i));
 
-    return m_result[i];
-}
 
-const std::shared_ptr<value::Value>&
-ValueStackSax::getLastResult() const
-{
-    if (m_result.empty())
-        throw utils::SaxParserError(
-          _("Get last result value with empty result vector"));
-
-    return m_result[m_result.size() - 1];
-}
 }
 } // namespace vle vpz

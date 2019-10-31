@@ -99,11 +99,7 @@ Experiment::setDuration(double duration)
                                 "does not exist"));
 
     auto& condSim = conditions().get(defaultSimulationEngineCondName());
-    auto& dur = condSim.getSetValues("duration");
-    dur.clear();
-
-    dur.emplace_back(std::static_pointer_cast<vle::value::Value>(
-      std::make_shared<vle::value::Double>(duration)));
+    condSim.setValueToPort("duration", vle::value::Double::create(duration));
 }
 
 double
@@ -114,12 +110,7 @@ Experiment::duration() const
                                 "does not exist"));
 
     const auto& condSim = conditions().get(defaultSimulationEngineCondName());
-    const auto& dur = condSim.getSetValues("duration");
-
-    if (dur.empty())
-        throw utils::ArgError(_("The simulation engine condition is empty"));
-
-    return dur[0]->toDouble().value();
+    return condSim.valueOfPort("duration")->toDouble().value();
 }
 
 void
@@ -130,10 +121,7 @@ Experiment::setBegin(double begin)
                                 "does not exist"));
 
     auto& condSim = conditions().get(defaultSimulationEngineCondName());
-    auto& dur = condSim.getSetValues("begin");
-    dur.clear();
-    dur.emplace_back(std::static_pointer_cast<vle::value::Value>(
-      std::make_shared<vle::value::Double>(begin)));
+    condSim.setValueToPort("begin", vle::value::Double::create(begin));
 }
 
 double
@@ -144,12 +132,7 @@ Experiment::begin() const
                                 "does not exist"));
 
     const auto& condSim = conditions().get(defaultSimulationEngineCondName());
-    const auto& dur = condSim.getSetValues("begin");
-
-    if (dur.empty())
-        throw utils::ArgError(_("The simulation engine condition is empty"));
-
-    return dur[0]->toDouble().value();
+    return condSim.valueOfPort("begin")->toDouble().value();
 }
 
 void

@@ -645,7 +645,7 @@ SaxStackVpz::pushConditionPort(const char** att)
     cnd->add(name);
 }
 
-std::vector<std::shared_ptr<value::Value>>&
+std::shared_ptr<value::Value>&
 SaxStackVpz::popConditionPort()
 {
     if (m_stack.empty() or not parent()->isCondition()) {

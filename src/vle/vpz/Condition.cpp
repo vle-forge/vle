@@ -64,10 +64,8 @@ Condition::Condition(const Condition& cnd)
   , m_ispermanent(cnd.m_ispermanent)
 {
     for (auto& elem : cnd.m_list) {
-        auto& set = m_list[elem.first];
-
-        for (auto& v : elem.second)
-            set.emplace_back(value::clone(v));
+        auto& init = m_list[elem.first];
+        init = std::move(value::clone(elem.second));
     }
 }
 
@@ -93,14 +91,11 @@ Condition::write(std::ostream& out) const
         out << " <port "
             << "name=\"" << elem.first.c_str() << "\" "
             << ">\n";
-
-        for (const auto& v : elem.second) {
-            if (v.get()) {
-                v->writeXml(out);
-                out << '\n';
-            }
+        auto& v = elem.second;
+        if (v.get()) {
+            v->writeXml(out);
+            out << '\n';
         }
-
         out << "</port>\n";
     }
     out << "</condition>\n";
@@ -128,7 +123,7 @@ Condition::exist(const std::string& portname) const
 void
 Condition::add(const std::string& portname)
 {
-    m_list[portname] = std::vector<std::shared_ptr<value::Value>>();
+    m_list[portname] = std::shared_ptr<value::Value>(nullptr);
     m_last_port.assign(portname);
 }
 
@@ -139,21 +134,11 @@ Condition::del(const std::string& portname)
 }
 
 void
-Condition::addValueToPort(const std::string& portname,
-                          std::shared_ptr<value::Value> value)
-{
-    auto& set = m_list[portname];
-    set.emplace_back(value);
-    m_last_port.assign(portname);
-}
-
-void
 Condition::setValueToPort(const std::string& portname,
                           std::shared_ptr<value::Value> value)
 {
-    auto& set = m_list[portname];
-    set.clear();
-    set.emplace_back(value);
+    auto& v = m_list[portname];
+    v = value;
     m_last_port.assign(portname);
 }
 
@@ -165,24 +150,11 @@ Condition::clearValueOfPort(const std::string& portname)
     if (it == m_list.end())
         throw utils::ArgError(
           _("Condition %s have no port %s"), m_name.c_str(), portname.c_str());
-
-    it->second.clear();
+    it->second.reset();
 }
 
-std::unordered_map<std::string, std::shared_ptr<value::Value>>
-Condition::fillWithFirstValues() const
-{
-    std::unordered_map<std::string, std::shared_ptr<value::Value>> ret;
-
-    for (const auto& elem : m_list)
-        if (not elem.second.empty())
-            ret[elem.first] = elem.second[0];
-
-    return ret;
-}
-
-const std::vector<std::shared_ptr<value::Value>>&
-Condition::getSetValues(const std::string& portname) const
+const std::shared_ptr<value::Value>&
+Condition::valueOfPort(const std::string& portname) const
 {
     auto it = m_list.find(portname);
 
@@ -190,53 +162,10 @@ Condition::getSetValues(const std::string& portname) const
         throw utils::ArgError(
           _("Condition %s have no port %s"), m_name.c_str(), portname.c_str());
     }
-
     return it->second;
 }
 
-std::vector<std::shared_ptr<value::Value>>&
-Condition::getSetValues(const std::string& portname)
-{
-    auto it = m_list.find(portname);
-
-    if (it == m_list.end()) {
-        throw utils::ArgError(
-          _("Condition %s have no port %s"), m_name.c_str(), portname.c_str());
-    }
-
-    return it->second;
-}
-
-const std::shared_ptr<value::Value>&
-Condition::firstValue(const std::string& portname) const
-{
-    const auto& set = getSetValues(portname);
-
-    if (set.empty())
-        throw utils::ArgError(_("Condition %s have not value"),
-                              portname.c_str());
-
-    return set[0];
-}
-
-const std::shared_ptr<value::Value>&
-Condition::nValue(const std::string& portname, size_t i) const
-{
-    auto& set = getSetValues(portname);
-
-    if (set.empty())
-        throw utils::ArgError(_("Condition %s have not value"),
-                              portname.c_str());
-
-    if (set.size() <= i)
-        throw utils::ArgError(_("Condition %s have not %lu values"),
-                              portname.c_str(),
-                              utils::numeric_cast<unsigned long>(i));
-
-    return set[i];
-}
-
-std::vector<std::shared_ptr<value::Value>>&
+std::shared_ptr<value::Value>&
 Condition::lastAddedPort()
 {
     auto it = m_list.find(m_last_port);
@@ -246,15 +175,8 @@ Condition::lastAddedPort()
                               m_name.c_str(),
                               m_last_port.c_str());
     }
-
     return it->second;
 }
 
-void
-Condition::deleteValueSet()
-{
-    for (auto& elem : m_list)
-        elem.second.clear();
-}
 }
 } // namespace vle vpz

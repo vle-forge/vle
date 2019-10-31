@@ -75,7 +75,7 @@ ModelFactory::createModel(Coordinator& coordinator,
     if (not conditions.empty()) {
         for (const auto& elem : conditions) {
             const auto& cnd = experiment_conditions.get(elem);
-            auto vl = cnd.fillWithFirstValues();
+            auto vl = cnd.conditionvalues();
 
             for (auto& elem : vl) {
                 if (initValues.exist(elem.first))

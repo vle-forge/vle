@@ -41,7 +41,7 @@ namespace vpz {
  * @brief Define the ConditionValues like a dictionnary, (portname, values).
  */
 using ConditionValues =
-  std::unordered_map<std::string, std::vector<std::shared_ptr<value::Value>>>;
+  std::unordered_map<std::string, std::shared_ptr<value::Value>>;
 
 /**
  * @brief A condition define a couple model name, port name and a Value.
@@ -132,15 +132,6 @@ public:
     void del(const std::string& portname);
 
     /**
-     * @brief Add a value to a specified port. If port does not exist, it
-     * will be create.
-     * @param portname name of the port to add value.
-     * @param value the value to push.
-     */
-    void addValueToPort(const std::string& portname,
-                        std::shared_ptr<value::Value> value);
-
-    /**
      * @brief Set a value to a specified port. If port contains already
      * value, these values are deleted.
      * @param portname The name of the port to add value.
@@ -157,55 +148,14 @@ public:
     void clearValueOfPort(const std::string& portname);
 
     /**
-     * @brief Fill a MapValue with the first value::Value of each port
-     * of this condition. Be careful, values contained in the value::Map
-     * are not copies.
-     *
-     * @param map, the value::MapValue to fill with the first value::Value
-     * of each port of the condition.
-     */
-    std::unordered_map<std::string, std::shared_ptr<value::Value>>
-    fillWithFirstValues() const;
-
-    /**
-     * @brief Get the value::Set attached to a port.
-     * @param portname The name of the port.
-     * @return A reference to a value::Set.
-     * @throw utils::ArgError if portname not exist.
-     */
-    const std::vector<std::shared_ptr<value::Value>>& getSetValues(
-      const std::string& portname) const;
-
-    /**
-     * @brief Get the value::Set attached to a port.
-     * @param portname The name of the port.
-     * @return A reference to a value::Set.
-     * @throw utils::ArgError if portname not exist.
-     */
-    std::vector<std::shared_ptr<value::Value>>& getSetValues(
-      const std::string& portname);
-
-    /**
      * @brief Return a reference to the first value::Value of the specified
      * port.
      * @param portname the name of the port to test.
      * @return A reference to a value::Value.
      * @throw utils::ArgError if portname not exist.
      */
-    const std::shared_ptr<value::Value>& firstValue(
+    const std::shared_ptr<value::Value>& valueOfPort(
       const std::string& portname) const;
-
-    /**
-     * @brief Return a reference to the nth value::Value of the specified
-     * port.
-     * @param portname the name of the specified port.
-     * @param i the value of the port.
-     * @return A reference to a value::Value.
-     * @throw utils::ArgError if portname not exist or if value list
-     * have no nth value.
-     */
-    const std::shared_ptr<value::Value>& nValue(const std::string& portname,
-                                                size_t i) const;
 
     /**
      * @brief Return a reference to the value::Set of the latest added port.
@@ -213,13 +163,7 @@ public:
      * @return A reference to the value::Set of the port.
      * @throw utils::ArgError if port does not exist.
      */
-    std::vector<std::shared_ptr<value::Value>>& lastAddedPort();
-
-    /**
-     * @brief This function deletes on each port the values stored
-     * in the value::Set
-     */
-    void deleteValueSet();
+    std::shared_ptr<value::Value>& lastAddedPort();
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
@@ -347,23 +291,6 @@ public:
         bool operator()(const Condition& x) const
         {
             return x.isPermanent();
-        }
-    };
-
-    /**
-     * @brief Unary function to delete the value set.
-     * To use with std::for_each
-     * or vle::for_each.
-     */
-    struct DeleteValueSet
-    {
-        /**
-         * @brief Delete and rebuild the Value of the specified Condition.
-         * @param x the Condition to delete and rebuild the Value.
-         */
-        void operator()(Condition& x) const
-        {
-            x.deleteValueSet();
         }
     };
 

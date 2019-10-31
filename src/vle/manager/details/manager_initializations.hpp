@@ -91,9 +91,8 @@ post_propagates(vpz::Vpz& model,
         for (unsigned int i=0; i < propagates.size(); i++) {
             ManPropagate& tmp_propagate = *propagates[i];
             vpz::Condition& cond = conds.get(tmp_propagate.cond);
-            cond.clearValueOfPort(tmp_propagate.port);
             const value::Value& exp = tmp_propagate.value(init);
-            cond.addValueToPort(tmp_propagate.port, exp.clone());
+            cond.setValueToPort(tmp_propagate.port, exp.clone());
         }
     } catch (const std::exception& e){
         err.code = -1;

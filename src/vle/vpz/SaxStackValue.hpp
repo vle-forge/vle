@@ -146,7 +146,7 @@ public:
      * @param val the value to add.
      */
     template<typename T, typename... Args>
-    void pushOnVectorValue(Args&&... args)
+    void pushOnValue(Args&&... args)
     {
         vle::value::Value* pointer = nullptr;
 
@@ -181,13 +181,17 @@ public:
             }
         } else {
             //
-            // Otherwise we are reading a @c std::vector of @c shared_ptr.
+            // Otherwise we are reading a @c shared_ptr.
             //
             auto value = std::shared_ptr<vle::value::Value>(
               new T(std::forward<Args>(args)...));
 
             pointer = value.get();
-            m_result.push_back(value);
+            if (m_result.get()) {
+                throw utils::SaxParserError(
+                     _("Value is already parsed."));
+            }
+            m_result = value;
         }
 
         if (pointer and
@@ -232,36 +236,19 @@ public:
     void pushResult(std::shared_ptr<value::Value> val);
 
     /**
-     * @brief Get the value::Value from the values'vector at a specified
-     * index.
-     * @param i The index in the result vector.
-     * @throw utils::SaxParserError if the index is greater that the
-     * vector'size.
+     * @brief Get the value::Value
      * @return A constant reference to the value::Value.
      */
-    const std::shared_ptr<value::Value>& getResult(size_t i) const;
-
-    /**
-     * @brief Get latest value::Value pushed into the values'vector.
-     * @throw utils::SaxParserError if the vector of result is empty.
-     * @return A constant reference to the latest pushed value::Value.
-     */
-    const std::shared_ptr<value::Value>& getLastResult() const;
-
-    /**
-     * @brief Get the vector of value::Value.
-     * @return A constant reference to the vector of value::Value.
-     */
-    const std::vector<std::shared_ptr<value::Value>>& getResults() const
+    const std::shared_ptr<value::Value>& getResult() const
     {
         return m_result;
     }
 
     /**
-     * @brief Get the vector of value::Value.
+     * @brief Get the value::Value.
      * @return A reference to the vector of value::Value.
      */
-    std::vector<std::shared_ptr<value::Value>>& getResults()
+    std::shared_ptr<value::Value>& getResult()
     {
         return m_result;
     }
@@ -286,7 +273,7 @@ private:
      * @brief Store result of Values parsing from trame, simple value,
      * factor.
      */
-    std::vector<std::shared_ptr<value::Value>> m_result;
+    std::shared_ptr<value::Value> m_result;
 
     /**
      * @brief Last map key read.

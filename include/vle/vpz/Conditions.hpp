@@ -205,11 +205,6 @@ public:
      */
     void cleanNoPermanent();
 
-    /**
-     * @brief This function deletes on each port the value::Set stored
-     */
-    void deleteValueSet();
-
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *
      * Get/Set

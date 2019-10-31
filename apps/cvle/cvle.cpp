@@ -297,7 +297,7 @@ generate_template(std::string file,
                 name += '.';
                 name += jt->first;
 
-                generate_template_line(ofs, oss, name, jt->second[0]);
+                generate_template_line(ofs, oss, name, jt->second);
 
                 ++jt;
 
@@ -390,12 +390,12 @@ struct Access
     vle::value::Value* value(VpzPtr vpz) const
     {
         auto& cnd = vpz->project().experiment().conditions().get(condition);
-        auto& set = cnd.getSetValues(port);
+        auto& elem = cnd.valueOfPort(port);
 
         if (params.empty())
-            return set[0].get();
+            return elem.get();
 
-        vle::value::Value* current = set[0].get();
+        vle::value::Value* current = elem.get();
         for (std::size_t i = 0, e = params.size(); i != e; ++i) {
             if (current->isSet()) {
                 errno = 0;
@@ -643,11 +643,9 @@ struct ConditionsBackup
             const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
             for (auto port : cond_cvle) {
                 if (port.first == "has_simulation_engine") {
-                    const std::vector<std::shared_ptr<vle::value::Value>>&
-                      vals = port.second;
-                    if (vals.size() > 0) {
-                        return (vals.at(0)->isBoolean() and
-                                vals.at(0)->toBoolean().value());
+                    auto&  vals = port.second;
+                    if (vals.get()) {
+                        return vals->isBoolean() and vals->toBoolean().value();
                     }
                 }
             }
@@ -663,11 +661,9 @@ struct ConditionsBackup
             const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
             for (auto port : cond_cvle) {
                 if (port.first == "has_simulation_engine") {
-                    const std::vector<std::shared_ptr<vle::value::Value>>&
-                      vals = port.second;
-                    modif_engine =
-                      (vals.size() > 0) and (vals.at(0)->isBoolean() and
-                                             vals.at(0)->toBoolean().value());
+                    auto& vals = port.second;
+                    modif_engine = vals.get() and (vals->isBoolean() and
+                            vals->toBoolean().value());
                 }
             }
         }
@@ -683,16 +679,15 @@ struct ConditionsBackup
                 }
                 vle::vpz::Condition& toup_cond = toup_conds.get(cond.first);
                 for (auto port : cond.second) {
-
                     auto toup_port =
                       toup_cond.conditionvalues().find(port.first);
                     if (toup_port != toup_cond.conditionvalues().end()) {
                         toup_cond.conditionvalues().erase(toup_port);
                     }
-                    if (port.second.size() == 0) {
+                    if (not port.second.get()) {
                         throw vle::utils::InternalError(_("No value"));
                     }
-                    toup_cond.addValueToPort(port.first, port.second.at(0));
+                    toup_cond.setValueToPort(port.first, port.second);
                 }
             }
         }
@@ -724,15 +719,11 @@ struct ConditionsBackup
         if (it_id == cond_cvle.conditionvalues().end()) {
             return "no_id";
         }
-        const std::vector<std::shared_ptr<vle::value::Value>>& vals =
-          it_id->second;
-        if (vals.size() == 0) {
+        auto& val = it_id->second;
+        if (not val.get() or not val->isString()) {
             return "no_id";
         }
-        if (not vals.at(0)->isString()) {
-            return "no_id";
-        }
-        return vals.at(0)->toString().value();
+        return val->toString().value();
     }
 
     vle::vpz::Conditions mconds;

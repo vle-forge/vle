@@ -42,8 +42,8 @@ Conditions::Conditions()
 {
     Condition& def = add(Experiment::defaultSimulationEngineCondName());
 
-    def.addValueToPort("begin", value::Double::create(0.0));
-    def.addValueToPort("duration", value::Double::create(100.0));
+    def.setValueToPort("begin", value::Double::create(0.0));
+    def.setValueToPort("duration", value::Double::create(100.0));
 }
 
 std::set<std::string>
@@ -200,10 +200,5 @@ Conditions::cleanNoPermanent()
     }
 }
 
-void
-Conditions::deleteValueSet()
-{
-    utils::forEach(m_list.begin(), m_list.end(), Condition::DeleteValueSet());
-}
 }
 } // namespace vle vpz

@@ -165,12 +165,12 @@ ConditionUpdater::get(vle::vpz::Vpz& file,
                       const ConditionUpdater::accessor& access) const
 {
     auto& cnd = file.project().experiment().conditions().get(access.condition);
-    auto& set = cnd.getSetValues(access.port);
+    auto& elem = cnd.valueOfPort(access.port);
 
     if (access.value_stack.empty())
-        return set[0].get();
+        return elem.get();
 
-    vle::value::Value* current = set[0].get();
+    vle::value::Value* current = elem.get();
     for (std::size_t i = 0, e = access.value_stack.size(); i != e; ++i) {
         if (current->isSet()) {
             errno = 0;

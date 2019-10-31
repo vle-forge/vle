@@ -675,15 +675,14 @@ public:
             for (unsigned int i=0; i < manObj->mReplicates.size(); i++) {
                 ManReplicate& tmp_repl = *manObj->mReplicates[i];
                 vpz::Condition& condRep = conds.get(tmp_repl.cond);
-                condRep.clearValueOfPort(tmp_repl.port);
                 const value::Value& exp = tmp_repl.values(init);
                 switch(exp.getType()) {
                 case value::Value::SET:
-                    condRep.addValueToPort(tmp_repl.port,
+                    condRep.setValueToPort(tmp_repl.port,
                             exp.toSet().get(replicate_index)->clone());
                     break;
                 case value::Value::TUPLE:
-                    condRep.addValueToPort(tmp_repl.port, value::Double::create(
+                    condRep.setValueToPort(tmp_repl.port, value::Double::create(
                             exp.toTuple().at(replicate_index)));
                     break;
                 default:
@@ -695,15 +694,14 @@ public:
             for (unsigned int i=0; i < manObj->mInputs.size(); i++) {
                 ManInput& tmp_input = *manObj->mInputs[i];
                 vpz::Condition& condIn = conds.get(tmp_input.cond);
-                condIn.clearValueOfPort(tmp_input.port);
                 const value::Value& exp = tmp_input.values(init);
                 switch (exp.getType()) {
                 case value::Value::SET: {
-                    condIn.addValueToPort(tmp_input.port,
+                    condIn.setValueToPort(tmp_input.port,
                             exp.toSet().get(input_index)->clone());
                     break;
                 } case value::Value::TUPLE: {
-                    condIn.addValueToPort(tmp_input.port, value::Double::create(
+                    condIn.setValueToPort(tmp_input.port, value::Double::create(
                             exp.toTuple().at(input_index)));
                     break;
                 } default: {

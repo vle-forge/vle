@@ -65,7 +65,6 @@ void
 Vpz::parseFile(const std::string& filename)
 {
     clear();
-    project().experiment().conditions().deleteValueSet();
     m_filename.assign(filename);
 
     vpz::SaxParser saxparser(*this);
@@ -74,9 +73,9 @@ Vpz::parseFile(const std::string& filename)
     auto& cnd = project().experiment().conditions().get(
       Experiment::defaultSimulationEngineCondName());
 
-    if (cnd.getSetValues("begin").empty()) {
-        cnd.getSetValues("begin").emplace_back(new value::Double(0));
-        cnd.getSetValues("duration").emplace_back(new value::Double(100));
+    if (not cnd.valueOfPort("begin").get()) {
+        cnd.setValueToPort("begin", value::Double::create(0));
+        cnd.setValueToPort("duration", value::Double::create(100));
     }
 }
 
@@ -84,7 +83,6 @@ void
 Vpz::parseMemory(const std::string& buffer)
 {
     clear();
-    project().experiment().conditions().deleteValueSet();
     m_filename.clear();
 
     vpz::SaxParser saxparser(*this);
@@ -93,9 +91,9 @@ Vpz::parseMemory(const std::string& buffer)
     auto& cnd = project().experiment().conditions().get(
       Experiment::defaultSimulationEngineCondName());
 
-    if (cnd.getSetValues("begin").empty()) {
-        cnd.getSetValues("begin").emplace_back(new value::Double(0));
-        cnd.getSetValues("duration").emplace_back(new value::Double(100));
+    if (not cnd.valueOfPort("begin").get()) {
+        cnd.setValueToPort("begin", value::Double::create(0));
+        cnd.setValueToPort("duration", value::Double::create(100));
     }
 }
 
@@ -111,22 +109,7 @@ Vpz::parseValue(const std::string& buffer)
                               buffer.c_str());
     }
 
-    return sax.getValues()[0];
-}
-
-std::vector<std::shared_ptr<value::Value>>
-Vpz::parseValues(const std::string& buffer)
-{
-    Vpz vpz;
-    SaxParser sax(vpz);
-    sax.parseMemory(buffer);
-
-    if (not sax.isValue()) {
-        throw utils::ArgError(_("The buffer [%s] is not a value."),
-                              buffer.c_str());
-    }
-
-    return sax.getValues();
+    return sax.getValue();
 }
 
 void
