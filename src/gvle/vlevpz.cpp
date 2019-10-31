@@ -3735,7 +3735,13 @@ vleVpz::importFromClipboard(QDomNode node_dest)
     QString vpzFile = QDir::tempPath() + "/clipboard/exp/clipboard.vpz";
     QString vpmFile =
       QDir::tempPath() + "/clipboard/metadata/exp/clipboard.vpm";
-    vleVpz src(vpzFile, vpmFile, mGvlePlugins);
+    std::unique_ptr<vleVpz> src;
+    try {
+        src.reset(new vleVpz(vpzFile, vpmFile, mGvlePlugins));
+    } catch (...) {
+        mLogger->log(" cannot parse the clipboard");
+        return;
+    }
 
     // get clipboard
     QStringList queries;
@@ -3760,7 +3766,7 @@ vleVpz::importFromClipboard(QDomNode node_dest)
     }
     QString src_mod_query = "";
     QSet<QString> elems = modifyImportSourceForImport(
-      node_dest, queries, track, src, src_mod_query);
+      node_dest, queries, track, *src, src_mod_query);
     if (elems.empty()) {
         return;
     }
@@ -3792,14 +3798,14 @@ vleVpz::importFromClipboard(QDomNode node_dest)
         QStringList elem = i->split("::");
         if (elem.at(0) == "cond") {
             condsFromDoc().appendChild(
-              src.condFromConds(src.condsFromDoc(), elem.at(1)));
+              src->condFromConds(src->condsFromDoc(), elem.at(1)));
             emit_cond = true;
         } else if (elem.at(0) == "dyn") {
-            dynamicsFromDoc().appendChild(src.dynamicFromDoc(elem.at(1)));
+            dynamicsFromDoc().appendChild(src->dynamicFromDoc(elem.at(1)));
             emit_dyn = true;
         } else if (elem.at(0) == "obs") {
             obsFromDoc().appendChild(
-              src.obsFromObss(src.obsFromDoc(), elem.at(1)));
+              src->obsFromObss(src->obsFromDoc(), elem.at(1)));
             emit_obs = true;
         } else if (elem.at(0) == "cond_port") {
             QString src_cond = elem.at(1).split("//").at(0);
@@ -3807,9 +3813,9 @@ vleVpz::importFromClipboard(QDomNode node_dest)
             QString src_cond_port = elem.at(1).split("//").at(2);
             QDomNode dest_cond_node = condFromConds(condsFromDoc(), dest_cond);
             QDomNode src_cond_node =
-              src.condFromConds(src.condsFromDoc(), src_cond);
+              src->condFromConds(src->condsFromDoc(), src_cond);
             QDomNode src_port_node =
-              src.portFromCond(src_cond_node, src_cond_port);
+              src->portFromCond(src_cond_node, src_cond_port);
 
             dest_cond_node.appendChild(src_port_node);
             emit_cond = true;
@@ -3820,7 +3826,7 @@ vleVpz::importFromClipboard(QDomNode node_dest)
         // import models
         QDomNode dest_submodels =
           DomFunctions::obtainChild(node_dest, "submodels", &mDoc);
-        QDomNode src_mod = src.vdo()->getNodeFromXQuery(src_mod_query);
+        QDomNode src_mod = src->vdo()->getNodeFromXQuery(src_mod_query);
         QSet<QString> mods_to_import;
         for (QSet<QString>::iterator i = elems.begin(); i != elems.end();
              i++) {
