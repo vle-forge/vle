@@ -382,7 +382,7 @@ public:
         argv.push_back("--block-size");
         argv.push_back(vle::utils::to(
                 (int(inputSize*repSize/int(mNbslots-1)+1))));
-        if (not mSimulationoption != SIMULATION_SPAWN_PROCESS) {
+        if (mSimulationoption != SIMULATION_SPAWN_PROCESS) {
             argv.push_back("--withoutspawn");
         }
         argv.push_back("--more-output-details");
