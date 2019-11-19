@@ -372,6 +372,122 @@ struct ManagerObjects
     {
         return mReplicates.size();
     }
+    /********************************************************/
+    void
+    check(manager::Error& err)
+    {
+        //check Define
+        for (auto& vleDef : mDefine) {
+            //check if exist in Input
+            bool found = false;
+            for (auto& vleIn : mInputs) {
+                if (vleDef->getName() == vleIn->getName()) {
+                    if (vleDef->to_add) {
+                        found = true;
+                    } else {
+                        err.code = -1;
+                        err.message = utils::format(
+                                "[Manager]: error in define_X '%s': it cannot "
+                                "be removed and declared as input at the same time",
+                                vleDef->getName().c_str());
+                        return ;
+                    }
+                }
+            }
+            //check if exist in Propagate
+            for (auto& vleProp : mPropagate) {
+                if (vleDef->getName() == vleProp->getName()) {
+                    if (vleDef->to_add) {
+                        found = true;
+                    } else {
+                        err.code = -1;
+                        err.message = utils::format(
+                                "[Manager]: error in define_X '%s': it cannot "
+                                "be removed and declared as propagate at the same "
+                                "time", vleDef->getName().c_str());
+                        return ;
+                    }
+                }
+            }
+            //check if initialized
+            if (vleDef->to_add and not found) {
+                err.code = -1;
+                err.message = utils::format(
+                        "[Manager]: error in define_X '%s': it cannot "
+                        "be added without initialization",
+                        vleDef->getName().c_str());
+                return ;
+            }
+        }
+
+        //check Inputs
+        unsigned int inputSize = 0;
+        for (auto&  vleIn : mInputs) {
+            //check input size which has to be consistent
+            if (inputSize == 0 and vleIn->nbValues > 1) {
+                inputSize = vleIn->nbValues;
+            } else {
+                if (vleIn->nbValues > 1 and inputSize > 0
+                        and inputSize != vleIn->nbValues) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error in input values: wrong number"
+                            " of values 1st input has %u values,  input %s has %u "
+                            "values", inputSize, vleIn->getName().c_str(),
+                            vleIn->nbValues);
+                    return ;
+                }
+            }
+            //check if already exist in replicate or propagate
+            for (auto& vleRepl : mReplicates) {
+                if (vleRepl->getName() == vleIn->getName()) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error input '%s' is also a replicate",
+                            vleIn->getName().c_str());
+                    return ;
+                }
+            }
+            for (auto& vleProp : mPropagate) {
+                if (vleProp->getName() == vleIn->getName()) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error input '%s' is also a propagate",
+                            vleIn->getName().c_str());
+                    return ;
+                }
+            }
+        }
+        //check Replicates
+        unsigned int replSize = 0;
+        for (auto& vleRepl : mReplicates) {
+            //check repl size which has to be consistent
+            if (replSize == 0 and vleRepl->nbValues > 1) {
+                replSize = vleRepl->nbValues;
+            } else {
+                if (vleRepl->nbValues > 1 and replSize > 0
+                        and replSize != vleRepl->nbValues) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error in replicate values: wrong number"
+                            " of values 1st replicate has %u values, replicate %s "
+                            "has %u values", replSize, vleRepl->getName().c_str(),
+                            vleRepl->nbValues);
+                    return ;
+                }
+            }
+            //check if already exist in replicate or propagate
+            for (auto& vleProp : mPropagate) {
+                if (vleProp->getName() == vleRepl->getName()) {
+                    err.code = -1;
+                    err.message = utils::format(
+                            "[Manager]: error replicate '%s' is also a "
+                            "propagate", vleRepl->getName().c_str());
+                    return ;
+                }
+            }
+        }
+    }
 };
 
 //static functions

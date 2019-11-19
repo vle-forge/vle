@@ -119,7 +119,8 @@ public:
           std::chrono::milliseconds timeout,   // for 1 simulation
           bool removeMPIfiles,                 // for cvle
           bool generateMPIhost,                // for cvle
-          const std::string& workingDir)       // for cvle
+          const std::string& workingDir,       // for cvle
+          unsigned int seed)                   //seedd for rng
       : mContext(context)
       , mRand()
       , mParalleloption(paralleloption)
@@ -132,13 +133,7 @@ public:
     {
         checkSimulationOption();
         checkParallelOption();
-    }
-
-
-    void
-    set_log_priority(unsigned int logLevel)
-    {
-        mContext->set_log_priority(logLevel);
+        set_seed(seed);
     }
 
     void
@@ -182,9 +177,6 @@ public:
     configure(wrapper_init& init)
     {
         bool status = true;
-        if (init.exist("log_level", status)) {
-            set_log_priority(init.getInt("log_level", status));
-        }
         if (init.exist("seed", status)) {
             set_seed(init.getInt("seed", status));
         }
@@ -481,7 +473,6 @@ public:
         std::string in_cond;
         std::string in_port;
         std::string out_id;
-        configure(init);
         bool status;
         try {
             std::string conf = "";
@@ -525,129 +516,10 @@ public:
 
     /********************************************************/
     void
-    check(const ManagerObjects& manObj, manager::Error& err)
-    {
-        //check Define
-        for (auto& vleDef : manObj.mDefine) {
-            //check if exist in Input
-            bool found = false;
-            for (auto& vleIn : manObj.mInputs) {
-                if (vleDef->getName() == vleIn->getName()) {
-                    if (vleDef->to_add) {
-                        found = true;
-                    } else {
-                        err.code = -1;
-                        err.message = utils::format(
-                                "[Manager]: error in define_X '%s': it cannot "
-                                "be removed and declared as input at the same time",
-                                vleDef->getName().c_str());
-                        return ;
-                    }
-                }
-            }
-            //check if exist in Propagate
-            for (auto& vleProp : manObj.mPropagate) {
-                if (vleDef->getName() == vleProp->getName()) {
-                    if (vleDef->to_add) {
-                        found = true;
-                    } else {
-                        err.code = -1;
-                        err.message = utils::format(
-                                "[Manager]: error in define_X '%s': it cannot "
-                                "be removed and declared as propagate at the same "
-                                "time", vleDef->getName().c_str());
-                        return ;
-                    }
-                }
-            }
-            //check if initialized
-            if (vleDef->to_add and not found) {
-                err.code = -1;
-                err.message = utils::format(
-                        "[Manager]: error in define_X '%s': it cannot "
-                        "be added without initialization",
-                        vleDef->getName().c_str());
-                return ;
-            }
-        }
-
-        //check Inputs
-        unsigned int inputSize = 0;
-        for (auto&  vleIn : manObj.mInputs) {
-            //check input size which has to be consistent
-            if (inputSize == 0 and vleIn->nbValues > 1) {
-                inputSize = vleIn->nbValues;
-            } else {
-                if (vleIn->nbValues > 1 and inputSize > 0
-                        and inputSize != vleIn->nbValues) {
-                    err.code = -1;
-                    err.message = utils::format(
-                            "[Manager]: error in input values: wrong number"
-                            " of values 1st input has %u values,  input %s has %u "
-                            "values", inputSize, vleIn->getName().c_str(),
-                            vleIn->nbValues);
-                    return ;
-                }
-            }
-            //check if already exist in replicate or propagate
-            for (auto& vleRepl : manObj.mReplicates) {
-                if (vleRepl->getName() == vleIn->getName()) {
-                    err.code = -1;
-                    err.message = utils::format(
-                            "[Manager]: error input '%s' is also a replicate",
-                            vleIn->getName().c_str());
-                    return ;
-                }
-            }
-            for (auto& vleProp : manObj.mPropagate) {
-                if (vleProp->getName() == vleIn->getName()) {
-                    err.code = -1;
-                    err.message = utils::format(
-                            "[Manager]: error input '%s' is also a propagate",
-                            vleIn->getName().c_str());
-                    return ;
-                }
-            }
-        }
-        //check Replicates
-        unsigned int replSize = 0;
-        for (auto& vleRepl : manObj.mReplicates) {
-            //check repl size which has to be consistent
-            if (replSize == 0 and vleRepl->nbValues > 1) {
-                replSize = vleRepl->nbValues;
-            } else {
-                if (vleRepl->nbValues > 1 and replSize > 0
-                        and replSize != vleRepl->nbValues) {
-                    err.code = -1;
-                    err.message = utils::format(
-                            "[Manager]: error in replicate values: wrong number"
-                            " of values 1st replicate has %u values, replicate %s "
-                            "has %u values", replSize, vleRepl->getName().c_str(),
-                            vleRepl->nbValues);
-                    return ;
-                }
-            }
-            //check if already exist in replicate or propagate
-            for (auto& vleProp : manObj.mPropagate) {
-                if (vleProp->getName() == vleRepl->getName()) {
-                    err.code = -1;
-                    err.message = utils::format(
-                            "[Manager]: error replicate '%s' is also a "
-                            "propagate", vleRepl->getName().c_str());
-                    return ;
-                }
-            }
-        }
-    }
-
-    /********************************************************/
-    void
     configEmbedded(vpz::Vpz& model, wrapper_init& init, manager::Error& err,
             unsigned int input_index, unsigned int replicate_index)
     {
         std::unique_ptr<ManagerObjects> manObj = init_from_plan(init, err);
-        if (err.code) return;
-        check(*manObj, err);
         if (err.code) return;
         //update conditions
         post_define(model, manObj->mDefine, err);
@@ -724,13 +596,7 @@ public:
             manager::Error& err)
     {
         std::unique_ptr<ManagerObjects> manObj = init_from_plan(init, err);
-        if (err.code) {
-            return nullptr;
-        }
-        check(*manObj, err);
-        if (err.code) {
-            return nullptr;
-        }
+        if (err.code) return nullptr;
         //launch simulations
         switch(mParalleloption) {
         case PARALLEL_MONO: {
@@ -760,10 +626,11 @@ Manager::Manager(utils::ContextPtr context,
         std::chrono::milliseconds timeout,   // for 1 simulation
         bool removeMPIfiles,                 // for cvle
         bool generateMPIhost,                // for cvle
-        const std::string& workingDir)       // for cvle
+        const std::string& workingDir,       // for cvle
+        unsigned int seed)                   // seed for rng
   : mPimpl(std::make_unique<Manager::Pimpl>(
           context, paralleloption, nbslots, simulationoption,
-          timeout, removeMPIfiles, generateMPIhost, workingDir))
+          timeout, removeMPIfiles, generateMPIhost, workingDir, seed))
 {}
 
 Manager::Manager(utils::ContextPtr context)
@@ -774,23 +641,37 @@ Manager::Manager(utils::ContextPtr context)
           std::chrono::milliseconds(0),                 //timeout,
           true,                                         //removeMPIfiles,
           false,                                        //generateMPIhost,
-          utils::Path::temp_directory_path().string())) //workingDir
+          utils::Path::temp_directory_path().string(), //workingDir
+          12365))
 {}
+
+Manager::Manager(utils::ContextPtr context, const vle::value::Map& config)
+  : Manager(context)
+{
+    configure(config);
+}
+
+Manager::Manager(utils::ContextPtr context, const devs::InitEventList& config)
+  : Manager(context)
+{
+  configure(config);
+}
 
 Manager::~Manager() = default;
 
-std::unique_ptr<value::Matrix>
-Manager::run(std::unique_ptr<vpz::Vpz> /*exp*/,
-             uint32_t /*thread*/,
-             uint32_t /*rank*/,
-             uint32_t /*world*/,
-             Error*/*error*/)
+//specific configure signatures
+void
+Manager::configure(const vle::value::Map& config)
 {
-    std::unique_ptr<value::Matrix> result;
+    wrapper_init config_rec(&config);
+    mPimpl->configure(config_rec);
+}
 
-    //TODO not available anymore
-
-    return result;
+void
+Manager::configure(const vd::InitEventList& config)
+{
+    wrapper_init config_rec(&config);
+    mPimpl->configure(config_rec);
 }
 
 utils::Rand&
@@ -800,16 +681,6 @@ Manager::random_number_generator()
 }
 
 //specific runPlan signatures
-std::unique_ptr<value::Map>
-Manager::runPlan(std::shared_ptr<vle::value::Map> init
-        , manager::Error& err)
-{
-    wrapper_init init_rec(init.get());
-    std::unique_ptr<vpz::Vpz> model = build_embedded_model(
-            init_rec, mPimpl->mContext, err);
-    return mPimpl->runPlan(std::move(model), init_rec, err);
-}
-
 std::unique_ptr<value::Map>
 Manager::runPlan(const vle::value::Map& init
         , manager::Error& err)
@@ -821,21 +692,12 @@ Manager::runPlan(const vle::value::Map& init
 }
 
 std::unique_ptr<value::Map>
-Manager::runPlan(const vd::InitEventList& events
+Manager::runPlan(const vd::InitEventList& init
         , manager::Error& err)
 {
-    wrapper_init init_rec(&events);
+    wrapper_init init_rec(&init);
     std::unique_ptr<vpz::Vpz> model = build_embedded_model(
             init_rec, mPimpl->mContext, err);
-    return mPimpl->runPlan(std::move(model), init_rec, err);
-}
-
-std::unique_ptr<value::Map>
-Manager::runPlan(std::unique_ptr<vpz::Vpz> model
-        , std::shared_ptr<vle::value::Map> init
-        , manager::Error& err)
-{
-    wrapper_init init_rec(init.get());
     return mPimpl->runPlan(std::move(model), init_rec, err);
 }
 
@@ -850,30 +712,14 @@ Manager::runPlan(std::unique_ptr<vpz::Vpz> model
 
 std::unique_ptr<value::Map>
 Manager::runPlan(std::unique_ptr<vpz::Vpz> model
-        , const vd::InitEventList& events
+        , const vd::InitEventList& init
         , manager::Error& err)
 {
-    wrapper_init init_rec(&events);
+    wrapper_init init_rec(&init);
     return mPimpl->runPlan(std::move(model), init_rec, err);
 }
 
-std::unique_ptr<vpz::Vpz>
-Manager::getEmbedded(std::shared_ptr<vle::value::Map> init, Error& err,
-        unsigned int input_index, unsigned int replicate_index)
-{
-    wrapper_init init_rec(init.get());
-    std::unique_ptr<vpz::Vpz> model =
-            build_embedded_model(init_rec, mPimpl->mContext, err);
-    mPimpl->configEmbedded(*model, init_rec, err,
-                           input_index, replicate_index);
-    if (err.code) {
-        return nullptr;
-    } else {
-        return model;
-    }
-
-}
-
+//specific getEmbedded signatures
 std::unique_ptr<vpz::Vpz>
 Manager::getEmbedded(const vle::value::Map& init, Error& err,
         unsigned int input_index, unsigned int replicate_index)
@@ -891,10 +737,10 @@ Manager::getEmbedded(const vle::value::Map& init, Error& err,
 }
 
 std::unique_ptr<vpz::Vpz>
-Manager::getEmbedded(const devs::InitEventList& events, Error& err,
+Manager::getEmbedded(const devs::InitEventList& init, Error& err,
         unsigned int input_index, unsigned int replicate_index)
 {
-    wrapper_init init_rec(&events);
+    wrapper_init init_rec(&init);
     std::unique_ptr<vpz::Vpz> model =
             build_embedded_model(init_rec, mPimpl->mContext, err);
     mPimpl->configEmbedded(*model, init_rec, err,
@@ -903,21 +749,6 @@ Manager::getEmbedded(const devs::InitEventList& events, Error& err,
         return nullptr;
     } else {
         return model;
-    }
-}
-
-std::unique_ptr<vpz::Vpz>
-Manager::getEmbedded(std::unique_ptr<vpz::Vpz> exp,
-        std::shared_ptr<vle::value::Map> init, Error& err,
-        unsigned int input_index, unsigned int replicate_index)
-{
-    wrapper_init init_rec(init.get());
-    mPimpl->configEmbedded(*exp, init_rec, err,
-            input_index, replicate_index);
-    if (err.code) {
-        return nullptr;
-    } else {
-        return std::move(exp);
     }
 }
 
@@ -937,10 +768,10 @@ Manager::getEmbedded(std::unique_ptr<vpz::Vpz> exp, const vle::value::Map& init,
 
 std::unique_ptr<vpz::Vpz>
 Manager::getEmbedded(std::unique_ptr<vpz::Vpz> exp,
-        const devs::InitEventList& events, Error& err,
+        const devs::InitEventList& init, Error& err,
         unsigned int input_index, unsigned int replicate_index)
 {
-    wrapper_init init_rec(&events);
+    wrapper_init init_rec(&init);
     mPimpl->configEmbedded(*exp, init_rec, err,
             input_index, replicate_index);
     if (err.code) {

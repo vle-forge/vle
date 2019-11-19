@@ -52,16 +52,24 @@ class VLE_API Manager
 public:
     using result_type = std::unique_ptr<value::Matrix>;
 
+    //complete constructor
     Manager(utils::ContextPtr context,
-            ParallelOptions paralleloption,      // type of parallelisation
-            unsigned int nbslots,                // nbslots for parallelization
-            SimulationOptions simulationoption,  // for 1 simulation
-            std::chrono::milliseconds timeout,   // for 1 simulation
-            bool removeMPIfiles,                 // for cvle
-            bool generateMPIhost,                // for cvle
-            const std::string& workingDir);      // for cvle
+                ParallelOptions paralleloption,      // type of parallelisation
+                unsigned int nbslots,                // nbslots for parallelization
+                SimulationOptions simulationoption,  // for 1 simulation
+                std::chrono::milliseconds timeout,   // for 1 simulation
+                bool removeMPIfiles,                 // for cvle
+                bool generateMPIhost,                // for cvle
+                const std::string& workingDir,       // for cvle
+                unsigned int seed);                  //seed for rng
 
+    //default constructor
     Manager(utils::ContextPtr context);
+
+    //constructor with an init structure that provides information for
+    //the complete constructor
+    Manager(utils::ContextPtr context, const vle::value::Map& config);
+    Manager(utils::ContextPtr context, const devs::InitEventList& config);
 
     ~Manager();
 
@@ -71,36 +79,18 @@ public:
     Manager& operator=(Manager&& other) = delete;
 
     /**
+     *  Configure the options of the manager
+     *
+     * @param[in] init, structure for the configuration of manager options
+     *                  either an init event list or a value Map
+     */
+    void configure(const vle::value::Map& config);
+    void configure(const devs::InitEventList& config);
+
+    /**
      * get access to the random number generator
      */
     utils::Rand& random_number_generator();
-
-    /**
-     * @brief Parse a string of the type that should identify an input, eg. :
-     *   input_cond.port
-     *   replicate_cond.port
-     *   cond.port
-     *
-     * @param[in]  conf, the string to parse
-     * @param[out] cond, the condition of the input or empty if not parsed
-     * @param[out] port, the port of the input or empty if not parsed
-     * @param[in] tells the prefix to parse.
-     *
-     * @return if parsing was successfull
-     */
-    static bool parseInput(const std::string& conf, std::string& cond,
-        std::string& port, const std::string& prefix ="input_");
-
-    /**
-     * @brief Parse a string of the type output_idout that should identify
-     * an output
-     *
-     * @param[in]  conf, the string to parse
-     * @param[out] idout, id of the output
-     *
-     * @return if parsing was successfull
-     */
-    static bool parseOutput(const std::string& conf, std::string& idout);
 
     /**
      * Run an part or a complete experimental frames with mono thread
@@ -130,23 +120,17 @@ public:
      * @param[in/optional] exp, the model to simulate, if not available, it
      *                          is built from the init structure for
      *                          configurations
-     * @param[in] init, structure for the configuration of simulations
+     * @param[in] init, structure for the configuration of simulations,
+     *                  either an init event list or a value Map
      * @param[out] err, an error structure
      *
      * @return the simulated values
      */
     std::unique_ptr<value::Map> runPlan(
-            std::shared_ptr<vle::value::Map> init,
-            Error& err);
-    std::unique_ptr<value::Map> runPlan(
             const vle::value::Map& init,
             Error& err);
     std::unique_ptr<value::Map> runPlan(
             const devs::InitEventList& init,
-            Error& err);
-    std::unique_ptr<value::Map> runPlan(
-            std::unique_ptr<vpz::Vpz> exp,
-            std::shared_ptr<vle::value::Map> init,
             Error& err);
     std::unique_ptr<value::Map> runPlan(
             std::unique_ptr<vpz::Vpz> exp,
@@ -163,33 +147,23 @@ public:
      * @param[in/optional] exp, the model to simulate, if not available, it
      *                          is built from the init structure for
      *                          configurations
-     * @param[in] init, structure for the configuration of simulations
+     * @param[in] init, structure for the configuration of simulations,
+     *                  either an init event list or a value Map
      * @param[out] err, an error structure
      * @param[in] input_index, index (between 0 and N-1) of
      *                         the input to set
      * @param[in] replicate_index, index (between 0 and M-1) of
      *                             the replicate to set
      *
-     * @return the simulated values
+     * @return the vpz initialized with the embedded model
      */
     std::unique_ptr<vpz::Vpz> getEmbedded(
-            std::shared_ptr<vle::value::Map> init,
-            Error& err,
-            unsigned int input_index = 0,
-            unsigned int replicate_index = 0);
-    std::unique_ptr<vpz::Vpz> getEmbedded(
             const vle::value::Map& init,
             Error& err,
             unsigned int input_index = 0,
             unsigned int replicate_index = 0);
     std::unique_ptr<vpz::Vpz> getEmbedded(
-            const devs::InitEventList& events,
-            Error& err,
-            unsigned int input_index = 0,
-            unsigned int replicate_index = 0);
-    std::unique_ptr<vpz::Vpz> getEmbedded(
-            std::unique_ptr<vpz::Vpz> exp,
-            std::shared_ptr<vle::value::Map> init,
+            const devs::InitEventList& init,
             Error& err,
             unsigned int input_index = 0,
             unsigned int replicate_index = 0);
@@ -201,10 +175,37 @@ public:
             unsigned int replicate_index = 0);
     std::unique_ptr<vpz::Vpz> getEmbedded(
             std::unique_ptr<vpz::Vpz> exp,
-            const devs::InitEventList& events,
+            const devs::InitEventList& init,
             Error& err,
             unsigned int input_index = 0,
             unsigned int replicate_index = 0);
+
+    /**
+     * @brief Parse a string of the type that should identify an input, eg. :
+     *   input_cond.port
+     *   replicate_cond.port
+     *   cond.port
+     *
+     * @param[in]  conf, the string to parse
+     * @param[out] cond, the condition of the input or empty if not parsed
+     * @param[out] port, the port of the input or empty if not parsed
+     * @param[in] tells the prefix to parse.
+     *
+     * @return if parsing was successfull
+     */
+    static bool parseInput(const std::string& conf, std::string& cond,
+        std::string& port, const std::string& prefix ="input_");
+
+    /**
+     * @brief Parse a string of the type output_idout that should identify
+     * an output
+     *
+     * @param[in]  conf, the string to parse
+     * @param[out] idout, id of the output
+     *
+     * @return if parsing was successfull
+     */
+    static bool parseOutput(const std::string& conf, std::string& idout);
 
 private:
     class Pimpl;
