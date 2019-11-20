@@ -885,7 +885,7 @@ main(int argc, char** argv)
     unsigned int mode = CLI_MODE_NOTHING;
     int verbose_level = 0;
     int processor_number = 1;
-    int log_stdout = 1;
+    int log_dest = 1;
     int restart_conf = 0;
     int manager = 0;
     int opt_index;
@@ -898,9 +898,9 @@ main(int argc, char** argv)
                                         { "name", 1, nullptr, 0 },
                                         { "condition", 0, nullptr, 'c' },
                                         { "restart", 0, &restart_conf, 1 },
-                                        { "log-file", 0, &log_stdout, 0 },
-                                        { "log-stdout", 0, &log_stdout, 1 },
-                                        { "log-stderr", 0, &log_stdout, 2 },
+                                        { "log-file", 0, &log_dest, 0 },
+                                        { "log-stdout", 0, &log_dest, 1 },
+                                        { "log-stderr", 0, &log_dest, 2 },
                                         { "write-output", 1, nullptr, 0 },
                                         { "timeout", 1, nullptr, 0 },
                                         { "verbose", 1, nullptr, 'V' },
@@ -1027,9 +1027,9 @@ main(int argc, char** argv)
                                       : std::min(verbose_level, 7);
 
     ctx->set_log_priority(verbose_level);
-    if (log_stdout == 0)
+    if (log_dest == 1)
         ctx->set_log_function(std::make_unique<vle_log_standard>(stdout));
-    else if (log_stdout == 1)
+    else if (log_dest == 2)
         ctx->set_log_function(std::make_unique<vle_log_standard>(stderr));
     else
         ctx->set_log_function(std::make_unique<vle_log_standard>());
