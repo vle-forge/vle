@@ -424,6 +424,15 @@ Context::getBinaryPackagesDir() const
         ret[1] /= "pkgs";
     }
 
+    if (not ret[1].exists()) {
+        //try in $PREFIX/lib64/ rather than $PREFIX/lib/
+        //depends on cmake ? TODO
+        ret[1] = m_pimpl->m_prefix;
+        ret[1] /= "lib64";
+        ret[1] /= utils::format("vle-%s", vle::string_version_abi().c_str());
+        ret[1] /= "pkgs";
+    }
+
     return ret;
 }
 
