@@ -158,9 +158,13 @@ struct thread_worker
                             exp.toTuple().at(inputIndex)));
                     break;
                 default:
-                    mError.code = -1;
-                    mError.message = "[Manager] error thread";
-                    return ;
+                    if (N == 1) {
+                        temp_val.reset(exp.clone().release());
+                    } else {
+                        mError.code = -1;
+                        mError.message = "[Manager] error thread";
+                        return ;
+                    }
                     break;
                 }
                 vpz_loc->project().experiment().conditions()
@@ -179,9 +183,13 @@ struct thread_worker
                             exp.toTuple().at(replIndex)));
                     break;
                 default:
-                    mError.code = -1;
-                    mError.message = "[Manager] error thread";
-                    break;
+                    if (M == 1) {
+                        temp_val.reset(exp.clone().release());
+                    } else {
+                        mError.code = -1;
+                        mError.message = "[Manager] error thread";
+                        return ;
+                    }
                 }
                 vpz_loc->project().experiment().conditions()
                                   .get(tmp_repl->cond)
@@ -198,7 +206,10 @@ struct thread_worker
             }
             if (error_loc.code) {
                 mError.code = error_loc.code;
-                mError.message = error_loc.message;
+                mError.message = "[Manager error] simulation input="+
+                        std::to_string(inputIndex)+
+                        ", replicate="+std::to_string(replIndex)+" : "+
+                        error_loc.message;
                 mMutex.unlock();
                 return ;
             }
@@ -214,7 +225,10 @@ struct thread_worker
                 }
             } catch ( const std::exception& e) {
                 mError.code = -1;
-                mError.message = e.what();
+                mError.message = "[Manager error] aggregation input="+
+                        std::to_string(inputIndex)+
+                        ", replicate="+std::to_string(replIndex)+" : "+
+                        e.what();
                 mMutex.unlock();
                 return ;
             }
