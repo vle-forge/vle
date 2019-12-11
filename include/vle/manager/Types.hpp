@@ -73,19 +73,6 @@ struct Error
 };
 
 /**
- * Defines the type of log
- *
- */
-enum LogOptions
-{
-    LOG_NONE = 0,         /**< Report nothing in output stream. */
-    LOG_SUMMARY = 1 << 0, /**< Report summary of the experimental
-                           * frame (size of the plan, number of
-                           * replicas etc.). */
-    LOG_RUN = 1 << 1      /**< Report information. */
-};
-
-/**
  * Defines the option to launch simulation.
  *
  */
@@ -96,53 +83,6 @@ enum SimulationOptions
                                         * subprocess.  */
     SIMULATION_NO_RETURN = 1 << 1      /**< The simulation result are empty. */
 };
-
-inline LogOptions
-operator|(LogOptions lhs, LogOptions rhs)
-{
-    return static_cast<LogOptions>(static_cast<unsigned>(lhs) |
-                                   static_cast<unsigned>(rhs));
-}
-
-inline LogOptions operator&(LogOptions lhs, LogOptions rhs)
-{
-    return static_cast<LogOptions>(static_cast<unsigned>(lhs) &
-                                   static_cast<unsigned>(rhs));
-}
-
-inline LogOptions
-operator^(LogOptions lhs, LogOptions rhs)
-{
-    return static_cast<LogOptions>(static_cast<unsigned>(lhs) ^
-                                   static_cast<unsigned>(rhs));
-}
-
-inline LogOptions
-operator~(LogOptions flags)
-{
-    return static_cast<LogOptions>(~static_cast<unsigned>(flags));
-}
-
-inline LogOptions&
-operator|=(LogOptions& lhs, LogOptions rhs)
-{
-    return (lhs = static_cast<LogOptions>(static_cast<unsigned>(lhs) |
-                                          static_cast<unsigned>(rhs)));
-}
-
-inline LogOptions&
-operator&=(LogOptions& lhs, LogOptions rhs)
-{
-    return (lhs = static_cast<LogOptions>(static_cast<unsigned>(lhs) &
-                                          static_cast<unsigned>(rhs)));
-}
-
-inline LogOptions&
-operator^=(LogOptions& lhs, LogOptions rhs)
-{
-    return (lhs = static_cast<LogOptions>(static_cast<unsigned>(lhs) ^
-                                          static_cast<unsigned>(rhs)));
-}
 
 inline SimulationOptions
 operator|(SimulationOptions lhs, SimulationOptions rhs)

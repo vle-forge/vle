@@ -848,18 +848,14 @@ public:
         if (not withoutspawn) {
             m_simulator = std::make_unique<vle::manager::Simulation>(
               m_context,
-              vle::manager::LOG_NONE,
               vle::manager::SIMULATION_NONE |
                 vle::manager::SIMULATION_SPAWN_PROCESS,
-              m_timeout,
-              nullptr);
+              m_timeout);
         } else {
             m_simulator = std::make_unique<vle::manager::Simulation>(
               m_context,
-              vle::manager::LOG_NONE,
               vle::manager::SIMULATION_NONE,
-              m_timeout,
-              nullptr);
+              m_timeout);
         }
         m_context->set_log_priority(3);
         m_vpz = std::make_unique<vle::vpz::Vpz>(vpz);

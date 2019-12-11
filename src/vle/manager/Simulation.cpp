@@ -34,7 +34,6 @@
 #include "utils/i18n.hpp"
 
 #include <boost/format.hpp>
-#include <boost/progress.hpp>
 #include <boost/timer.hpp>
 
 #include <fstream>
@@ -88,34 +87,21 @@ class Simulation::Pimpl
 public:
     utils::ContextPtr m_context;
     std::chrono::milliseconds m_timeout;
-    std::ostream* m_out;
     utils::UnlinkPath m_vpz_file;
     utils::UnlinkPath m_output_file;
-    LogOptions m_logoptions;
     SimulationOptions m_simulationoptions;
 
     Pimpl(utils::ContextPtr context,
-          LogOptions logoptions,
           SimulationOptions simulationoptionts,
-          std::chrono::milliseconds timeout,
-          std::ostream* output)
+          std::chrono::milliseconds timeout)
       : m_context(std::move(context))
       , m_timeout(timeout)
-      , m_out(output)
       , m_vpz_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.vpz"))
       , m_output_file(make_temp("vle-%%%%-%%%%-%%%%-%%%%.value"))
-      , m_logoptions(logoptions)
       , m_simulationoptions(simulationoptionts)
     {
         if (timeout != std::chrono::milliseconds::zero())
             m_simulationoptions |= vle::manager::SIMULATION_SPAWN_PROCESS;
-    }
-
-    template<typename T>
-    void write(const T& t)
-    {
-        if (m_out)
-            (*m_out) << t;
     }
 
     std::unique_ptr<value::Map> runVerboseRun(std::unique_ptr<vpz::Vpz> vpz,
@@ -123,51 +109,45 @@ public:
     {
         std::unique_ptr<value::Map> result;
         boost::timer timer;
-
         try {
             devs::RootCoordinator root(m_context);
 
             const double duration = vpz->project().experiment().duration();
             const double begin = vpz->project().experiment().begin();
 
-            write(utils::format(_("[%s]\n"), vpz->filename().c_str()));
-            write(_(" - Coordinator load models ......: "));
+            m_context->info(utils::format(_("[%s]\n"),
+                    vpz->filename().c_str()));
+            m_context->info(_(" - Coordinator load models ......: "));
 
             root.load(*vpz);
 
-            write(_("ok\n"));
+            m_context->info(_("ok\n"));
 
-            write(_(" - Clean project file ...........: "));
+            m_context->info(_(" - Clean project file ...........: "));
             vpz->clear();
             vpz.reset(nullptr);
-            write(_("ok\n"));
+            m_context->info(_("ok\n"));
 
-            write(_(" - Coordinator initializing .....: "));
+            m_context->info(_(" - Coordinator initializing .....: "));
             root.init();
-            write(_("ok\n"));
+            m_context->info(_("ok\n"));
 
-            write(_(" - Simulation run................: "));
-
-            boost::progress_display display(
-              100, *m_out, "\n   ", "   ", "   ");
-            long previous = 0;
+            m_context->info(_(" - Simulation run................\n"));
 
             while (root.run()) {
-                auto pc = static_cast<long>(std::floor(
-                  100. * (root.getCurrentTime() - begin) / duration));
-
-                display += pc - previous;
-                previous = pc;
+                m_context->info(utils::format(_(
+                        "simulation time %f [end:%f], real time elapsed: %f\n"),
+                        root.getCurrentTime(), duration, timer.elapsed()));
             }
+            m_context->info(_("Simulation run ok\n"));
 
-            display += 100 - previous;
-
-            write(_(" - Coordinator cleaning .........: "));
+            m_context->info(_(" - Coordinator cleaning .........: "));
             result = root.finish();
-            write(_("ok\n"));
+            m_context->info(_("ok\n"));
 
-            write(utils::format(_(" - Time spent in kernel .........: %f s"),
-                                timer.elapsed()));
+            m_context->info(utils::format(
+                    _(" - Time spent in kernel .........: %f s \n"),
+                    timer.elapsed()));
 
             error->code = 0;
         } catch (const std::exception& e) {
@@ -189,34 +169,36 @@ public:
         try {
             devs::RootCoordinator root(m_context);
 
-            write(utils::format(_("[%s]\n"), vpz->filename().c_str()));
-            write(_(" - Coordinator load models ......: "));
+            m_context->notice(utils::format(_("[%s]\n"),
+                    vpz->filename().c_str()));
+            m_context->notice(_(" - Coordinator load models ......: "));
 
             root.load(*vpz);
 
-            write(_("ok\n"));
+            m_context->notice(_("ok\n"));
 
-            write(_(" - Clean project file ...........: "));
+            m_context->notice(_(" - Clean project file ...........: "));
             vpz->clear();
             vpz.reset(nullptr);
-            write(_("ok\n"));
+            m_context->notice(_("ok\n"));
 
-            write(_(" - Coordinator initializing .....: "));
+            m_context->notice(_(" - Coordinator initializing .....: "));
             root.init();
-            write(_("ok\n"));
+            m_context->notice(_("ok\n"));
 
-            write(_(" - Simulation run................: "));
+            m_context->notice(_(" - Simulation run................: "));
 
             while (root.run())
                 ;
-            write(_("ok\n"));
+            m_context->notice(_("ok\n"));
 
-            write(_(" - Coordinator cleaning .........: "));
+            m_context->notice(_(" - Coordinator cleaning .........: "));
             result = root.finish();
-            write(_("ok\n"));
+            m_context->notice(_("ok\n"));
 
-            write(utils::format(_(" - Time spent in kernel .........: %f s"),
-                                timer.elapsed()));
+            m_context->notice(utils::format(
+                    _(" - Time spent in kernel .........: %f s\n"),
+                    timer.elapsed()));
 
             error->code = 0;
         } catch (const std::exception& e) {
@@ -362,15 +344,11 @@ public:
 };
 
 Simulation::Simulation(utils::ContextPtr context,
-                       LogOptions logoptions,
                        SimulationOptions simulationoptionts,
-                       std::chrono::milliseconds timeout,
-                       std::ostream* output)
+                       std::chrono::milliseconds timeout)
   : mPimpl(std::make_unique<Simulation::Pimpl>(context,
-                                               logoptions,
                                                simulationoptionts,
-                                               timeout,
-                                               output))
+                                               timeout))
 {}
 
 Simulation::~Simulation() = default;
@@ -384,17 +362,15 @@ Simulation::run(std::unique_ptr<vpz::Vpz> vpz, Error* error)
     if (mPimpl->m_simulationoptions & SIMULATION_SPAWN_PROCESS) {
         result = mPimpl->runSubProcess(std::move(vpz), error);
     } else {
-        if (mPimpl->m_logoptions != manager::LOG_NONE) {
-            if (mPimpl->m_logoptions & manager::LOG_RUN and mPimpl->m_out) {
-                result = mPimpl->runVerboseRun(std::move(vpz), error);
-            } else {
-                result = mPimpl->runVerboseSummary(std::move(vpz), error);
-            }
-        } else {
+        int log_level = mPimpl->m_context->get_log_priority();
+        if (log_level < VLE_LOG_NOTICE) {
             result = mPimpl->runQuiet(std::move(vpz), error);
+        } else if (log_level == VLE_LOG_NOTICE) {
+            result = mPimpl->runVerboseSummary(std::move(vpz), error);
+        } else {
+            result = mPimpl->runVerboseRun(std::move(vpz), error);
         }
     }
-
     if (mPimpl->m_simulationoptions & manager::SIMULATION_NO_RETURN) {
         return {};
     } else {

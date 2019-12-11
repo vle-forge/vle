@@ -141,8 +141,7 @@ struct thread_worker
         for (unsigned int  i =  mIndex; i < M*N; i += mThreads) {
             unsigned int inputIndex = i / M;
             unsigned int replIndex = i % M;
-            Simulation sim(mContext, LOG_NONE, //TODO remove
-                    mSimulationOption, mTimeout, nullptr);
+            Simulation sim(mContext, mSimulationOption, mTimeout);
 
             std::unique_ptr<vpz::Vpz> vpz_loc(new vpz::Vpz(mVpz));
 

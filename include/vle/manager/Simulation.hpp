@@ -52,10 +52,8 @@ public:
     using result_type = std::unique_ptr<value::Map>;
 
     Simulation(utils::ContextPtr context,
-               LogOptions logoptions,
                SimulationOptions simulationoptionts,
-               std::chrono::milliseconds timeout,
-               std::ostream* output);
+               std::chrono::milliseconds timeout);
 
     Simulation(const Simulation& other) = delete;
     Simulation& operator=(const Simulation& other) = delete;

@@ -451,10 +451,8 @@ run_simulation(vle::utils::ContextPtr ctx, std::unique_ptr<vle::vpz::Vpz> file)
     using namespace std::chrono_literals;
 
     vle::manager::Simulation simulator(ctx,
-                                       vle::manager::LOG_NONE,
                                        vle::manager::SIMULATION_NONE,
-                                       0ms,
-                                       &std::cerr);
+                                       0ms);
 
     vle::manager::Error error;
     auto ret = simulator.run(std::move(file), &error);

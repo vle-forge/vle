@@ -376,19 +376,6 @@ search_vpz(const std::string& param, std::shared_ptr<vle::utils::Package> pkg)
     return std::string();
 }
 
-static vle::manager::LogOptions
-convert_log_mode(vle::utils::ContextPtr ctx)
-{
-    switch (ctx->get_log_priority()) {
-    case 7:
-        return vle::manager::LOG_SUMMARY & vle::manager::LOG_RUN;
-    case 6:
-        return vle::manager::LOG_SUMMARY;
-    default:
-        return vle::manager::LOG_NONE;
-    }
-}
-
 static int
 run_manager(vle::utils::ContextPtr /*ctx*/,
             std::chrono::milliseconds /*timeout*/,
@@ -454,10 +441,8 @@ run_simulation(vle::utils::ContextPtr ctx,
                std::shared_ptr<vle::utils::Package> pkg)
 {
     vle::manager::Simulation sim(ctx,
-                                 convert_log_mode(ctx),
                                  vle::manager::SIMULATION_NONE,
-                                 timeout,
-                                 &std::cout);
+                                 timeout);
     int success = EXIT_SUCCESS;
 
     for (; (it != end) and (success == EXIT_SUCCESS); ++it) {
