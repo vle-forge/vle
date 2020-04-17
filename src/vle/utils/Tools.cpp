@@ -212,52 +212,6 @@ to<double>(const std::string& str);
 template VLE_API float
 to<float>(const std::string& str);
 
-template<typename output>
-output
-convert(const std::string& value, bool locale, const std::string& loc)
-{
-    std::stringstream s;
-
-    if (locale or not loc.empty()) {
-        if (not isLocaleAvailable(loc)) {
-            s.imbue(std::locale::classic());
-            locale = false;
-        } else {
-            s.imbue(std::locale(loc.c_str()));
-            locale = true;
-        }
-    }
-
-    s << value;
-
-    if (s.bad() or s.fail()) {
-        throw ArgError(_("failed to read the value"));
-    }
-
-    output result;
-    s >> result;
-
-    if (s.bad()) {
-        throw ArgError("failed to write the value");
-    } else {
-        std::streambuf* buf = s.rdbuf();
-
-        if (buf->in_avail() > 0 and locale) {
-            s.imbue(std::locale::classic());
-            s.str(value);
-            s >> result;
-
-            if (s.bad()) {
-                throw ArgError(_("failed to write the value"));
-            } else {
-                return result;
-            }
-        } else {
-            return result;
-        }
-    }
-}
-
 bool
 isLocaleAvailable(const std::string& locale)
 {
@@ -268,43 +222,6 @@ isLocaleAvailable(const std::string& locale)
         return false;
     }
 }
-
-template VLE_API bool
-convert<bool>(const std::string& value, bool locale, const std::string& loc);
-
-template VLE_API int8_t
-convert<int8_t>(const std::string& value, bool locale, const std::string& loc);
-
-template VLE_API int16_t
-convert<int16_t>(const std::string& value,
-                 bool locale,
-                 const std::string& loc);
-
-template VLE_API int32_t
-convert<int32_t>(const std::string& value,
-                 bool locale,
-                 const std::string& loc);
-
-template VLE_API uint8_t
-convert<uint8_t>(const std::string& value,
-                 bool locale,
-                 const std::string& loc);
-
-template VLE_API uint16_t
-convert<uint16_t>(const std::string& value,
-                  bool locale,
-                  const std::string& loc);
-
-template VLE_API uint32_t
-convert<uint32_t>(const std::string& value,
-                  bool locale,
-                  const std::string& loc);
-
-template VLE_API double
-convert<double>(const std::string& value, bool locale, const std::string& loc);
-
-template VLE_API float
-convert<float>(const std::string& value, bool locale, const std::string& loc);
 
 std::string
 toScientificString(const double& v, bool locale)

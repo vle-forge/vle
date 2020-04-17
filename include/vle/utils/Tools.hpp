@@ -139,33 +139,6 @@ T
 to(const std::string& str);
 
 /**
- * Convert the string to the output template type with or without
- * the use of locale.
- * \c T can be one of the following type: bool, float, double, int8_t,
- * uint8_t, int16_t, uint16_t, int32_t or uint32_t.
- * @code
- * vle::utils::convert < double >("123.456");
- * // returns 123.456
- *
- * vle::utils::convert < double >("123 456,789", true, "fr_FR");
- * // returns 123456.789
- * @endcode
- *
- * @param value The string to convert
- * @param locale True to use the default locale, false otherwise.
- * @param loc The locale to use.
- *
- * @throw utils::ArgError if a convertion failed.
- *
- * @return A template output type.
- */
-template<typename T>
-T
-convert(const std::string& value,
-        bool locale = false,
-        const std::string& loc = std::string());
-
-/**
  * Check if the locale exists on this operating system.
  * @param locale The locale to check.
  * @return True if the locale exists, false otherwise.

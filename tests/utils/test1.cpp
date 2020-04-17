@@ -304,39 +304,6 @@ to_time_function()
 }
 
 void
-localized_conversion()
-{
-    namespace vu = vle::utils;
-
-    /* convert a C locale real */
-    EnsuresApproximatelyEqual(
-      vu::convert<double>("123456789"), 123456789., 0.1);
-    EnsuresApproximatelyEqual(
-      vu::convert<double>("12.3456789"), 12.3456789, 0.1);
-    EnsuresApproximatelyEqual(
-      vu::convert<double>("12345678.9"), 12345678., 0.1);
-    EnsuresApproximatelyEqual(vu::convert<double>("-12345e5"), -12345e5, 0.1);
-    EnsuresApproximatelyEqual(vu::convert<double>("12345e5"), 12345e5, 0.1);
-    EnsuresApproximatelyEqual(vu::convert<double>("12345."), 12345., 0.1);
-
-    /* convert a fr_FR locale real */
-    if (vu::isLocaleAvailable("fr_FR")) {
-        EnsuresApproximatelyEqual(
-          vu::convert<double>("123 456 789", true, "fr_FR"), 123456789., 0.1);
-        EnsuresApproximatelyEqual(
-          vu::convert<double>("12,3456789", true, "fr_FR"), 12.3456789, 0.1);
-        EnsuresApproximatelyEqual(
-          vu::convert<double>("12345678,9", true, "fr_FR"), 12345678., 0.1);
-        EnsuresApproximatelyEqual(
-          vu::convert<double>("-12345,0e5", true, "fr_FR"), -12345e5, 0.1);
-        EnsuresApproximatelyEqual(
-          vu::convert<double>("12345,0e5", true, "fr_FR"), 12345e5, 0.1);
-        EnsuresApproximatelyEqual(
-          vu::convert<double>("12345,", true, "fr_FR"), 12345., 0.1);
-    }
-}
-
-void
 to_scientific_string_function()
 {
     namespace vu = vle::utils;
@@ -504,7 +471,6 @@ main()
     date_time();
     julian_date();
     to_time_function();
-    localized_conversion();
     to_scientific_string_function();
     test_format_copy();
     test_array();
