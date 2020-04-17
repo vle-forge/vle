@@ -241,7 +241,7 @@ public:
         t->add(value);
         t->add(m_last_output_value);
         t->add(observation_time == m_last_output_date);
-        return std::move(t);
+        return t;
     }
 
 private:
