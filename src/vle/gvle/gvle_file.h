@@ -45,6 +45,7 @@ struct gvle_file
     gvle_file();
     gvle_file(const gvle_file& f);
     gvle_file(const utils::Package& pkg, QString relPath);
+    gvle_file& operator=(const gvle_file&) = default;
 
     QString baseName() const; // eg NewCpp
     PluginMainPanel* newInstanceMainPanel(gvle_plugins& plugins);
