@@ -301,13 +301,13 @@ buildNewDynamics(utils::ContextPtr context,
 
             assignEventView(views, vpzviews, observable, observation);
 
-            return std::move(observation);
+            return observation;
         }
 
         if (atom->getStructure()->needDebug()) {
             auto debug = std::make_unique<DynamicsDbg>(init, events);
             debug->set(std::move(dynamics));
-            return std::move(debug);
+            return debug;
         } else {
             return dynamics;
         }
@@ -369,13 +369,13 @@ buildNewExecutive(utils::ContextPtr context,
 
             assignEventView(views, vpzviews, observable, observation);
 
-            return std::move(observation);
+            return observation;
         }
 
         if (atom->getStructure()->needDebug()) {
             auto debug = std::make_unique<DynamicsDbg>(init, events);
             debug->set(std::move(executive));
-            return std::move(debug);
+            return debug;
         } else {
             return executive;
         }
