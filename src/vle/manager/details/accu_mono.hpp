@@ -584,7 +584,9 @@ protected:
 
         double quantile = 0;
         unsigned int n = x.size();
-        if (quantile == 1.0) {
+        if (n == 1) {
+            quantile = x[0];
+        } else if (quantile == 1.0) {
             quantile = x[n - 1];
         } else {
             double m = 1-p;
