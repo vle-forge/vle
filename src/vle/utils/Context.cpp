@@ -577,7 +577,7 @@ Context::readHomeDir()
             return;
         }
 
-        this->info("$VLE_HOME (%s) defined but not usable.\n",
+        this->notice("$VLE_HOME (%s) defined but not usable.\n",
                    home.string().c_str());
     }
 
@@ -597,7 +597,7 @@ Context::readHomeDir()
             return;
         }
 
-        this->info("$HOME/.vle (%s) not usable.\n", home.string().c_str());
+        this->notice("$HOME/.vle (%s) not usable.\n", home.string().c_str());
     }
 #endif
 
@@ -615,7 +615,7 @@ Context::set_log_function(std::unique_ptr<LogFunctor> fn) noexcept
 {
     m_pimpl->log_fn = std::move(fn);
 
-    this->info("custom logging function registered\n");
+    this->debug("custom logging function registered\n");
 }
 
 void

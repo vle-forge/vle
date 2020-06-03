@@ -168,7 +168,7 @@ Context::load_settings() noexcept
 
         auto it = m_pimpl->settings.find(key);
         if (it == m_pimpl->settings.end()) {
-            this->info(_("Settings: unknown key `%s'\n"), key.c_str());
+            this->notice(_("Settings: unknown key `%s'\n"), key.c_str());
             continue;
         }
 

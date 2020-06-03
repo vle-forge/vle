@@ -104,7 +104,7 @@ public:
             m_simulationoptions |= vle::manager::SIMULATION_SPAWN_PROCESS;
     }
 
-    std::unique_ptr<value::Map> runVerboseRun(std::unique_ptr<vpz::Vpz> vpz,
+    std::unique_ptr<value::Map> runVerbose(std::unique_ptr<vpz::Vpz> vpz,
                                               Error* error)
     {
         std::unique_ptr<value::Map> result;
@@ -115,89 +115,38 @@ public:
             const double duration = vpz->project().experiment().duration();
             const double begin = vpz->project().experiment().begin();
 
-            m_context->info(utils::format(_("[%s]\n"),
+            m_context->debug(utils::format(_("[%s]\n"),
                     vpz->filename().c_str()));
-            m_context->info(_(" - Coordinator load models ......: "));
+            m_context->debug(_(" - Coordinator load models ......: "));
 
             root.load(*vpz);
 
-            m_context->info(_("ok\n"));
+            m_context->debug(_("ok\n"));
 
-            m_context->info(_(" - Clean project file ...........: "));
+            m_context->debug(_(" - Clean project file ...........: "));
             vpz->clear();
             vpz.reset(nullptr);
-            m_context->info(_("ok\n"));
+            m_context->debug(_("ok\n"));
 
-            m_context->info(_(" - Coordinator initializing .....: "));
+            m_context->debug(_(" - Coordinator initializing .....: "));
             root.init();
-            m_context->info(_("ok\n"));
+            m_context->debug(_("ok\n"));
 
-            m_context->info(_(" - Simulation run................\n"));
+            m_context->debug(_(" - Simulation run................\n"));
 
             while (root.run()) {
-                m_context->info(utils::format(_(
+                m_context->debug(utils::format(_(
                         "simulation time %f [end:%f], real time elapsed: %f\n"),
                         root.getCurrentTime(), duration, timer.elapsed()));
             }
-            m_context->info(_("Simulation run ok\n"));
+            m_context->debug(_("Simulation run ok\n"));
 
-            m_context->info(_(" - Coordinator cleaning .........: "));
+            m_context->debug(_(" - Coordinator cleaning .........: "));
             result = root.finish();
-            m_context->info(_("ok\n"));
+            m_context->debug(_("ok\n"));
 
-            m_context->info(utils::format(
+            m_context->debug(utils::format(
                     _(" - Time spent in kernel .........: %f s \n"),
-                    timer.elapsed()));
-
-            error->code = 0;
-        } catch (const std::exception& e) {
-            error->message =
-              utils::format(_("\n/!\\ error reported: %s\n"), e.what());
-            error->code = -1;
-        }
-
-        return result;
-    }
-
-    std::unique_ptr<value::Map> runVerboseSummary(
-      std::unique_ptr<vpz::Vpz> vpz,
-      Error* error)
-    {
-        std::unique_ptr<value::Map> result;
-        boost::timer timer;
-
-        try {
-            devs::RootCoordinator root(m_context);
-
-            m_context->notice(utils::format(_("[%s]\n"),
-                    vpz->filename().c_str()));
-            m_context->notice(_(" - Coordinator load models ......: "));
-
-            root.load(*vpz);
-
-            m_context->notice(_("ok\n"));
-
-            m_context->notice(_(" - Clean project file ...........: "));
-            vpz->clear();
-            vpz.reset(nullptr);
-            m_context->notice(_("ok\n"));
-
-            m_context->notice(_(" - Coordinator initializing .....: "));
-            root.init();
-            m_context->notice(_("ok\n"));
-
-            m_context->notice(_(" - Simulation run................: "));
-
-            while (root.run())
-                ;
-            m_context->notice(_("ok\n"));
-
-            m_context->notice(_(" - Coordinator cleaning .........: "));
-            result = root.finish();
-            m_context->notice(_("ok\n"));
-
-            m_context->notice(utils::format(
-                    _(" - Time spent in kernel .........: %f s\n"),
                     timer.elapsed()));
 
             error->code = 0;
@@ -271,10 +220,12 @@ public:
                 while (not spawn.isfinish()) {
                     if (spawn.get(&output, &err)) {
                         if (not output.empty()) {
-                            m_context->info("%s", output.c_str());
+                            m_context->log(m_context->get_log_priority(),
+                                    "%s", output.c_str());
                         }
                         if (not err.empty()) {
-                            m_context->error("%s", err.c_str());
+                            m_context->log(m_context->get_log_priority(),
+                                    "%s", err.c_str());
                         }
                         output.clear();
                         err.clear();
@@ -297,10 +248,12 @@ public:
                 while (not spawn.isfinish()) {
                     if (spawn.get(&output, &err)) {
                         if (not output.empty()) {
-                            m_context->info("%s", output.c_str());
+                            m_context->log(m_context->get_log_priority(),
+                                    "%s", output.c_str());
                         }
                         if (not err.empty()) {
-                            m_context->error("%s", err.c_str());
+                            m_context->log(m_context->get_log_priority(),
+                                    "%s", err.c_str());
                         }
                         output.clear();
                         err.clear();
@@ -362,12 +315,10 @@ Simulation::run(std::unique_ptr<vpz::Vpz> vpz, Error* error)
         result = mPimpl->runSubProcess(std::move(vpz), error);
     } else {
         int log_level = mPimpl->m_context->get_log_priority();
-        if (log_level < VLE_LOG_NOTICE) {
+        if (log_level < VLE_LOG_DEBUG) {
             result = mPimpl->runQuiet(std::move(vpz), error);
-        } else if (log_level == VLE_LOG_NOTICE) {
-            result = mPimpl->runVerboseSummary(std::move(vpz), error);
         } else {
-            result = mPimpl->runVerboseRun(std::move(vpz), error);
+            result = mPimpl->runVerbose(std::move(vpz), error);
         }
     }
     if (mPimpl->m_simulationoptions & manager::SIMULATION_NO_RETURN) {
