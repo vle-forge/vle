@@ -28,6 +28,7 @@
 #include <vle/utils/Exception.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Tools.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -785,6 +786,8 @@ private:
     std::unique_ptr<ConditionsBackup> m_conditions; // used for complex values
     bool m_warnings;
     bool m_more_output_details;
+    bool m_workspace_per_worker;
+    std::string m_workspace_prefix_path;
 
     void simulate(std::ostream& os, int row_id)
     {
@@ -793,7 +796,30 @@ private:
         auto vpz = std::make_unique<vle::vpz::Vpz>(*m_vpz.get());
         vpz->project().setInstance(row_id);
 
+	vle::utils::Path current = vle::utils::Path::current_path();
+        if (m_workspace_per_worker) {
+	   vle::utils::Path workpath(m_workspace_prefix_path
+				     + "_"
+				     + std::to_string(row_id));
+
+	   if (workpath.exists())
+	      throw vle::utils::FileError(_("The workspace directory (%s)"
+					    "already exist"),
+					  workpath.string().c_str());
+
+	   if (not vle::utils::Path::create_directories(workpath))
+	      throw vle::utils::FileError(_("Failed to build the workspace"
+					    "directory (%s)"),
+					  workpath.string().c_str());
+
+	   vle::utils::Path::current_path(workpath);
+	}
+
         auto result = m_simulator->run(std::move(vpz), &error);
+
+        if (m_workspace_per_worker) {
+	   vle::utils::Path::current_path(current);
+	}
 
         if (error.code) {
             if (m_warnings) {
@@ -838,12 +864,16 @@ public:
            const std::string& vpz,
            bool withoutspawn,
            bool warnings,
-           bool more_output_details)
+           bool more_output_details,
+	   bool workspace_per_worker,
+	   const std::string& workspace_prefix_path)
       : m_context(vle::utils::make_context())
       , m_timeout(timeout)
       , m_simulator(nullptr)
       , m_warnings(warnings)
       , m_more_output_details(more_output_details)
+      , m_workspace_per_worker(workspace_per_worker)
+      , m_workspace_prefix_path(workspace_prefix_path)
     {
         if (not withoutspawn) {
             m_simulator = std::make_unique<vle::manager::Simulation>(
@@ -1091,10 +1121,13 @@ run_as_worker(const std::string& vpz,
               std::chrono::milliseconds timeout,
               bool withoutspawn,
               bool warnings,
-              bool more_output_details)
+              bool more_output_details,
+              bool workspace_per_worker,
+	      const std::string& workspace_prefix_path)
 {
     try {
-        Worker w(timeout, vpz, withoutspawn, warnings, more_output_details);
+        Worker w(timeout, vpz, withoutspawn, warnings, more_output_details,
+		 workspace_per_worker, workspace_prefix_path);
         std::string block;
         int from;
         int first, last;
@@ -1171,15 +1204,16 @@ int
 main(int argc, char* argv[])
 {
     std::string package_name;
-    std::string input_file, output_file, template_file;
+    std::string input_file, output_file, template_file, workspace_prefix_path;
     std::chrono::milliseconds timeout{ std::chrono::milliseconds::zero() };
     int withoutspawn = 0;
     int warnings = 0;
     int more_output_details = 0;
+    int workspace_per_worker = 0;
     int block_size = 5000;
     int ret = EXIT_SUCCESS;
 
-    const char* const short_opts = "hP:i:o:t:b:";
+    const char* const short_opts = "hP:i:o:t:b:w:";
     const struct option long_opts[] = {
         { "help", 0, nullptr, 'h' },
         { "timeout", 1, nullptr, 0 },
@@ -1187,6 +1221,7 @@ main(int argc, char* argv[])
         { "input-file", 1, nullptr, 'i' },
         { "output-file", 1, nullptr, 'o' },
         { "template", 1, nullptr, 't' },
+        { "workspace-prefix-path", 1, nullptr, 'w' },
         { "withoutspawn", 0, &withoutspawn, 1 },
         { "warnings", 0, &warnings, 1 },
         { "block-size", 1, nullptr, 'b' },
@@ -1230,6 +1265,10 @@ main(int argc, char* argv[])
             break;
         case 't':
             template_file = ::optarg;
+            break;
+        case 'w':
+            workspace_prefix_path = ::optarg;
+	    workspace_per_worker = 1;
             break;
         case 'b':
             try {
@@ -1288,12 +1327,15 @@ main(int argc, char* argv[])
                  "timeout   : %ld\n"
                  "input csv : %s\n"
                  "output csv: %s\n"
+                 "workspace prefix: %s\n"
                  "vpz       : %s\n"),
                block_size,
                package_name.c_str(),
                timeout.count(),
                (input_file.empty()) ? "stdin" : input_file.c_str(),
                (output_file.empty()) ? "stdout" : output_file.c_str(),
+               (workspace_prefix_path.empty()) ? ""
+	       : workspace_prefix_path.c_str(),
                vpz.front().c_str());
 
         status = run_as_master(input_file, output_file, block_size);
@@ -1302,7 +1344,9 @@ main(int argc, char* argv[])
                                timeout,
                                withoutspawn,
                                warnings,
-                               more_output_details);
+                               more_output_details,
+			       workspace_per_worker,
+			       workspace_prefix_path);
     }
 
     MPI_Finalize();
