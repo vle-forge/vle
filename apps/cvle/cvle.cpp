@@ -1234,7 +1234,7 @@ main(int argc, char* argv[])
         const auto opt =
           getopt_long(argc, argv, short_opts, long_opts, &opt_index);
         if (opt == -1)
-            break;
+            return EXIT_FAILURE;
 
         switch (opt) {
         case 0:
@@ -1307,14 +1307,15 @@ main(int argc, char* argv[])
         vpz_abs = pack.getExpFile(vpz_abs, vle::utils::PKG_BINARY);
     }
 
-    MPI_Init(&argc, &argv);
     int rank = 0, world_size = 0;
-    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     if (rank == 0 and not template_file.empty()) {
-        generate_template(template_file, vpz_abs);
+        return generate_template(template_file, vpz_abs);
     }
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     if (world_size == 1) {
         fprintf(stderr, _("cvle needs two processors.\n"));
