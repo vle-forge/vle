@@ -1235,7 +1235,6 @@ struct mpi_session_manager
 static int
 main_mpi(vle::utils::ContextPtr ctx, mpi_session_manager& session)
 {
-    ctx->debug("main-mpi starts\n");
     int status = EXIT_SUCCESS;
     int rank = 0;
     int world_size = 0;
@@ -1244,45 +1243,52 @@ main_mpi(vle::utils::ContextPtr ctx, mpi_session_manager& session)
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     try {
-        if (rank == 0 and not session.template_file.empty()) {
-            generate_template(session.template_file, session.vpz_abs);
-        }
-
-        if (world_size == 1) {
-            fprintf(stderr, _("cvle needs two processors.\n"));
-            status = EXIT_FAILURE;
-        } else {
+        if (not session.template_file.empty()) {
             if (rank == 0) {
-                printf(
-                  _("block size: %d\n"
-                    "package   : %s\n"
-                    "timeout   : %ld\n"
-                    "input csv : %s\n"
-                    "output csv: %s\n"
-                    "workspace prefix: %s\n"
-                    "vpz       : %s\n"),
-                  session.block_size,
-                  session.package_name.c_str(),
-                  session.timeout.count(),
-                  (session.input_file.empty()) ? "stdin"
-                                               : session.input_file.c_str(),
-                  (session.output_file.empty()) ? "stdout"
-                                                : session.output_file.c_str(),
-                  (session.workspace_prefix_path.empty())
-                    ? ""
-                    : session.workspace_prefix_path.c_str(),
-                  session.vpz.front().c_str());
+                ctx->debug("Generates template file\n");
 
-                status = run_as_master(
-                  session.input_file, session.output_file, session.block_size);
+                status =
+                  generate_template(session.template_file, session.vpz_abs);
+            }
+        } else {
+            if (world_size == 1) {
+                fprintf(stderr, _("cvle needs two processors.\n"));
+                status = EXIT_FAILURE;
             } else {
-                status = run_as_worker(session.vpz_abs,
-                                       session.timeout,
-                                       session.withoutspawn,
-                                       session.warnings,
-                                       session.more_output_details,
-                                       session.workspace_per_worker,
-                                       session.workspace_prefix_path);
+                if (rank == 0) {
+                    printf(_("block size: %d\n"
+                             "package   : %s\n"
+                             "timeout   : %ld\n"
+                             "input csv : %s\n"
+                             "output csv: %s\n"
+                             "workspace prefix: %s\n"
+                             "vpz       : %s\n"),
+                           session.block_size,
+                           session.package_name.c_str(),
+                           session.timeout.count(),
+                           (session.input_file.empty())
+                             ? "stdin"
+                             : session.input_file.c_str(),
+                           (session.output_file.empty())
+                             ? "stdout"
+                             : session.output_file.c_str(),
+                           (session.workspace_prefix_path.empty())
+                             ? ""
+                             : session.workspace_prefix_path.c_str(),
+                           session.vpz.front().c_str());
+
+                    status = run_as_master(session.input_file,
+                                           session.output_file,
+                                           session.block_size);
+                } else {
+                    status = run_as_worker(session.vpz_abs,
+                                           session.timeout,
+                                           session.withoutspawn,
+                                           session.warnings,
+                                           session.more_output_details,
+                                           session.workspace_per_worker,
+                                           session.workspace_prefix_path);
+                }
             }
         }
     } catch (const std::exception& e) {
