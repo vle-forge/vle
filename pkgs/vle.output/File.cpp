@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 
 namespace vle {
 namespace oov {
