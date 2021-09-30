@@ -22,13 +22,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <boost/algorithm/string.hpp>
 #include <memory>
 #include <utility>
 #include <vle/manager/Simulation.hpp>
 #include <vle/utils/Exception.hpp>
+#include <vle/utils/Filesystem.hpp>
 #include <vle/utils/Package.hpp>
 #include <vle/utils/Tools.hpp>
-#include <vle/utils/Filesystem.hpp>
 #include <vle/value/Boolean.hpp>
 #include <vle/value/Double.hpp>
 #include <vle/value/Integer.hpp>
@@ -36,11 +37,15 @@
 #include <vle/value/Set.hpp>
 #include <vle/value/String.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 #define OMPI_SKIP_MPICXX
+#include <getopt.h>
 #include <mpi.h>
 
+#include <cassert>
+#include <cerrno>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -48,13 +53,6 @@
 #include <locale>
 #include <sstream>
 #include <stack>
-
-#include <cassert>
-#include <cerrno>
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
-#include <getopt.h>
 
 #ifdef VLE_HAVE_NLS
 #ifndef ENABLE_NLS
@@ -271,8 +269,7 @@ generate_template_line(std::ostream& header,
 }
 
 int
-generate_template(std::string file,
-                  std::string exp) noexcept
+generate_template(std::string file, std::string exp) noexcept
 {
     std::ofstream ofs(file);
     if (not ofs.is_open()) {
@@ -411,8 +408,7 @@ struct Access
                       port.c_str(),
                       i);
 
-                current =
-                  current->toSet()[static_cast<std::size_t>(val)].get();
+                current = current->toSet()[static_cast<std::size_t>(val)].get();
             } else if (current->isMap()) {
                 auto it = current->toMap().find(params[i]);
 
@@ -644,7 +640,7 @@ struct ConditionsBackup
             const vle::vpz::Condition& cond_cvle = other.get("_cvle_cond");
             for (auto port : cond_cvle) {
                 if (port.first == "has_simulation_engine") {
-                    auto&  vals = port.second;
+                    auto& vals = port.second;
                     if (vals.get()) {
                         return vals->isBoolean() and vals->toBoolean().value();
                     }
@@ -664,7 +660,7 @@ struct ConditionsBackup
                 if (port.first == "has_simulation_engine") {
                     auto& vals = port.second;
                     modif_engine = vals.get() and (vals->isBoolean() and
-                            vals->toBoolean().value());
+                                                   vals->toBoolean().value());
                 }
             }
         }
@@ -796,30 +792,29 @@ private:
         auto vpz = std::make_unique<vle::vpz::Vpz>(*m_vpz.get());
         vpz->project().setInstance(row_id);
 
-	vle::utils::Path current = vle::utils::Path::current_path();
+        vle::utils::Path current = vle::utils::Path::current_path();
         if (m_workspace_per_worker) {
-	   vle::utils::Path workpath(m_workspace_prefix_path
-				     + "_"
-				     + std::to_string(row_id));
+            vle::utils::Path workpath(m_workspace_prefix_path + "_" +
+                                      std::to_string(row_id));
 
-	   if (workpath.exists())
-	      throw vle::utils::FileError(_("The workspace directory (%s)"
-					    "already exist"),
-					  workpath.string().c_str());
+            if (workpath.exists())
+                throw vle::utils::FileError(_("The workspace directory (%s)"
+                                              "already exist"),
+                                            workpath.string().c_str());
 
-	   if (not vle::utils::Path::create_directories(workpath))
-	      throw vle::utils::FileError(_("Failed to build the workspace"
-					    "directory (%s)"),
-					  workpath.string().c_str());
+            if (not vle::utils::Path::create_directories(workpath))
+                throw vle::utils::FileError(_("Failed to build the workspace"
+                                              "directory (%s)"),
+                                            workpath.string().c_str());
 
-	   vle::utils::Path::current_path(workpath);
-	}
+            vle::utils::Path::current_path(workpath);
+        }
 
         auto result = m_simulator->run(std::move(vpz), &error);
 
         if (m_workspace_per_worker) {
-	   vle::utils::Path::current_path(current);
-	}
+            vle::utils::Path::current_path(current);
+        }
 
         if (error.code) {
             if (m_warnings) {
@@ -865,8 +860,8 @@ public:
            bool withoutspawn,
            bool warnings,
            bool more_output_details,
-	   bool workspace_per_worker,
-	   const std::string& workspace_prefix_path)
+           bool workspace_per_worker,
+           const std::string& workspace_prefix_path)
       : m_context(vle::utils::make_context())
       , m_timeout(timeout)
       , m_simulator(nullptr)
@@ -883,9 +878,7 @@ public:
               m_timeout);
         } else {
             m_simulator = std::make_unique<vle::manager::Simulation>(
-              m_context,
-              vle::manager::SIMULATION_NONE,
-              m_timeout);
+              m_context, vle::manager::SIMULATION_NONE, m_timeout);
         }
         m_context->set_log_priority(3);
         m_vpz = std::make_unique<vle::vpz::Vpz>(vpz);
@@ -1071,8 +1064,7 @@ run_as_master(const std::string& inputfile,
 
         for (int rank = 1; rank < world_size; ++rank) {
             if (r.read(block, first, last)) {
-                mpi_send_block(
-                  rank, worker_block_todo_tag, block, first, last);
+                mpi_send_block(rank, worker_block_todo_tag, block, first, last);
                 workers[rank] = true;
             } else
                 break;
@@ -1092,8 +1084,7 @@ run_as_master(const std::string& inputfile,
 
             if (not block.empty()) {
                 printf(_("master sends block %d to %d\n"), blockid++, from);
-                mpi_send_block(
-                  from, worker_block_todo_tag, block, first, last);
+                mpi_send_block(from, worker_block_todo_tag, block, first, last);
                 workers[from] = true;
             }
         }
@@ -1123,11 +1114,16 @@ run_as_worker(const std::string& vpz,
               bool warnings,
               bool more_output_details,
               bool workspace_per_worker,
-	      const std::string& workspace_prefix_path)
+              const std::string& workspace_prefix_path)
 {
     try {
-        Worker w(timeout, vpz, withoutspawn, warnings, more_output_details,
-		 workspace_per_worker, workspace_prefix_path);
+        Worker w(timeout,
+                 vpz,
+                 withoutspawn,
+                 warnings,
+                 more_output_details,
+                 workspace_per_worker,
+                 workspace_prefix_path);
         std::string block;
         int from;
         int first, last;
@@ -1200,17 +1196,107 @@ show_help()
              " [default 5000]\n"));
 }
 
+struct mpi_session_manager
+{
+    mpi_session_manager(int argc, char* argv[])
+      : timeout(std::chrono::milliseconds::zero())
+      , withoutspawn(0)
+      , warnings(0)
+      , more_output_details(0)
+      , workspace_per_worker(0)
+      , block_size(5000)
+      , status(EXIT_SUCCESS)
+    {
+        if (MPI_Init(&argc, &argv) != MPI_SUCCESS)
+            status = EXIT_FAILURE;
+    }
+
+    ~mpi_session_manager()
+    {
+        MPI_Finalize();
+    }
+
+    std::string package_name;
+    std::string input_file;
+    std::string output_file;
+    std::string template_file;
+    std::string workspace_prefix_path;
+    std::vector<std::string> vpz;
+    std::string vpz_abs;
+    std::chrono::milliseconds timeout;
+    int withoutspawn;
+    int warnings;
+    int more_output_details;
+    int workspace_per_worker;
+    int block_size;
+    int status;
+};
+
+static int
+main_mpi(vle::utils::ContextPtr ctx, mpi_session_manager& session)
+{
+    ctx->debug("main-mpi starts\n");
+    int status = EXIT_SUCCESS;
+    int rank = 0;
+    int world_size = 0;
+
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    try {
+        if (rank == 0 and not session.template_file.empty()) {
+            generate_template(session.template_file, session.vpz_abs);
+        }
+
+        if (world_size == 1) {
+            fprintf(stderr, _("cvle needs two processors.\n"));
+            status = EXIT_FAILURE;
+        } else {
+            if (rank == 0) {
+                printf(
+                  _("block size: %d\n"
+                    "package   : %s\n"
+                    "timeout   : %ld\n"
+                    "input csv : %s\n"
+                    "output csv: %s\n"
+                    "workspace prefix: %s\n"
+                    "vpz       : %s\n"),
+                  session.block_size,
+                  session.package_name.c_str(),
+                  session.timeout.count(),
+                  (session.input_file.empty()) ? "stdin"
+                                               : session.input_file.c_str(),
+                  (session.output_file.empty()) ? "stdout"
+                                                : session.output_file.c_str(),
+                  (session.workspace_prefix_path.empty())
+                    ? ""
+                    : session.workspace_prefix_path.c_str(),
+                  session.vpz.front().c_str());
+
+                status = run_as_master(
+                  session.input_file, session.output_file, session.block_size);
+            } else {
+                status = run_as_worker(session.vpz_abs,
+                                       session.timeout,
+                                       session.withoutspawn,
+                                       session.warnings,
+                                       session.more_output_details,
+                                       session.workspace_per_worker,
+                                       session.workspace_prefix_path);
+            }
+        }
+    } catch (const std::exception& e) {
+        fprintf(stderr, _("mpi error: %s\n"), e.what());
+        status = EXIT_FAILURE;
+    }
+
+    return status;
+}
+
 int
 main(int argc, char* argv[])
 {
-    std::string package_name;
-    std::string input_file, output_file, template_file, workspace_prefix_path;
-    std::chrono::milliseconds timeout{ std::chrono::milliseconds::zero() };
-    int withoutspawn = 0;
-    int warnings = 0;
-    int more_output_details = 0;
-    int workspace_per_worker = 0;
-    int block_size = 5000;
+    mpi_session_manager session(argc, argv);
     int ret = EXIT_SUCCESS;
 
     const char* const short_opts = "hP:i:o:t:b:w:";
@@ -1222,14 +1308,14 @@ main(int argc, char* argv[])
         { "output-file", 1, nullptr, 'o' },
         { "template", 1, nullptr, 't' },
         { "workspace-prefix-path", 1, nullptr, 'w' },
-        { "withoutspawn", 0, &withoutspawn, 1 },
-        { "warnings", 0, &warnings, 1 },
+        { "withoutspawn", 0, &session.withoutspawn, 1 },
+        { "warnings", 0, &session.warnings, 1 },
         { "block-size", 1, nullptr, 'b' },
-        { "more-output-details", 0, &more_output_details, 1 },
+        { "more-output-details", 0, &session.more_output_details, 1 },
         { nullptr, 0, nullptr, 0 }
     };
-    int opt_index;
 
+    int opt_index;
     for (;;) {
         const auto opt =
           getopt_long(argc, argv, short_opts, long_opts, &opt_index);
@@ -1241,13 +1327,16 @@ main(int argc, char* argv[])
             if (not strcmp(long_opts[opt_index].name, "timeout")) {
                 try {
                     long int t = std::stol(::optarg);
-                    if (t <= 0)
-                        throw std::exception();
-                    timeout = std::chrono::milliseconds(t);
+                    if (t <= 0) {
+                        ret = EXIT_FAILURE;
+                    } else {
+                        session.timeout = std::chrono::milliseconds(t);
+                    }
                 } catch (const std::exception& /*e*/) {
                     fprintf(stderr,
                             _("Bad timeout: %s Assume no timeout\n"),
                             ::optarg);
+                    ret = EXIT_FAILURE;
                 }
             }
             break;
@@ -1255,30 +1344,34 @@ main(int argc, char* argv[])
             show_help();
             return ret;
         case 'P':
-            package_name = ::optarg;
+            session.package_name = ::optarg;
             break;
         case 'i':
-            input_file = ::optarg;
+            session.input_file = ::optarg;
             break;
         case 'o':
-            output_file = ::optarg;
+            session.output_file = ::optarg;
             break;
         case 't':
-            template_file = ::optarg;
+            session.template_file = ::optarg;
             break;
         case 'w':
-            workspace_prefix_path = ::optarg;
-	    workspace_per_worker = 1;
+            session.workspace_prefix_path = ::optarg;
+            session.workspace_per_worker = 1;
             break;
         case 'b':
             try {
-                block_size = std::stoi(::optarg);
+                session.block_size = std::stoi(::optarg);
+                if (session.block_size < 0) {
+                    ret = EXIT_FAILURE;
+                }
             } catch (const std::exception& /* e */) {
                 fprintf(stderr,
                         _("Bad block size: %s. "
                           "Assume block size=%d\n"),
                         ::optarg,
-                        block_size);
+                        session.block_size);
+                ret = EXIT_FAILURE;
             }
             break;
         case '?':
@@ -1289,67 +1382,29 @@ main(int argc, char* argv[])
         };
     }
 
-    std::vector<std::string> vpz(argv + ::optind, argv + argc);
-    if (vpz.size() > 1) {
-        fprintf( stderr,
-                _("Use only the first vpz: %s\n"), vpz.front().c_str());
-    } else if (vpz.size() ==0) {
+    if (ret != EXIT_SUCCESS)
+        return ret;
+
+    session.vpz.assign(argv + ::optind, argv + argc);
+    if (session.vpz.size() == 0) {
         fprintf(stderr, _("Require 1 vpz \n"));
         return EXIT_FAILURE;
     }
 
+    if (session.vpz.size() > 1)
+        fprintf(stderr,
+                _("Use only the first vpz: %s\n"),
+                session.vpz.front().c_str());
+
     auto ctx = vle::utils::make_context();
 
-    //handle package mode
-    std::string vpz_abs = vpz.front();
-    if (not package_name.empty()) {
-        vle::utils::Package pack(ctx, package_name);
-        vpz_abs = pack.getExpFile(vpz_abs, vle::utils::PKG_BINARY);
+    // handle package mode
+    session.vpz_abs = session.vpz.front();
+    if (not session.package_name.empty()) {
+        vle::utils::Package pack(ctx, session.package_name);
+        session.vpz_abs =
+          pack.getExpFile(session.vpz_abs, vle::utils::PKG_BINARY);
     }
 
-    MPI_Init(&argc, &argv);
-    int rank = 0, world_size = 0;
-    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    if (rank == 0 and not template_file.empty()) {
-        generate_template(template_file, vpz_abs);
-    }
-
-    if (world_size == 1) {
-        fprintf(stderr, _("cvle needs two processors.\n"));
-    }
-
-    int status;
-    if (rank == 0) {
-        printf(_("block size: %d\n"
-                 "package   : %s\n"
-                 "timeout   : %ld\n"
-                 "input csv : %s\n"
-                 "output csv: %s\n"
-                 "workspace prefix: %s\n"
-                 "vpz       : %s\n"),
-               block_size,
-               package_name.c_str(),
-               timeout.count(),
-               (input_file.empty()) ? "stdin" : input_file.c_str(),
-               (output_file.empty()) ? "stdout" : output_file.c_str(),
-               (workspace_prefix_path.empty()) ? ""
-	       : workspace_prefix_path.c_str(),
-               vpz.front().c_str());
-
-        status = run_as_master(input_file, output_file, block_size);
-    } else {
-        status = run_as_worker(vpz_abs,
-                               timeout,
-                               withoutspawn,
-                               warnings,
-                               more_output_details,
-			       workspace_per_worker,
-			       workspace_prefix_path);
-    }
-
-    MPI_Finalize();
-
-    return status;
+    return main_mpi(ctx, session);
 }
