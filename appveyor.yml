@@ -16,13 +16,13 @@ install:
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S --overwrite * mingw-w64-i686-expat"
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S --overwrite * mingw-w64-i686-openssl"
   - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S --overwrite * mingw-w64-i686-curl"
+  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S --overwrite * mingw-w64-i686-boost"
 
 before_build:
   - cmd: set OLD_PATH=C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\
   - cmd: set SourcePath=%APPVEYOR_BUILD_FOLDER%
   - cmd: set QtDir=c:\Qt\5.9\mingw53_32
   - cmd: set QtDirTools=c:\Qt\Tools\mingw530_32
-  - cmd: set BoostPath=C:\Libraries\boost_1_63_0
   - cmd: set VleDeps=%APPVEYOR_BUILD_FOLDER%\VleDeps
   - cmd: set MingwPath=c:\msys64\mingw32
   - cmd: set InstallPath=%APPVEYOR_BUILD_FOLDER%\install-iss
@@ -56,7 +56,7 @@ before_build:
   - cmd: xcopy /Y %MingwPath%\bin\libidn2*.dll %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\libintl-8.dll %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\liblzma-5.dll %VleDeps%\bin
-  - cmd: xcopy /Y %MingwPath%\bin\libmetalink-3.dll %VleDeps%\bin
+  - cmd: xcopy /Y %MingwPath%\bin\libboost* %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\libnghttp2-14.dll %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\libssh2-1.dll %VleDeps%\bin
   - cmd: xcopy /Y %MingwPath%\bin\libunistring-2.dll %VleDeps%\bin
@@ -79,7 +79,7 @@ build_script:
   - cmd: set PATH=%QtDirTools%\bin;%QtDir%\bin;%CMakePath%\bin;%OLD_PATH%
   - cmd: mkdir %BuildPath%
   - cmd: cd %BuildPath%
-  - cmd: cmake.exe -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=%VleDeps% -DBOOST_ROOT=%BoostPath% -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%InstallPath% -DCMAKE_BUILD_TYPE=RelWithDebInfo %SourcePath%
+  - cmd: cmake.exe -G "MinGW Makefiles" -DCMAKE_PREFIX_PATH=%VleDeps% -DBOOST_INCLUDEDIR=%MingwPath%\include -DQt5_DIR=C:\Qt\5.12.11\mingw73_64\lib\cmake\Qt5 -DWITH_MVLE=OFF -DWITH_CVLE=OFF -DWITH_DOXYGEN=OFF -DWITH_GVLE=ON -DCMAKE_INSTALL_PREFIX=%InstallPath% -DCMAKE_BUILD_TYPE=RelWithDebInfo %SourcePath%
   - cmd: mingw32-make VERBOSE=1 -j4
   - cmd: mingw32-make install
 
