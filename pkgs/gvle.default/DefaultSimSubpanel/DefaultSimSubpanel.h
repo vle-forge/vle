@@ -25,8 +25,7 @@
 #ifndef GVLE_DEFAULT_SIM_SUB_PANEL_H
 #define GVLE_DEFAULT_SIM_SUB_PANEL_H
 
-#include <qcustomplot.h>
-
+#include "qcustomplot/qcustomplot.h"
 #include <QDebug>
 #include <QObject>
 #include <QWidget>
