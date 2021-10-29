@@ -113,7 +113,7 @@ Context::findInstallPrefix()
         }
     }
 
-    show_message_box("Failed to initialized prefix from registry. Try to "
+    show_message_box("Failed to initialize prefix from registry. Try to "
                      "use the current executable to determine the prefix "
                      "but access to cmake, vle, curl or wget will fail.");
 
@@ -140,7 +140,7 @@ Context::findInstallPrefix()
         }
     }
 
-    show_message_box("Failed to initialized prefix. Please, re-install "
+    show_message_box("Failed to initialize prefix. Please, re-install "
                      "VLE or define a variable into the register "
                      "editor");
 
