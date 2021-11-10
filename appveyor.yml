@@ -7,6 +7,8 @@ branches:
     - test
 
 init:
+  - cmd: dir c:\Qt\5.15.2\mingw81_32\bin\
+  - cmd: dir c:\Qt\5.15.2\mingw81_32\lib\
   - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
   - set APPVEYOR_PATH=%PATH%
 

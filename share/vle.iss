@@ -114,19 +114,6 @@ Source: "{#QtDir}\bin\Qt5Svg.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#QtDir}\bin\Qt5Xml.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#QtDir}\bin\Qt5XmlPatterns.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#QtDir}\bin\Qt5Widgets.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5Concurrentd.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5Cored.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5Guid.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5Helpd.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5OpenGLd.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5PrintSupportd.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5Networkd.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5Sqld.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5Svgd.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5Xmld.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5XmlPatternsd.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#QtDir}\bin\Qt5Widgetsd.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-
 Source: "{#QtDir}\lib\libQt5Concurrent.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#QtDir}\lib\libQt5Core.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#QtDir}\lib\libQt5Gui.a"; DestDir: "{app}\lib"; Flags: ignoreversion
@@ -139,18 +126,6 @@ Source: "{#QtDir}\lib\libQt5Svg.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#QtDir}\lib\libQt5Xml.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#QtDir}\lib\libQt5XmlPatterns.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#QtDir}\lib\libQt5Widgets.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5Concurrentd.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5Cored.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5Guid.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5Helpd.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5OpenGLd.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5PrintSupportd.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5Networkd.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5Sqld.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5Svgd.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5Xmld.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5XmlPatternsd.a"; DestDir: "{app}\lib"; Flags: ignoreversion
-Source: "{#QtDir}\lib\libQt5Widgetsd.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 
 Source: "{#QtDir}\bin\libGLESV2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#QtDir}\bin\libEGL.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
