@@ -75,7 +75,6 @@ Source: "{#MingwPath}\bin\libiconv-2.dll"; DestDir: "{app}\bin"; Flags: ignoreve
 Source: "{#MingwPath}\bin\libidn2*.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libintl-8.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\liblzma-5.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "{#MingwPath}\bin\libmetalink-3.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libnghttp2-14.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libssh2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libunistring-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
