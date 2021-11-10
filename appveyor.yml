@@ -28,7 +28,7 @@ before_build:
   - cmd: set InstallPath=%APPVEYOR_BUILD_FOLDER%\install-iss
   - cmd: set BuildPath=%APPVEYOR_BUILD_FOLDER%\build
   - cmd: set CMakePath=%ProgramFiles%\CMake
-  - cmd: set InnoSetupPath="%ProgramFiles(x86)%\Inno Setup 5"
+  - cmd: set InnoSetupPath="%ProgramFiles(x86)%\Inno Setup 6"
   - cmd: for /f "tokens=3 delims= " %%a in ('type %SourcePath%\CMakeLists.txt^|find "project(VLE VERSION "') do (set version=%%a)
   - cmd: for /F "tokens=1,2,3 delims=." %%a in ("%version%") do (set "Major=%%a" & set "Minor=%%b" & set "Patch=%%c")
   - cmd: set VLE_ABI=%Major%.%Minor%
@@ -88,7 +88,6 @@ after_build:
   - cmd: set PATH=%InnoSetupPath%;%OLD_PATH%
   - cmd: cd %SourcePath%\share
   - cmd: echo %PATH%
-  - cmd:  dir "%ProgramFiles(x86)%\Inno Setup 5"
   - cmd: iscc.exe vle.iss
   - cmd: set PATH=%APPVEYOR_PATH%
   - cmd: 7z a vle.zip Output\*.exe
