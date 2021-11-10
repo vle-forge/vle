@@ -87,6 +87,8 @@ build_script:
 after_build:
   - cmd: set PATH=%InnoSetupPath%;%OLD_PATH%
   - cmd: cd %SourcePath%\share
+  - cmd: echo %PATH%
+  - cmd:  dir "%ProgramFiles(x86)%\Inno Setup 5"
   - cmd: iscc.exe vle.iss
   - cmd: set PATH=%APPVEYOR_PATH%
   - cmd: 7z a vle.zip Output\*.exe
