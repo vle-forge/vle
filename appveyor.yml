@@ -27,7 +27,7 @@ before_build:
   - cmd: set MingwPath=c:\msys64\mingw32
   - cmd: set InstallPath=%APPVEYOR_BUILD_FOLDER%\install-iss
   - cmd: set BuildPath=%APPVEYOR_BUILD_FOLDER%\build
-  - cmd: set CMakePath=%ProgramFiles(x86)%\CMake
+  - cmd: set CMakePath=%ProgramFiles%\CMake
   - cmd: set InnoSetupPath="%ProgramFiles(x86)%\Inno Setup 5"
   - cmd: for /f "tokens=3 delims= " %%a in ('type %SourcePath%\CMakeLists.txt^|find "project(VLE VERSION "') do (set version=%%a)
   - cmd: for /F "tokens=1,2,3 delims=." %%a in ("%version%") do (set "Major=%%a" & set "Minor=%%b" & set "Patch=%%c")
