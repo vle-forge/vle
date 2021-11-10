@@ -21,8 +21,8 @@ install:
 before_build:
   - cmd: set OLD_PATH=C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\
   - cmd: set SourcePath=%APPVEYOR_BUILD_FOLDER%
-  - cmd: set QtDir=c:\Qt\5.12.11\mingw73_32
-  - cmd: set QtDirTools=c:\Qt\Tools\mingw730_32
+  - cmd: set QtDir=c:\Qt\5.15.2\mingw81_32
+  - cmd: set QtDirTools=c:\Qt\Tools\mingw810_32
   - cmd: set VleDeps=%APPVEYOR_BUILD_FOLDER%\VleDeps
   - cmd: set MingwPath=c:\msys64\mingw32
   - cmd: set InstallPath=%APPVEYOR_BUILD_FOLDER%\install-iss
