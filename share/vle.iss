@@ -79,6 +79,7 @@ Source: "{#MingwPath}\bin\libnghttp2-14.dll"; DestDir: "{app}\bin"; Flags: ignor
 Source: "{#MingwPath}\bin\libssh2-1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\libunistring-2.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\zlib1.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "{#MingwPath}\bin\libzstd.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\bin\curl.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "{#MingwPath}\lib\liblzma.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#MingwPath}\lib\liblzma.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
@@ -90,6 +91,8 @@ Source: "{#MingwPath}\lib\libiconv.a"; DestDir: "{app}\lib"; Flags: ignoreversio
 Source: "{#MingwPath}\lib\libiconv.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#MingwPath}\lib\libintl.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#MingwPath}\lib\libintl.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libzstd.a"; DestDir: "{app}\lib"; Flags: ignoreversion
+Source: "{#MingwPath}\lib\libzstd.dll.a"; DestDir: "{app}\lib"; Flags: ignoreversion
 Source: "{#MingwPath}\ssl\*"; DestDir: "{app}\ssl"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MingwPath}\ssl\certs\*"; DestDir: "{app}\ssl\certs"; Flags: ignoreversion recursesubdirs createallsubdirs
 
@@ -182,6 +185,7 @@ Source: "{#QtDir}\plugins\imageformats\*"; DestDir: "{app}\plugins\imageformats"
 Source: "{#QtDir}\plugins\generic\*"; DestDir: "{app}\plugins\generic"; Flags: ignoreversion
 Source: "{#QtDir}\plugins\platforms\*"; DestDir: "{app}\plugins\platforms"; Flags: ignoreversion
 Source: "{#QtDir}\plugins\platforminputcontexts\*"; DestDir: "{app}\plugins\platforminputcontexts"; Flags: ignoreversion
+Source: "{#QtDir}\plugins\platformthemes\*"; DestDir: "{app}\plugins\platformthemes"; Flags: ignoreversion
 Source: "{#QtDir}\plugins\printsupport\*"; DestDir: "{app}\plugins\printsupport"; Flags: ignoreversion
 
 
