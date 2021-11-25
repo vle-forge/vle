@@ -186,6 +186,7 @@ Source: "{#QtDir}\plugins\generic\*"; DestDir: "{app}\plugins\generic"; Flags: i
 Source: "{#QtDir}\plugins\platforms\*"; DestDir: "{app}\plugins\platforms"; Flags: ignoreversion
 Source: "{#QtDir}\plugins\platforminputcontexts\*"; DestDir: "{app}\plugins\platforminputcontexts"; Flags: ignoreversion
 Source: "{#QtDir}\plugins\platformthemes\*"; DestDir: "{app}\plugins\platformthemes"; Flags: ignoreversion
+Source: "{#QtDir}\plugins\styles\*"; DestDir: "{app}\plugins\styles"; Flags: ignoreversion
 Source: "{#QtDir}\plugins\printsupport\*"; DestDir: "{app}\plugins\printsupport"; Flags: ignoreversion
 
 
