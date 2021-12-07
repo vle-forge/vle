@@ -128,7 +128,7 @@ public:
       const vle::devs::ObservationEvent& event) const override
     {
         // Example:
-        // return vle::Double::create(123.321);
+        // return vle::value::Double::create(123.321);
 
         return vle::devs::Dynamics::observation(event);
     }
