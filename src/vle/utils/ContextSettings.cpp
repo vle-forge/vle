@@ -51,7 +51,7 @@
     "cmake.exe --build '%1%' "                                                \
     "--target package_source"
 #define VLE_COMMAND_TAR "cmake.exe -E tar jcf '%1%' '%2%'"
-#define VLE_COMMAND_UNTAR "cmake.exe -E tar jxf '%1%' ."
+#define VLE_COMMAND_UNTAR "cmake.exe -E tar jxf '%1%'"
 #define VLE_COMMAND_URL_GET "curl.exe -L '%1%' -o '%2%'"
 #define VLE_COMMAND_DIR_COPY "cmake.exe -E copy_directory '%1%' '%2%'"
 #define VLE_COMMAND_DIR_REMOVE "cmake.exe -E remove_directory '%1%'"
