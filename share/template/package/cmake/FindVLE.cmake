@@ -108,7 +108,7 @@ foreach (_find_vle_test_version ${_find_vle_all_versions})
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\Wow6432Node\\VLE ${_find_vle_test_version};]/bin"
       NO_DEFAULT_PATH)
 
-    find_path(_vle_base_lib libvle-${_find_vle_test_version}.a PATHS
+    find_path(_vle_base_lib libvle-${_find_vle_test_version}.dll.a PATHS
       $ENV{VLE_BASEPATH}/lib
       ${VLE_BASEPATH_LOCAL}/lib
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\VLE Development Team\\VLE ${_find_vle_test_version};Path]/lib"
@@ -124,14 +124,13 @@ foreach (_find_vle_test_version ${_find_vle_all_versions})
 
     if(_vle_base_include AND _vle_base_bin AND _vle_base_lib)
       set(VLE_INCLUDE_DIRS
-        ${_vle_base_include}/vle-${_find_vle_test_version}; ${_vle_base_include};
-        ${_vle_base_include}/libxml2)
+        ${_vle_base_include}/vle-${_find_vle_test_version}; ${_vle_base_include})
 
       set(VLE_LIBRARY_DIRS
         ${_vle_base_bin};${_vle_base_lib})
 
       set(VLE_LIBRARIES
-        vle-${_find_vle_test_version} xml2 intl)
+        vle-${_find_vle_test_version} expat intl)
 
       set (VLE_SHARE_DIR "${_vle_base_include}/../share/vle-${_find_vle_test_version}")
 
