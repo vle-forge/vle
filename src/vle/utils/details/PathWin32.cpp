@@ -83,8 +83,13 @@ Context::findInstallPrefix()
                                         "SOFTWARE\\VLE Development Team\\VLE",
                                         std::get<0>(version),
                                         std::get<1>(version));
+        std::string keywow = utils::format("%s %d.%d",
+                                        "SOFTWARE\\WOW6432Node\\VLE Development Team\\VLE",
+                                        std::get<0>(version),
+                                        std::get<1>(version));
 
         auto widekey = from_utf8_to_wide(key);
+        auto widekeywow = from_utf8_to_wide(keywow);
 
         HKEY hkey;
         bool result;
@@ -92,6 +97,29 @@ Context::findInstallPrefix()
 
         if (RegOpenKeyExW(HKEY_LOCAL_MACHINE,
                           widekey.c_str(),
+                          0,
+                          KEY_QUERY_VALUE,
+                          &hkey) == ERROR_SUCCESS) {
+            result = win32_RegQueryValue(hkey, &prefix);
+            RegCloseKey(hkey);
+
+            if (result)
+                return utils::Path(prefix);
+        }
+
+        if (RegOpenKeyExW(
+              HKEY_CURRENT_USER, widekey.c_str(), 0, KEY_QUERY_VALUE, &hkey) ==
+            ERROR_SUCCESS) {
+            result = win32_RegQueryValue(hkey, &prefix);
+            RegCloseKey(hkey);
+
+            if (result)
+                return utils::Path(prefix);
+        }
+
+
+ 	if (RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+                          widekeywow.c_str(),
                           0,
                           KEY_QUERY_VALUE,
                           &hkey) == ERROR_SUCCESS) {
