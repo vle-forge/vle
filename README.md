@@ -5,10 +5,10 @@ Virtual Laboratory Environment 2.1
 | :---- | :---- |
 [ ![Linux build status][1]][2] | [![Windows build status][3]][4] |
 
-[1]: https://travis-ci.org/vle-forge/vle.svg?branch=master
-[2]: https://travis-ci.org/vle-forge/vle?branch=master
-[3]: https://ci.appveyor.com/api/projects/status/github/vle-forge/vle?branch=master&svg=true
-[4]: https://ci.appveyor.com/project/quesnel/vle?branch=master
+[1]: https://travis-ci.org/vle-forge/vle.svg?branch=master2.1
+[2]: https://travis-ci.org/vle-forge/vle?branch=master2.1
+[3]: https://ci.appveyor.com/api/projects/status/github/vle-forge/vle?branch=master2.1&svg=true
+[4]: https://ci.appveyor.com/project/quesnel/vle?branch=master2.1
 
 See AUTHORS and COPYRIGHT for the list of contributors.
 
