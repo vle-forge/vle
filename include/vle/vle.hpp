@@ -27,6 +27,7 @@
 #ifndef VLE_MAIN_INIT_HPP
 #define VLE_MAIN_INIT_HPP
 
+#include <string>
 #include <tuple>
 #include <vle/DllDefines.hpp>
 
@@ -38,8 +39,7 @@ namespace vle {
  * integer version and the extra version as a string (may be empty).
  * @return A @c std::tuple.
  */
-std::tuple<int, int, int> VLE_API
-version();
+std::tuple<int, int, int> VLE_API version();
 
 /**
  * @brief Returns major and minor version of the libvle library.
@@ -47,8 +47,7 @@ version();
  * major and minor version.
  * @return A @c std::tuple.
  */
-std::tuple<int, int> VLE_API
-version_abi();
+std::tuple<int, int> VLE_API version_abi();
 
 /**
  * @brief Returns a string representation of the version of the libvle library.
@@ -56,8 +55,7 @@ version_abi();
  * "1.1.0, 2.0.0, 2.0.0-alpha1").
  * @return A @c std::string that represents the version of the libvle library.
  */
-std::string VLE_API
-string_version();
+std::string VLE_API string_version();
 
 /**
  * @brief Returns a string representation of the ABI version of the libvle
@@ -66,8 +64,7 @@ string_version();
  * "1.1, 2.0").
  * @return A @c std::string that represents the version of the libvle library.
  */
-std::string VLE_API
-string_version_abi();
-}
+std::string VLE_API string_version_abi();
+}  // namespace vle
 
 #endif
