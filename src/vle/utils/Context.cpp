@@ -183,21 +183,22 @@ Context::Context(const Path& /* prefix */)
     }
 
     {
-        this->debug(_("Environment\n"));
-        LPWCH env = ::GetEnvironmentStringsW();
-        for (LPWSTR vars = static_cast<PWSTR>(env); *vars;
-             vars += wcslen(vars) + 1) {
-            try {
-                std::wstring str(vars);
-
-                if (not str.empty() or str[0] != L'=' or
-                    str.find(L'=') != str.npos)
-                    this->debug(_("%s\n"), from_wide_to_utf8(str).c_str());
-            } catch (const std::exception& /*e*/) {
-            }
-        }
-
-        FreeEnvironmentStringsW(env);
+        //// Uncomment to print environment variables
+        //this->debug(_("Environment\n"));
+        //LPWCH env = ::GetEnvironmentStringsW();
+        //for (LPWSTR vars = static_cast<PWSTR>(env); *vars;
+        //     vars += wcslen(vars) + 1) {
+        //    try {
+        //        std::wstring str(vars);
+        //
+        //        if (not str.empty() or str[0] != L'=' or
+        //            str.find(L'=') != str.npos)
+        //            this->debug(_("%s\n"), from_wide_to_utf8(str).c_str());
+        //    } catch (const std::exception& /*e*/) {
+        //    }
+        //}
+        //
+        //FreeEnvironmentStringsW(env);
     }
 #endif
 
