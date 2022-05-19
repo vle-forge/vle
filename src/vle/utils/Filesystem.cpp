@@ -27,7 +27,6 @@
 #include <Windows.h>
 
 #include "utils/details/UtilsWin.hpp"
-#include <ctime>
 #endif
 
 #include <array>
@@ -464,11 +463,7 @@ Path
 Path::unique_path(const std::string& model)
 {
     std::mt19937 rng;
-#if defined _WIN32
-    rng.seed(static_cast<unsigned int>(std::time(0)));
-#else
     rng.seed(std::random_device{}());
-#endif
     std::uniform_int_distribution<std::mt19937::result_type> distribution(0,
                                                                           16);
 
