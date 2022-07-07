@@ -125,6 +125,13 @@ config_views(vpz::Vpz& model,
             }
             vle::vpz::AtomicModel* atomMod = baseModel->findModelFromPath(
                     atomPath)->toAtomic();
+	    if (not atomMod) {
+		 err.code = -1;
+		 err.message = utils::format(
+		        "[Manager]: atomic model not found : '%s'",
+                       atomPath.c_str());
+                return ;
+	    }
             obsPort = atomMod->observables() + "," + obsPort;
             obsAndPortTokeep.insert(obsPort);
         }
