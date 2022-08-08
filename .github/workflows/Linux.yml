@@ -2,9 +2,9 @@ name: Linux
 
 on:
   push:
-    branches: [ master, test ]
+    branches: [ master, master2.1, test ]
   pull_request:
-    branches: [ master, test ]
+    branches: [ master, master2.1, test ]
 
 env:
   TEST_OUTPUT_ON_FAILURE: 1
