@@ -113,7 +113,6 @@ public:
             devs::RootCoordinator root(m_context);
 
             const double duration = vpz->project().experiment().duration();
-            const double begin = vpz->project().experiment().begin();
 
             m_context->debug(utils::format(_("[%s]\n"),
                     vpz->filename().c_str()));
