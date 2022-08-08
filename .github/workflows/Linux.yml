@@ -1,0 +1,39 @@
+name: Linux
+
+on:
+  push:
+    branches: [ master, test ]
+  pull_request:
+    branches: [ master, test ]
+
+env:
+  TEST_OUTPUT_ON_FAILURE: 1
+  CC: gcc-10
+  CXX: g++-10
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        BUILD_TYPE: [Debug, RelWithDebInfo, Release]
+      
+    steps:
+    - name: Checkout repository and submodule
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install cmake asciidoctor libboost-dev libopenmpi-dev libexpat1-dev qttools5-dev qttools5-dev-tools qtbase5-dev qtbase5-dev-tools libqt5svg5-dev qtchooser qt5-default
+      
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{matrix.BUILD_TYPE}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C ${{env.BUILD_TYPE}}
+      
