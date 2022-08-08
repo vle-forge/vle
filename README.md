@@ -3,7 +3,7 @@ Virtual Laboratory Environment 2.1
 
 | Linux | Windows |
 | :---- | :---- |
-[![Linux](https://github.com/vle-forge/vle/actions/workflows/Linux.yml/badge.svg)](https://github.com/vle-forge/vle/actions/workflows/Linux.yml)| [![Windows build status][3]][4] |
+[![Linux](https://github.com/vle-forge/vle/actions/workflows/Linux.yml/badge.svg?branch=master2.1)](https://github.com/vle-forge/vle/actions/workflows/Linux.yml) | [![Windows build status][3]][4] |
 
 [3]: https://ci.appveyor.com/api/projects/status/github/vle-forge/vle?branch=master&svg=true
 [4]: https://ci.appveyor.com/project/quesnel/vle?branch=master
