@@ -213,7 +213,7 @@ class DescriptionParser
         if (c == '<' or c == '>') {
             c = get();
 
-            if (c == '=' or c == '=')
+            if (c == '=')
                 str.append(1, static_cast<char>(c));
             else
                 unget();
