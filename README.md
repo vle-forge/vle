@@ -23,7 +23,7 @@ For the VFL API:
 * expat (≥ 2.0)
 * boost (≥ 1.47)
 * cmake (≥ 3.5)
-T c++ compiler (gcc ≥ 4.9, clang ≥ 3.3, intel icc (≥ 11.0)
+* c++ compiler (gcc ≥ 4.9, clang ≥ 3.3, intel icc (≥ 11.0)
 
 For the MPI command line:
 
