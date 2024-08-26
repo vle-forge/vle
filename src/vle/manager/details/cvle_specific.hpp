@@ -7,6 +7,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <cstdlib>
+
 #include <vle/value/Set.hpp>
 #include <vle/value/Tuple.hpp>
 
@@ -241,9 +243,16 @@ cvle_read_Matrix(std::ifstream& outFile, std::string& line,
                         value::Double::create(
                                 std::numeric_limits<double>::max()));
             } else {
+                char *end = nullptr;               
+                errno = 0;
+                double value = strtod(tokens[c].c_str(), &end);
+                if (value == 0 && errno == ERANGE) {
+	            throw std::out_of_range("Out of range value in cvle");
+                }
                 viewMatrix->set(c,viewMatrix->rows()-1,
-                        value::Double::create(
-                                std::stod(tokens[c])));
+                        value::Double::create(value));
+                
+                                 
             }
         }
     }
